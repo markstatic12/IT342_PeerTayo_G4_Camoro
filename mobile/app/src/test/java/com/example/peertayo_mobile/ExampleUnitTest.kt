@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.peertayo_mobile
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.peertayo_mobile
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
