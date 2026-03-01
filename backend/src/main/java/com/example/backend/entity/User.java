@@ -1,7 +1,6 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,11 +11,6 @@ import java.util.Set;
 @Entity
 @Table(name = "users",
         uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class User {
 
     @Id
@@ -41,7 +35,6 @@ public class User {
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
-    @Builder.Default
     private EProvider provider = EProvider.LOCAL;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -50,7 +43,6 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     @CreationTimestamp
@@ -60,4 +52,65 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public User() {}
+
+    public User(Long id, String firstName, String lastName, String email, String passwordHash,
+                EProvider provider, Set<Role> roles, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.provider = provider != null ? provider : EProvider.LOCAL;
+        this.roles = roles != null ? roles : new HashSet<>();
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public Long getId() { return id; }
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public String getEmail() { return email; }
+    public String getPasswordHash() { return passwordHash; }
+    public EProvider getProvider() { return provider; }
+    public Set<Role> getRoles() { return roles; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setEmail(String email) { this.email = email; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+    public void setProvider(EProvider provider) { this.provider = provider; }
+    public void setRoles(Set<Role> roles) { this.roles = roles; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public static Builder builder() { return new Builder(); }
+
+    public static class Builder {
+        private Long id;
+        private String firstName;
+        private String lastName;
+        private String email;
+        private String passwordHash;
+        private EProvider provider = EProvider.LOCAL;
+        private Set<Role> roles = new HashSet<>();
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
+
+        public Builder id(Long id) { this.id = id; return this; }
+        public Builder firstName(String firstName) { this.firstName = firstName; return this; }
+        public Builder lastName(String lastName) { this.lastName = lastName; return this; }
+        public Builder email(String email) { this.email = email; return this; }
+        public Builder passwordHash(String passwordHash) { this.passwordHash = passwordHash; return this; }
+        public Builder provider(EProvider provider) { this.provider = provider; return this; }
+        public Builder roles(Set<Role> roles) { this.roles = roles; return this; }
+
+        public User build() {
+            return new User(id, firstName, lastName, email, passwordHash, provider, roles, createdAt, updatedAt);
+        }
+    }
 }

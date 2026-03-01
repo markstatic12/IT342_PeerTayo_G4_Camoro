@@ -1,17 +1,9 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "roles")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Role {
 
     @Id
@@ -21,4 +13,16 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @Column(length = 20, unique = true, nullable = false)
     private ERole name;
+
+    public Role() {}
+
+    public Role(Long id, ERole name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Long getId() { return id; }
+    public ERole getName() { return name; }
+    public void setId(Long id) { this.id = id; }
+    public void setName(ERole name) { this.name = name; }
 }

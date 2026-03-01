@@ -5,8 +5,8 @@ import com.example.backend.entity.ERole;
 import com.example.backend.entity.Role;
 import com.example.backend.repository.CriteriaRepository;
 import com.example.backend.repository.RoleRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +17,17 @@ import java.util.List;
  * Seeds: roles (RESPONDENT, FACILITATOR) and the 10 fixed evaluation criteria.
  */
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class DatabaseSeeder implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(DatabaseSeeder.class);
 
     private final RoleRepository roleRepository;
     private final CriteriaRepository criteriaRepository;
+
+    public DatabaseSeeder(RoleRepository roleRepository, CriteriaRepository criteriaRepository) {
+        this.roleRepository = roleRepository;
+        this.criteriaRepository = criteriaRepository;
+    }
 
     @Override
     public void run(String... args) {

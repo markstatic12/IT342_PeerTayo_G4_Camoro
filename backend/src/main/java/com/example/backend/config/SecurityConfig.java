@@ -2,7 +2,6 @@ package com.example.backend.config;
 
 import com.example.backend.security.JwtAuthenticationFilter;
 import com.example.backend.security.UserDetailsServiceImpl;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +29,6 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -39,6 +37,14 @@ public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,
+                          UserDetailsServiceImpl userDetailsService,
+                          JwtAuthEntryPoint jwtAuthEntryPoint) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.userDetailsService = userDetailsService;
+        this.jwtAuthEntryPoint = jwtAuthEntryPoint;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

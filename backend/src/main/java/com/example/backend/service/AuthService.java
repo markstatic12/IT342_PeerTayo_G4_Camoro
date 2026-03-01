@@ -18,8 +18,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,9 +36,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -50,6 +50,19 @@ public class AuthService {
 
     @Value("${app.google.client-id}")
     private String googleClientId;
+
+    public AuthService(UserRepository userRepository, RoleRepository roleRepository,
+                       PasswordEncoder passwordEncoder, JwtService jwtService,
+                       AuthenticationManager authenticationManager,
+                       UserDetailsService userDetailsService, EmailService emailService) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
+        this.emailService = emailService;
+    }
 
     // ── Register ─────────────────────────────────────────────────────────────
 
