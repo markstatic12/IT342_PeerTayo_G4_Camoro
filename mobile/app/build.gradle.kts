@@ -7,6 +7,11 @@ android {
     namespace = "com.example.peertayo_mobile"
     compileSdk = 34
 
+    compileOptions {
+        // Support for Java 17 features
+        isCoreLibraryDesugaringEnabled = true
+    }
+
     defaultConfig {
         applicationId = "com.example.peertayo_mobile"
         minSdk = 24
@@ -27,11 +32,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 
@@ -42,6 +47,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    
+    // Desugaring for Java 17 API support on older Android versions
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
