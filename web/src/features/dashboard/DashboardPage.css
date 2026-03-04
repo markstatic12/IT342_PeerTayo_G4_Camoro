@@ -1,0 +1,17 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Dashboard Page
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.dashboard__header {
+  margin-bottom: var(--space-xl);
+}
+.dashboard__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: var(--space-xs);
+}
+.dashboard__subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
