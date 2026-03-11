@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.1</version>
+		<version>3.5.0</version>
 		<relativePath/>
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>backend</artifactId>
+	<groupId>edu.cit.camoro</groupId>
+	<artifactId>peertayo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>peertayo-backend</name>
 	<description>PeerTayo - Criteria-Based Peer Evaluation System Backend</description>
@@ -97,6 +97,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- Google OAuth 2.0 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>
 
 	</dependencies>
