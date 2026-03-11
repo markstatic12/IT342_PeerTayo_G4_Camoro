@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -10,6 +11,7 @@ import {
   SettingsIcon,
   LogoutIcon,
 } from '../components/icons/Icons';
+import Toast from '../components/ui/Toast';
 import './Sidebar.css';
 
 const mainMenu = [
@@ -26,10 +28,17 @@ const manageMenu = [
 export default function Sidebar() {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await logout();
+    setIsLoggingOut(false);
+    setShowConfirm(false);
+    setShowToast(true);
+    setTimeout(() => navigate('/login', { replace: true }), 1800);
   };
 
   return (
@@ -78,11 +87,42 @@ export default function Sidebar() {
           <SettingsIcon size={18} />
           Settings
         </NavLink>
-        <button className="sidebar__footer-link" onClick={handleLogout}>
-          <LogoutIcon size={18} />
-          Sign Out
-        </button>
+
+        {showConfirm ? (
+          <div className="sidebar__confirm">
+            <p className="sidebar__confirm-text">Sign out of PeerTayo?</p>
+            <div className="sidebar__confirm-actions">
+              <button
+                className="sidebar__confirm-btn sidebar__confirm-btn--cancel"
+                onClick={() => setShowConfirm(false)}
+                disabled={isLoggingOut}
+              >
+                Cancel
+              </button>
+              <button
+                className="sidebar__confirm-btn sidebar__confirm-btn--danger"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? 'Signing out…' : 'Yes, sign out'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button className="sidebar__footer-link" onClick={() => setShowConfirm(true)}>
+            <LogoutIcon size={18} />
+            Sign Out
+          </button>
+        )}
       </div>
+
+      {showToast && (
+        <Toast
+          message="You have been signed out successfully."
+          onDismiss={() => setShowToast(false)}
+          duration={1800}
+        />
+      )}
     </aside>
   );
 }
