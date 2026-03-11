@@ -59,15 +59,36 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  const loginWithToken = async (jwt) => {
+    try {
+      const res = await api.get('/auth/me', {
+        headers: { Authorization: `Bearer ${jwt}` },
+      });
+      const userData = res.data.data;
+      setToken(jwt);
+      setUser(userData);
+      return { success: true, user: userData };
+    } catch (err) {
+      return { success: false, message: 'Failed to fetch user info after Google sign-in' };
+    }
+  };
+
+  const logout = async () => {
+    try {
+      // Tell the server to blacklist the current token immediately
+      await api.post('/auth/logout');
+    } catch {
+      // Token may already be expired or server unreachable — still clear locally
+    } finally {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, loginWithToken, isAuthenticated: !!token }}>
       {children}
     </AuthContext.Provider>
   );

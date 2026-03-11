@@ -4,6 +4,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
+import AuthCallbackPage from './features/auth/AuthCallbackPage';
 import DashboardPage from './features/dashboard/DashboardPage';
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>

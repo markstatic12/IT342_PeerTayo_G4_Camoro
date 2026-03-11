@@ -13,6 +13,10 @@ export default function LoginPage() {
   const { login, loading } = useAuth();
   const navigate = useNavigate();
 
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -60,7 +64,7 @@ export default function LoginPage() {
         <span>or continue with</span>
       </div>
 
-      <button className="auth-social-btn" type="button">
+      <button className="auth-social-btn" type="button" onClick={handleGoogleLogin}>
         <GoogleIcon size={18} />
         Continue with Google
       </button>
