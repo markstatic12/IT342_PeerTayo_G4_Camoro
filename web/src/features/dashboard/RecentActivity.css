@@ -1,0 +1,117 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   RecentActivity — Activity feed on the Dashboard
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.recent-activity {
+  margin-top: var(--space-xl);
+}
+
+.recent-activity__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+.recent-activity__title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+}
+.recent-activity__view-all {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family);
+}
+.recent-activity__view-all:hover {
+  color: var(--color-primary-hover);
+}
+
+/* ── Cards grid ────────────────────────────────────────────────────────── */
+.recent-activity__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-md);
+}
+
+.activity-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: box-shadow var(--transition-fast);
+}
+.activity-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.activity-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.activity-card__icon--info {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.activity-card__icon--success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+.activity-card__icon--warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.activity-card__body {
+  flex: 1;
+  min-width: 0;
+}
+.activity-card__title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+.activity-card__desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xs);
+}
+.activity-card__time {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Empty state ───────────────────────────────────────────────────────── */
+.recent-activity__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-2xl) var(--space-xl);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+}
+.recent-activity__empty p {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text-secondary);
+}
+.recent-activity__empty span {
+  font-size: var(--font-size-sm);
+}
