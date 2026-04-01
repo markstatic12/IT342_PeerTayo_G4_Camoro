@@ -1,0 +1,74 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   PeerTayo — Design Tokens
+   Color palette derived from the Facilitator Dashboard mockup (Image 4)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Primary ─────────────────────────────────────────────────────────── */
+  --color-primary:        #0DCAF0;
+  --color-primary-hover:  #0BB4D8;
+  --color-primary-light:  #E0F7FA;
+  --color-primary-dark:   #0A9AB8;
+
+  /* ── Neutrals ────────────────────────────────────────────────────────── */
+  --color-bg:             #F0F4F8;
+  --color-surface:        #FFFFFF;
+  --color-border:         #E2E8F0;
+  --color-border-light:   #F1F5F9;
+
+  /* ── Text ────────────────────────────────────────────────────────────── */
+  --color-text:           #1B2A4A;
+  --color-text-secondary: #6B7B93;
+  --color-text-muted:     #94A3B8;
+
+  /* ── Semantic ────────────────────────────────────────────────────────── */
+  --color-success:        #22C55E;
+  --color-success-light:  #DCFCE7;
+  --color-warning:        #F97316;
+  --color-warning-light:  #FFF7ED;
+  --color-error:          #EF4444;
+  --color-error-light:    #FEF2F2;
+
+  /* ── Dark / Accent ───────────────────────────────────────────────────── */
+  --color-dark:           #1E293B;
+  --color-dark-soft:      #334155;
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  --font-family:          'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+                          'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-size-xs:         0.75rem;   /* 12px */
+  --font-size-sm:         0.8125rem; /* 13px */
+  --font-size-base:       0.875rem;  /* 14px */
+  --font-size-md:         1rem;      /* 16px */
+  --font-size-lg:         1.25rem;   /* 20px */
+  --font-size-xl:         1.5rem;    /* 24px */
+  --font-size-2xl:        1.75rem;   /* 28px */
+  --font-size-3xl:        2rem;      /* 32px */
+
+  /* ── Spacing ─────────────────────────────────────────────────────────── */
+  --space-xs:             0.25rem;
+  --space-sm:             0.5rem;
+  --space-md:             1rem;
+  --space-lg:             1.5rem;
+  --space-xl:             2rem;
+  --space-2xl:            3rem;
+
+  /* ── Layout ──────────────────────────────────────────────────────────── */
+  --sidebar-width:        240px;
+  --topbar-height:        64px;
+
+  /* ── Radii ───────────────────────────────────────────────────────────── */
+  --radius-sm:            6px;
+  --radius-md:            10px;
+  --radius-lg:            14px;
+  --radius-full:          9999px;
+
+  /* ── Shadows ─────────────────────────────────────────────────────────── */
+  --shadow-sm:            0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md:            0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg:            0 8px 24px rgba(0, 0, 0, 0.12);
+
+  /* ── Transitions ─────────────────────────────────────────────────────── */
+  --transition-fast:      150ms ease;
+  --transition-base:      250ms ease;
+}

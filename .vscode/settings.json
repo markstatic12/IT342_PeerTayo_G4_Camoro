@@ -2,14 +2,14 @@
     "java.compile.nullAnalysis.mode": "disabled",
     "java.configuration.runtimes": [
         {
-            "name": "JavaSE-21",
-            "path": "C:\\Program Files\\Java\\jdk-21",
+            "name": "JavaSE-17",
+            "path": "C:\\Program Files\\Java\\jdk-17",
             "default": true
         },
         {
-            "name": "JavaSE-23",
-            "path": "C:\\Program Files\\Java\\jdk-23"
+            "name": "JavaSE-21",
+            "path": "C:\\Program Files\\Java\\jdk-21"
         }
     ],
-    "java.jdt.ls.java.home": "C:\\Program Files\\Java\\jdk-21"
+    "java.jdt.ls.lombokSupport.enabled": true
 }
