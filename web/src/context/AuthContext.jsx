@@ -1,37 +1,44 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api/axios';
+import { authSession } from '../features/auth/patterns/AuthSessionFacade';
+import { authEventBus, AUTH_EVENTS } from '../features/auth/patterns/AuthEventBus';
+import { adaptAuthPayload, adaptUserPayload } from '../features/auth/patterns/AuthResponseAdapter';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('user');
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [user, setUser] = useState(() => authSession.getUser());
+  const [token, setToken] = useState(() => authSession.getToken());
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (token) {
-      localStorage.setItem('token', token);
-    } else {
-      localStorage.removeItem('token');
-    }
+    authSession.setToken(token);
   }, [token]);
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
+    authSession.setUser(user);
   }, [user]);
+
+  useEffect(() => {
+    const unsubscribeUnauthorized = authEventBus.on(AUTH_EVENTS.UNAUTHORIZED, () => {
+      setUser(null);
+      setToken(null);
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    });
+
+    return () => {
+      unsubscribeUnauthorized();
+    };
+  }, []);
 
   const register = async (firstName, lastName, email, password) => {
     setLoading(true);
     try {
       const res = await api.post('/auth/register', { firstName, lastName, email, password });
-      const { user: userData, token: jwt } = res.data.data;
+      const { user: userData, token: jwt } = adaptAuthPayload(res.data.data);
       setUser(userData);
       setToken(jwt);
       return { success: true };
@@ -47,7 +54,7 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const res = await api.post('/auth/login', { email, password });
-      const { user: userData, token: jwt } = res.data.data;
+      const { user: userData, token: jwt } = adaptAuthPayload(res.data.data);
       setUser(userData);
       setToken(jwt);
       return { success: true };
@@ -64,11 +71,11 @@ export function AuthProvider({ children }) {
       const res = await api.get('/auth/me', {
         headers: { Authorization: `Bearer ${jwt}` },
       });
-      const userData = res.data.data;
+      const { user: userData } = adaptUserPayload(res.data.data);
       setToken(jwt);
       setUser(userData);
       return { success: true, user: userData };
-    } catch (err) {
+    } catch {
       return { success: false, message: 'Failed to fetch user info after Google sign-in' };
     }
   };
@@ -82,8 +89,8 @@ export function AuthProvider({ children }) {
     } finally {
       setUser(null);
       setToken(null);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      authSession.clearSession();
+      authEventBus.emit(AUTH_EVENTS.LOGGED_OUT);
     }
   };
 

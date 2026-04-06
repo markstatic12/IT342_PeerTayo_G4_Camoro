@@ -1,30 +1,30 @@
-import axios from 'axios';
+import { createApiClient } from './apiClientFactory';
+import { authSession } from '../features/auth/patterns/AuthSessionFacade';
+import { authEventBus, AUTH_EVENTS } from '../features/auth/patterns/AuthEventBus';
 
-const api = axios.create({
+const api = createApiClient({
   baseURL: 'http://localhost:8080/api/v1',
-  headers: { 'Content-Type': 'application/json' },
-});
+  defaultHeaders: { 'Content-Type': 'application/json' },
+  configureInterceptors: (client) => {
+    client.interceptors.request.use((config) => {
+      const token = authSession.getToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    });
 
-// Attach JWT token to every request if available
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+    client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          authSession.clearSession();
+          authEventBus.emit(AUTH_EVENTS.UNAUTHORIZED, { reason: 'token-expired-or-invalid' });
+        }
+        return Promise.reject(error);
+      }
+    );
+  },
 });
-
-// Auto-logout on 401
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
 
 export default api;
