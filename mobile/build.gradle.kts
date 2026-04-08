@@ -2,12 +2,5 @@
 plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.jetbrainsKotlinAndroid) apply false
-}
-
-// Configure Java toolchain for all subprojects
-subprojects {
-    tasks.withType<JavaCompile>().configureEach {
-        sourceCompatibility = JavaVersion.VERSION_17.toString()
-        targetCompatibility = JavaVersion.VERSION_17.toString()
-    }
+    id("com.google.dagger.hilt.android") version "2.48" apply false
 }
