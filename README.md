@@ -39,51 +39,113 @@ To keep the system simple and maintainable, the following features are intention
 
 ## Technology Stack
 
-Replace these with your actual technologies if different:
-
-- **Frontend:** JavaScript / Framework (React)
-- **Backend:** Spring Boot
+- **Frontend:** React + Vite
+- **Backend:** Spring Boot (Java)
+- **Mobile:** Android (Kotlin) - MVVM + Clean Architecture
 - **Database:** MySQL
-- **Authentication:** JWT / Session-based
+- **Authentication:** JWT
 - **Version Control:** Git & GitHub
+
+## Project Structure
+
+```
+IT342_PeerTayo_G4_Camoro/
+├── backend/          # Spring Boot REST API
+├── web/              # React frontend application
+├── mobile/           # Android app (Kotlin)
+│   ├── app/
+│   │   └── src/main/java/com/example/peertayo_mobile/
+│   │       ├── core/         # Base classes
+│   │       ├── data/         # Data layer (API, Database, Repository)
+│   │       ├── domain/       # Business logic (Models, Use Cases)
+│   │       ├── ui/           # UI layer (Activities, ViewModels)
+│   │       ├── di/           # Dependency Injection (Hilt)
+│   │       └── utils/        # Utilities
+│   ├── README.md             # Mobile app documentation
+│   ├── TESTING.md            # Testing guide
+│   └── setup_folders.bat     # Folder structure setup script
+└── docs/             # Project documentation and SDD
+```
 
 ## Getting Started
 
-These are example steps — adjust to your actual project setup.
+### Backend Setup
 
-1. Clone the repository:
-
-   ```bash
-   git clone <your-repo-url>
-   cd <repo-folder>
-   ```
-
-2. Backend (Spring Boot / Maven):
-
+1. Navigate to backend directory:
    ```bash
    cd backend
+   ```
+
+2. Configure database in `application.properties`
+
+3. Run the Spring Boot application:
+   ```bash
    ./mvnw spring-boot:run    # or mvnw.cmd on Windows
    ```
 
-3. Frontend (if React / Vite):
+4. Backend will be available at: `http://localhost:8080`
 
+### Frontend Setup
+
+1. Navigate to web directory:
    ```bash
    cd web
+   ```
+
+2. Install dependencies:
+   ```bash
    npm install
+   ```
+
+3. Run development server:
+   ```bash
    npm run dev
    ```
 
-4. Database:
+4. Frontend will be available at the URL shown in terminal
 
-   - Configure the connection in `backend/src/main/resources/application.properties`.
-   - Run migrations or allow JPA/Hibernate to create schema (if configured).
+### Mobile Setup (Android)
 
-## Project Structure (high-level)
+1. **Prerequisites:**
+   - Android Studio installed
+   - Android SDK configured
+   - JDK 17 or higher
 
-- `backend/` — Spring Boot application and API
-- `web/` — Frontend app (React / Vite)
-- `mobile/` — Mobile app (optional)
-- `docs/` — Project documentation and help files
+2. **Configure Backend URL:**
+   - Open `mobile/app/src/main/java/com/example/peertayo_mobile/utils/Constants.kt`
+   - For emulator: `BASE_URL = "http://10.0.2.2:8080/"`
+   - For physical device: `BASE_URL = "http://YOUR_IP:8080/"`
+
+3. **Build and Run:**
+   - Open `mobile/` folder in Android Studio
+   - Sync Gradle files
+   - Run on emulator or device
+
+4. **Detailed Instructions:**
+   - See `mobile/README.md` for complete setup guide
+   - See `mobile/TESTING.md` for testing instructions
+
+## Mobile App Features
+
+✅ **Implemented:**
+- User Registration with validation
+- User Login with JWT authentication
+- Secure token storage (EncryptedSharedPreferences)
+- Main dashboard with user info
+- Logout functionality
+- Clean Architecture (MVVM + Clean Architecture)
+- Dependency Injection with Hilt
+- Offline caching with Room
+- Reactive UI with Kotlin Flow
+
+## API Endpoints
+
+### Authentication
+- `POST /api/v1/auth/register` - Register new user
+- `POST /api/v1/auth/login` - Login user
+- `GET /api/v1/auth/me` - Get current user info
+- `POST /api/v1/auth/logout` - Logout user
+
 
 ## Contributing
 
