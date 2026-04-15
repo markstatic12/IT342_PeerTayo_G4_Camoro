@@ -5,7 +5,8 @@ import AppLayout from './layouts/AppLayout';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
 import AuthCallbackPage from './features/auth/AuthCallbackPage';
-import DashboardPage from './features/dashboard/DashboardPage';
+import DashboardPage from './pages/dashboard/DashboardPage';
+import CreateEvaluationPage from './pages/forms/CreateEvaluationPage';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/forms-created" element={<CreateEvaluationPage />} />
               {/* Future feature routes */}
             </Route>
           </Route>
