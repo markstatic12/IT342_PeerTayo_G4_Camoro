@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Input, Button, Toast } from '../../components/ui';
 import { GoogleIcon } from '../../components/icons/Icons';
 import AuthLayout from './AuthLayout';
+import { createOAuthProvider } from './patterns/OAuthProviderFactory';
 
 export default function RegisterPage() {
   const [firstName, setFirstName] = useState('');
@@ -15,9 +16,10 @@ export default function RegisterPage() {
   const [toast, setToast] = useState(false);
   const { register, loading } = useAuth();
   const navigate = useNavigate();
+  const googleProvider = createOAuthProvider('google');
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    window.location.href = googleProvider.loginUrl;
   };
 
   const handleSubmit = async (e) => {
