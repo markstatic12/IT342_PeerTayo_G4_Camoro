@@ -1,9 +1,11 @@
 import { createApiClient } from './apiClientFactory';
-import { authSession } from '../features/auth/patterns/AuthSessionFacade';
-import { authEventBus, AUTH_EVENTS } from '../features/auth/patterns/AuthEventBus';
+import { authSession } from '../utils/auth/AuthSession';
+import { authEventBus, AUTH_EVENTS } from '../utils/auth/AuthEventBus';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 const api = createApiClient({
-  baseURL: 'http://localhost:8080/api/v1',
+  baseURL: API_BASE_URL,
   defaultHeaders: { 'Content-Type': 'application/json' },
   configureInterceptors: (client) => {
     client.interceptors.request.use((config) => {
