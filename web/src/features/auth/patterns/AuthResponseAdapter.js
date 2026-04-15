@@ -1,13 +1,1 @@
-export function adaptAuthPayload(payload) {
-  return {
-    user: payload?.user ?? null,
-    token: payload?.token ?? null,
-  };
-}
-
-export function adaptUserPayload(payload) {
-  return {
-    user: payload ?? null,
-    token: null,
-  };
-}
+export { adaptAuthPayload, adaptUserPayload } from '../../../utils/auth/AuthResponseAdapter';

@@ -1,9 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api/axios';
-import { authSession } from '../features/auth/patterns/AuthSessionFacade';
-import { authEventBus, AUTH_EVENTS } from '../features/auth/patterns/AuthEventBus';
-import { adaptAuthPayload, adaptUserPayload } from '../features/auth/patterns/AuthResponseAdapter';
+import { authSession } from '../utils/auth/AuthSession';
+import { authEventBus, AUTH_EVENTS } from '../utils/auth/AuthEventBus';
+import { adaptAuthPayload, adaptUserPayload } from '../utils/auth/AuthResponseAdapter';
 
 const AuthContext = createContext(null);
 

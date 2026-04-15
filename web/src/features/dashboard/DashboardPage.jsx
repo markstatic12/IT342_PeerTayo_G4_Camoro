@@ -1,3 +1,1 @@
-export default function DashboardPage() {
-  return <div className="dashboard" />;
-}
+export { default } from '../../pages/dashboard/DashboardPage';
