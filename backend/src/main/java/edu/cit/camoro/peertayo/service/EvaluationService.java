@@ -1,94 +1,254 @@
 package edu.cit.camoro.peertayo.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.cit.camoro.peertayo.dto.request.CreateEvaluationRequest;
-import edu.cit.camoro.peertayo.dto.request.UpdateEvaluationRequest;
-import edu.cit.camoro.peertayo.dto.response.EvaluationResponse;
-import edu.cit.camoro.peertayo.entity.EvaluationForm;
-import edu.cit.camoro.peertayo.entity.User;
+import edu.cit.camoro.peertayo.dto.request.SubmitEvaluationRequest;
+import edu.cit.camoro.peertayo.dto.response.*;
+import edu.cit.camoro.peertayo.entity.*;
+import edu.cit.camoro.peertayo.exception.BusinessRuleException;
 import edu.cit.camoro.peertayo.exception.ResourceNotFoundException;
-import edu.cit.camoro.peertayo.repository.EvaluationFormRepository;
-import edu.cit.camoro.peertayo.repository.UserRepository;
+import edu.cit.camoro.peertayo.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class EvaluationService {
 
-    private static final TypeReference<List<String>> STRING_LIST = new TypeReference<>() {};
-
     private final EvaluationFormRepository evaluationFormRepository;
+    private final EvaluationAssignmentRepository evaluationAssignmentRepository;
+    private final CriterionRepository criterionRepository;
+    private final RatingRepository ratingRepository;
+    private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
-    private final ObjectMapper objectMapper;
+    private final RoleRepository roleRepository;
 
     @Transactional
-    public EvaluationResponse create(CreateEvaluationRequest request, String creatorEmail) {
+    public CreatedEvaluationResponse create(CreateEvaluationRequest request, String creatorEmail) {
         User creator = getUserByEmail(creatorEmail);
+        ensureFacilitatorRole(creator);
 
-        EvaluationForm form = EvaluationForm.builder()
+        EvaluationForm evaluation = EvaluationForm.builder()
                 .title(request.getTitle().trim())
                 .description(request.getDescription().trim())
                 .deadline(request.getDeadline())
-                .status(normalizeStatus(request.getStatus()))
-                .criteriaJson(toJson(request.getCriteria()))
-                .questionsJson(toJson(request.getQuestions()))
-                .ratingFieldsJson(toJson(request.getRatingFields()))
+                .status("ACTIVE")
                 .createdBy(creator)
                 .build();
 
-        EvaluationForm saved = evaluationFormRepository.save(form);
-        return toResponse(saved);
+        EvaluationForm saved = evaluationFormRepository.save(evaluation);
+
+        List<User> evaluatees = userRepository.findAllById(request.getEvaluateeIds());
+        List<User> evaluators = userRepository.findAllById(request.getEvaluatorIds());
+
+        if (evaluatees.size() != request.getEvaluateeIds().size()) {
+            throw new ResourceNotFoundException("One or more evaluatees were not found");
+        }
+        if (evaluators.size() != request.getEvaluatorIds().size()) {
+            throw new ResourceNotFoundException("One or more evaluators were not found");
+        }
+
+        List<EvaluationAssignment> assignments = new ArrayList<>();
+        for (User evaluator : evaluators) {
+            for (User evaluatee : evaluatees) {
+                if (Objects.equals(evaluator.getId(), evaluatee.getId())) {
+                    continue;
+                }
+                assignments.add(EvaluationAssignment.builder()
+                        .evaluation(saved)
+                        .evaluator(evaluator)
+                        .evaluatee(evaluatee)
+                        .submitted(false)
+                        .build());
+            }
+        }
+
+        if (assignments.isEmpty()) {
+            throw new BusinessRuleException("VALID-001", "No valid evaluator-evaluatee assignments could be created");
+        }
+
+        evaluationAssignmentRepository.saveAll(assignments);
+
+        List<Notification> notifications = evaluators.stream()
+                .map(user -> Notification.builder()
+                        .user(user)
+                        .message("You have a new evaluation assigned.")
+                        .read(false)
+                        .build())
+                .toList();
+        notificationRepository.saveAll(notifications);
+
+        return CreatedEvaluationResponse.builder()
+                .id(saved.getId())
+                .title(saved.getTitle())
+                .deadline(saved.getDeadline())
+                .createdBy(creator.getId())
+                .status(saved.getStatus())
+                .build();
     }
 
     @Transactional(readOnly = true)
-    public List<EvaluationResponse> findAllByCreator(String creatorEmail) {
-        User creator = getUserByEmail(creatorEmail);
+    public List<PendingEvaluationResponse> getPendingEvaluations(String email) {
+        User currentUser = getUserByEmail(email);
+        LocalDateTime now = LocalDateTime.now();
+
+        return evaluationAssignmentRepository.findAllByEvaluatorAndSubmittedFalseOrderByEvaluationDeadlineAsc(currentUser)
+                .stream()
+                .filter(item -> item.getEvaluation().getDeadline().isAfter(now))
+                .map(item -> PendingEvaluationResponse.builder()
+                        .id(item.getEvaluation().getId())
+                        .assignmentId(item.getId())
+                        .title(item.getEvaluation().getTitle())
+                        .deadline(item.getEvaluation().getDeadline())
+                        .evaluateeName(fullName(item.getEvaluatee()))
+                        .build())
+                .toList();
+    }
+
+    @Transactional
+    public void submitEvaluation(Long evaluationId, String email, SubmitEvaluationRequest request) {
+        User currentUser = getUserByEmail(email);
+        EvaluationForm evaluation = evaluationFormRepository.findById(evaluationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+
+        if (evaluation.getDeadline().isBefore(LocalDateTime.now())) {
+            throw new BusinessRuleException("EVAL-001", "Cannot submit evaluation after the deadline");
+        }
+
+        List<EvaluationAssignment> assignments = evaluationAssignmentRepository
+                .findAllByEvaluationAndEvaluatorAndSubmittedFalse(evaluation, currentUser);
+
+        if (assignments.isEmpty()) {
+            throw new BusinessRuleException("EVAL-002", "You have already submitted this evaluation");
+        }
+
+        List<Long> criterionIds = request.getResponses().stream()
+                .map(SubmitEvaluationRequest.ResponseItem::getCriteriaId)
+                .distinct()
+                .toList();
+
+        Map<Long, Criterion> criterionMap = criterionRepository.findAllByIdInAndActiveTrue(criterionIds)
+                .stream()
+                .collect(Collectors.toMap(Criterion::getId, c -> c));
+
+        if (criterionMap.size() != criterionIds.size()) {
+            throw new BusinessRuleException("VALID-001", "One or more criteria are invalid");
+        }
+
+        for (EvaluationAssignment assignment : assignments) {
+            List<Rating> ratings = request.getResponses().stream()
+                    .map(item -> Rating.builder()
+                            .assignment(assignment)
+                            .criterion(criterionMap.get(item.getCriteriaId()))
+                            .rating(item.getRating())
+                            .active(true)
+                            .build())
+                    .toList();
+            ratingRepository.saveAll(ratings);
+            assignment.setSubmitted(true);
+            assignment.setSubmittedAt(LocalDateTime.now());
+        }
+
+        evaluationAssignmentRepository.saveAll(assignments);
+    }
+
+    @Transactional(readOnly = true)
+    public MyResultsResponse getMyResults(String email) {
+        User me = getUserByEmail(email);
+
+        List<EvaluationAssignment> submittedAssignments = evaluationAssignmentRepository.findAll().stream()
+                .filter(a -> Objects.equals(a.getEvaluatee().getId(), me.getId()) && a.isSubmitted())
+                .toList();
+
+        if (submittedAssignments.isEmpty()) {
+            return MyResultsResponse.builder()
+                    .overallAverage(0.0)
+                    .questionAverages(Collections.emptyList())
+                    .comments(Collections.emptyList())
+                    .build();
+        }
+
+        List<Rating> ratings = ratingRepository.findAllByAssignmentInAndActiveTrue(submittedAssignments);
+
+        Map<Long, List<Rating>> groupedByCriteria = ratings.stream()
+                .collect(Collectors.groupingBy(r -> r.getCriterion().getId()));
+
+        List<CriterionAverageResponse> criterionAverages = groupedByCriteria.entrySet().stream()
+                .map(entry -> CriterionAverageResponse.builder()
+                        .criteriaId(entry.getKey())
+                        .average(entry.getValue().stream().mapToInt(Rating::getRating).average().orElse(0))
+                        .build())
+                .sorted(Comparator.comparing(CriterionAverageResponse::getCriteriaId))
+                .toList();
+
+        double overall = ratings.stream().mapToInt(Rating::getRating).average().orElse(0);
+
+        return MyResultsResponse.builder()
+                .overallAverage(overall)
+                .questionAverages(criterionAverages)
+                .comments(Collections.emptyList())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CreatedEvaluationListItemResponse> getCreatedEvaluations(String email) {
+        User creator = getUserByEmail(email);
         return evaluationFormRepository.findAllByCreatedByOrderByCreatedAtDesc(creator)
                 .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+                .map(evaluation -> {
+                    long total = evaluationAssignmentRepository.countByEvaluation(evaluation);
+                    long submitted = evaluationAssignmentRepository.countByEvaluationAndSubmittedTrue(evaluation);
+                    return CreatedEvaluationListItemResponse.builder()
+                            .id(evaluation.getId())
+                            .title(evaluation.getTitle())
+                            .deadline(evaluation.getDeadline())
+                            .submissionProgress(submitted + "/" + total)
+                            .build();
+                })
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public EvaluationResponse findById(Long id, String creatorEmail) {
-        User creator = getUserByEmail(creatorEmail);
-        EvaluationForm form = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
-                .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
-        return toResponse(form);
-    }
-
-    @Transactional
-    public EvaluationResponse update(Long id, UpdateEvaluationRequest request, String creatorEmail) {
-        User creator = getUserByEmail(creatorEmail);
-        EvaluationForm form = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
+    public EvaluationResultsResponse getEvaluationResults(Long evaluationId, String email) {
+        User creator = getUserByEmail(email);
+        EvaluationForm evaluation = evaluationFormRepository.findByIdAndCreatedBy(evaluationId, creator)
                 .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
 
-        form.setTitle(request.getTitle().trim());
-        form.setDescription(request.getDescription().trim());
-        form.setDeadline(request.getDeadline());
-        form.setStatus(normalizeStatus(request.getStatus()));
-        form.setCriteriaJson(toJson(request.getCriteria()));
-        form.setQuestionsJson(toJson(request.getQuestions()));
-        form.setRatingFieldsJson(toJson(request.getRatingFields()));
+        List<EvaluationAssignment> submittedAssignments = evaluationAssignmentRepository.findAllByEvaluationAndSubmittedTrue(evaluation);
+        Map<Long, List<EvaluationAssignment>> byEvaluatee = submittedAssignments.stream()
+                .collect(Collectors.groupingBy(a -> a.getEvaluatee().getId()));
 
-        EvaluationForm updated = evaluationFormRepository.save(form);
-        return toResponse(updated);
-    }
+        List<EvaluateeResultResponse> evaluatees = new ArrayList<>();
+        for (Map.Entry<Long, List<EvaluationAssignment>> entry : byEvaluatee.entrySet()) {
+            List<Rating> ratings = ratingRepository.findAllByAssignmentInAndActiveTrue(entry.getValue());
+            Map<Long, List<Rating>> byCriterion = ratings.stream()
+                    .collect(Collectors.groupingBy(r -> r.getCriterion().getId()));
 
-    @Transactional
-    public void delete(Long id, String creatorEmail) {
-        User creator = getUserByEmail(creatorEmail);
-        EvaluationForm form = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
-                .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
-        evaluationFormRepository.delete(form);
+            List<CriterionAverageResponse> criterionAverages = byCriterion.entrySet().stream()
+                    .map(c -> CriterionAverageResponse.builder()
+                            .criteriaId(c.getKey())
+                            .average(c.getValue().stream().mapToInt(Rating::getRating).average().orElse(0))
+                            .build())
+                    .sorted(Comparator.comparing(CriterionAverageResponse::getCriteriaId))
+                    .toList();
+
+            User evaluatee = entry.getValue().get(0).getEvaluatee();
+            evaluatees.add(EvaluateeResultResponse.builder()
+                    .userId(entry.getKey())
+                    .evaluateeName(fullName(evaluatee))
+                    .overallAverage(ratings.stream().mapToInt(Rating::getRating).average().orElse(0))
+                    .criteriaAverages(criterionAverages)
+                    .build());
+        }
+
+        return EvaluationResultsResponse.builder()
+                .evaluationId(evaluation.getId())
+                .evaluatees(evaluatees)
+                .build();
     }
 
     private User getUserByEmail(String email) {
@@ -96,50 +256,18 @@ public class EvaluationService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
-    private String normalizeStatus(String status) {
-        String normalized = status == null || status.isBlank() ? "DRAFT" : status.trim().toUpperCase();
-        return switch (normalized) {
-            case "DRAFT", "ACTIVE", "CLOSED" -> normalized;
-            default -> "DRAFT";
-        };
-    }
+    private void ensureFacilitatorRole(User user) {
+        Role facilitatorRole = roleRepository.findByName(ERole.FACILITATOR)
+                .orElseGet(() -> roleRepository.save(new Role(null, ERole.FACILITATOR)));
 
-    private String toJson(List<String> values) {
-        try {
-            return objectMapper.writeValueAsString(values == null ? Collections.emptyList() : values);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Unable to serialize evaluation list fields");
+        boolean hasRole = user.getRoles().stream().anyMatch(role -> role.getName() == ERole.FACILITATOR);
+        if (!hasRole) {
+            user.getRoles().add(facilitatorRole);
+            userRepository.save(user);
         }
     }
 
-    private List<String> fromJson(String json) {
-        if (json == null || json.isBlank()) {
-            return Collections.emptyList();
-        }
-        try {
-            return objectMapper.readValue(json, STRING_LIST);
-        } catch (JsonProcessingException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    private EvaluationResponse toResponse(EvaluationForm form) {
-        User creator = form.getCreatedBy();
-        String fullName = (creator.getFirstName() + " " + creator.getLastName()).trim();
-
-        return EvaluationResponse.builder()
-                .id(form.getId())
-                .title(form.getTitle())
-                .description(form.getDescription())
-                .deadline(form.getDeadline())
-                .status(form.getStatus())
-                .criteria(fromJson(form.getCriteriaJson()))
-                .questions(fromJson(form.getQuestionsJson()))
-                .ratingFields(fromJson(form.getRatingFieldsJson()))
-                .createdByEmail(creator.getEmail())
-                .createdByName(fullName)
-                .createdAt(form.getCreatedAt())
-                .updatedAt(form.getUpdatedAt())
-                .build();
+    private String fullName(User user) {
+        return (user.getFirstName() + " " + user.getLastName()).trim();
     }
 }

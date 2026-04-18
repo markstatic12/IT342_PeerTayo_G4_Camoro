@@ -5,12 +5,14 @@
 .app-layout {
   display: flex;
   min-height: 100vh;
+  background: #0c0f18;
 }
 
 .app-layout__content {
   flex: 1;
   margin-left: var(--sidebar-width);
   margin-top: var(--topbar-height);
-  padding: var(--space-xl);
+  padding: 0;
   min-height: calc(100vh - var(--topbar-height));
+  background: #0c0f18;
 }

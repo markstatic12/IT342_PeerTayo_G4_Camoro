@@ -34,6 +34,10 @@ public class User {
     @Column(name = "password_hash")
     private String passwordHash;
 
+    @Column(name = "provider", nullable = false, length = 20)
+    @Builder.Default
+    private String provider = "LOCAL";
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

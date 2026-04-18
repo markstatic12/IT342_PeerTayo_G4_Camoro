@@ -1,6 +1,7 @@
 package edu.cit.camoro.peertayo.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -19,11 +20,9 @@ public class CreateEvaluationRequest {
     @NotNull(message = "Deadline is required")
     private LocalDateTime deadline;
 
-    private String status;
+    @NotEmpty(message = "At least one evaluatee is required")
+    private List<Long> evaluateeIds;
 
-    private List<String> criteria;
-
-    private List<String> questions;
-
-    private List<String> ratingFields;
+    @NotEmpty(message = "At least one evaluator is required")
+    private List<Long> evaluatorIds;
 }
