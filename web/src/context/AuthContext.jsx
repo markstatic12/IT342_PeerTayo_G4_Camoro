@@ -80,6 +80,19 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const refreshCurrentUser = async () => {
+    if (!token) return { success: false, message: 'No active session' };
+
+    try {
+      const res = await api.get('/auth/me');
+      const { user: userData } = adaptUserPayload(res.data.data);
+      setUser(userData);
+      return { success: true, user: userData };
+    } catch {
+      return { success: false, message: 'Unable to refresh current user' };
+    }
+  };
+
   const logout = async () => {
     try {
       // Tell the server to blacklist the current token immediately
@@ -95,7 +108,19 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, loginWithToken, isAuthenticated: !!token }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        login,
+        register,
+        logout,
+        loginWithToken,
+        refreshCurrentUser,
+        isAuthenticated: !!token,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
