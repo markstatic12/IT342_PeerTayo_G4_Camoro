@@ -48,6 +48,7 @@ public class AuthService {
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
+            .provider("LOCAL")
                 .build();
 
         user.getRoles().add(respondentRole);
@@ -86,6 +87,7 @@ public class AuthService {
                     .firstName(firstName != null ? firstName : "")
                     .lastName(lastName != null ? lastName : "")
                     .email(email)
+                    .provider("GOOGLE")
                     .build();
             newUser.getRoles().add(respondentRole);
             return userRepository.save(newUser);

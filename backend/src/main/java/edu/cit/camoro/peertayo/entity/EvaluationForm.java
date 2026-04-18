@@ -8,7 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "evaluation_forms")
+@Table(name = "evaluations")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,18 +32,6 @@ public class EvaluationForm {
     @Column(nullable = false, length = 30)
     private String status;
 
-    @Lob
-    @Column(name = "criteria_json")
-    private String criteriaJson;
-
-    @Lob
-    @Column(name = "questions_json")
-    private String questionsJson;
-
-    @Lob
-    @Column(name = "rating_fields_json")
-    private String ratingFieldsJson;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
@@ -51,8 +39,4 @@ public class EvaluationForm {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 }
