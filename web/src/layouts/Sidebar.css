@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------------
-   Sidebar — Left navigation panel
+   Sidebar ï¿½ Left navigation panel
    Dark mode shell for the dashboard UI
    ------------------------------------------------------------------------------- */
 
@@ -69,13 +69,13 @@
 }
 
 .sidebar__link.active {
-  color: #60a5fa;
+  color: #3b82f6;
   background: rgba(59, 130, 246, 0.18);
   font-weight: 600;
 }
 
 .sidebar__link.active svg {
-  stroke: #60a5fa;
+  stroke: #3b82f6;
 }
 
 .sidebar__footer {

@@ -64,7 +64,7 @@
 }
 
 .gh-hello span {
-  color: #60a5fa;
+  color: #3b82f6;
 }
 
 .gh-date {
@@ -121,7 +121,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #60a5fa;
+  color: #3b82f6;
   margin-bottom: 5px;
   opacity: 0.85;
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -180,7 +180,7 @@
   transition: all 0.2s;
 }
 .cdot.active {
-  background: #60a5fa;
+  background: #3b82f6;
   width: 16px;
   border-radius: 3px;
 }
@@ -230,7 +230,7 @@
   justify-content: center;
   margin-bottom: 2px;
 }
-.ic-blue   { background: rgba(59, 130, 246, 0.14); color: #60a5fa; }
+.ic-blue   { background: rgba(59, 130, 246, 0.14); color: #3b82f6; }
 .ic-orange { background: rgba(249, 115, 22, 0.12);  color: #fb923c; }
 .ic-green  { background: rgba(34, 197, 94, 0.12);   color: #22c55e; }
 .ic-warn   { background: rgba(234, 179, 8, 0.12);   color: #eab308; }
@@ -277,7 +277,7 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 10px;
   font-weight: 700;
-  color: #60a5fa;
+  color: #3b82f6;
   cursor: pointer;
   transition: opacity 150ms;
 }
@@ -489,7 +489,7 @@
   gap: 4px;
   font-size: 9.5px;
   font-weight: 700;
-  color: #60a5fa;
+  color: #3b82f6;
   padding: 5px 10px;
   border-radius: 6px;
   background: rgba(59, 130, 246, 0.08);
@@ -604,7 +604,7 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 .tag-done    { background: rgba(34, 197, 94, 0.1);   color: #22c55e; }
-.tag-pending { background: rgba(59, 130, 246, 0.1);  color: #60a5fa; }
+.tag-pending { background: rgba(59, 130, 246, 0.1);  color: #3b82f6; }
 .tag-new     { background: rgba(249, 115, 22, 0.12); color: #fb923c; }
 .tag-alert   { background: rgba(249, 115, 22, 0.12); color: #fb923c; }
 .tag-late    { background: rgba(239, 68, 68, 0.12);  color: #ef4444; }
