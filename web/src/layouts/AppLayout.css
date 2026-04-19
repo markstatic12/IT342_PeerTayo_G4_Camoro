@@ -13,6 +13,7 @@
   margin-left: var(--sidebar-width);
   margin-top: var(--topbar-height);
   padding: 0;
-  min-height: calc(100vh - var(--topbar-height));
+  height: calc(100vh - var(--topbar-height));
+  overflow-y: auto;
   background: #0c0f18;
 }
