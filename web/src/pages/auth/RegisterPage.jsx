@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Input, Button, Toast } from '../../components/ui';
 import { GoogleIcon } from '../../components/icons/Icons';
@@ -27,11 +27,11 @@ export default function RegisterPage() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match.');
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Password must be at least 6 characters.');
       return;
     }
 
@@ -46,15 +46,15 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout>
-      <h1 className="auth-heading">Create an Account</h1>
-      <p className="auth-subheading">Get started with PeerTayo</p>
+      <h1 className="auth-heading">Create an account</h1>
+      <p className="auth-subheading">Get started with PeerTayo for free</p>
 
       {error && <div className="auth-error">{error}</div>}
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="auth-form__row">
           <Input
-            label="First Name"
+            label="First name"
             id="firstName"
             type="text"
             placeholder="Juan"
@@ -63,7 +63,7 @@ export default function RegisterPage() {
             required
           />
           <Input
-            label="Last Name"
+            label="Last name"
             id="lastName"
             type="text"
             placeholder="Dela Cruz"
@@ -74,7 +74,7 @@ export default function RegisterPage() {
         </div>
 
         <Input
-          label="Email"
+          label="Email address"
           id="email"
           type="email"
           placeholder="you@example.com"
@@ -92,7 +92,7 @@ export default function RegisterPage() {
           required
         />
         <Input
-          label="Confirm Password"
+          label="Confirm password"
           id="confirmPassword"
           type="password"
           placeholder="Re-enter your password"
@@ -107,17 +107,21 @@ export default function RegisterPage() {
       </form>
 
       <div className="auth-divider">
-        <span>or continue with</span>
+        <span>or</span>
       </div>
 
       <button className="auth-social-btn" type="button" onClick={handleGoogleLogin}>
-        <GoogleIcon size={18} />
+        <GoogleIcon size={17} />
         Continue with Google
       </button>
 
+      <p className="auth-footer-link">
+        Already have an account? <Link to="/login">Sign in</Link>
+      </p>
+
       {toast && (
         <Toast
-          message={`Account created! Welcome to PeerTayo, ${firstName}!`}
+          message={`Welcome, ${firstName}! Your account has been created.`}
           onDismiss={() => setToast(false)}
           duration={1500}
         />

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Input, Button, Toast } from '../../components/ui';
 import { GoogleIcon } from '../../components/icons/Icons';
@@ -33,14 +33,14 @@ export default function LoginPage() {
 
   return (
     <AuthLayout>
-      <h1 className="auth-heading">Welcome Back!</h1>
-      <p className="auth-subheading">Sign in to continue to PeerTayo</p>
+      <h1 className="auth-heading">Welcome back</h1>
+      <p className="auth-subheading">Sign in to your PeerTayo account</p>
 
       {error && <div className="auth-error">{error}</div>}
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <Input
-          label="Email"
+          label="Email address"
           id="email"
           type="email"
           placeholder="you@example.com"
@@ -63,17 +63,21 @@ export default function LoginPage() {
       </form>
 
       <div className="auth-divider">
-        <span>or continue with</span>
+        <span>or</span>
       </div>
 
       <button className="auth-social-btn" type="button" onClick={handleGoogleLogin}>
-        <GoogleIcon size={18} />
+        <GoogleIcon size={17} />
         Continue with Google
       </button>
 
+      <p className="auth-footer-link">
+        Don't have an account? <Link to="/register">Create one</Link>
+      </p>
+
       {toast && (
         <Toast
-          message="Welcome back! You have signed in successfully."
+          message="Welcome back! Redirecting to your dashboard…"
           onDismiss={() => setToast(false)}
           duration={1500}
         />
