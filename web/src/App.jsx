@@ -2,9 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
-import LoginPage from './features/auth/LoginPage';
-import RegisterPage from './features/auth/RegisterPage';
+import AuthShell from './features/auth/AuthShell';
 import AuthCallbackPage from './features/auth/AuthCallbackPage';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import CreateEvaluationPage from './pages/forms/CreateEvaluationPage';
 
@@ -13,9 +14,11 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          {/* Auth routes — AuthShell stays mounted, only Outlet swaps */}
+          <Route element={<AuthShell />}>
+            <Route path="/login"    element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
           {/* Protected routes */}
