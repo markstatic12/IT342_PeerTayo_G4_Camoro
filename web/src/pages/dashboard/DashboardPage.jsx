@@ -33,7 +33,7 @@ const criteriaMetaById = {
   1:  { label: 'Quality of Work',          short: 'Quality',  color: '#3b82f6' },
   2:  { label: 'Reliability & Dependability', short: 'Reliab.',  color: '#a78bfa' },
   3:  { label: 'Collaboration & Teamwork', short: 'Collab.',  color: '#22c55e' },
-  4:  { label: 'Communication Skills',     short: 'Comm.',    color: '#06b6d4' },
+  4:  { label: 'Communication Skills',     short: 'Comm.',    color: '#3b82f6' },
   5:  { label: 'Initiative & Proactiveness', short: 'Init.',  color: '#f97316' },
   6:  { label: 'Problem Solving',          short: 'Problem',  color: '#3b82f6' },
   7:  { label: 'Professionalism & Conduct', short: 'Prof.',   color: '#eab308' },
@@ -187,7 +187,7 @@ function drawLineChart(canvas, criteriaData) {
   pts.forEach((pt, i) => {
     const v = scores[i];
     const isHigh = v === highest, isLow = v === lowest;
-    const dotColor = isHigh ? '#60a5fa' : isLow ? '#ef4444' : '#3b82f6';
+    const dotColor = isHigh ? '#3b82f6' : isLow ? '#ef4444' : '#3b82f6';
     const dotR = isHigh || isLow ? 4.5 : 3.5;
 
     ctx.beginPath();
@@ -212,7 +212,7 @@ function drawLineChart(canvas, criteriaData) {
     if (isHigh || isLow) {
       ctx.font = '700 8.5px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillStyle = isHigh ? '#60a5fa' : '#ef4444';
+      ctx.fillStyle = isHigh ? '#3b82f6' : '#ef4444';
       ctx.fillText(v.toFixed(1), pt.x, isHigh ? pt.y - dotR - 5 : pt.y + dotR + 11);
     }
   });

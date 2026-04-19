@@ -5,10 +5,10 @@
 
 :root {
   /* ── Primary ─────────────────────────────────────────────────────────── */
-  --color-primary:        #0DCAF0;
-  --color-primary-hover:  #0BB4D8;
-  --color-primary-light:  #E0F7FA;
-  --color-primary-dark:   #0A9AB8;
+  --color-primary:        #3b82f6;
+  --color-primary-hover:  #3b82f6;
+  --color-primary-light:  rgba(59,130,246,0.12);
+  --color-primary-dark:   #3b82f6;
 
   /* ── Neutrals ────────────────────────────────────────────────────────── */
   --color-bg:             #F0F4F8;

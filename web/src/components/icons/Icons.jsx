@@ -9,8 +9,16 @@ const defaults = { strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'roun
 export function LogoIcon({ size = 28, ...props }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" {...props}>
-      <rect width="32" height="32" rx="8" fill="#0DCAF0" />
-      <path d="M10 16L14 20L22 12" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Background */}
+      <rect width="32" height="32" rx="8" fill="#3b82f6" />
+
+      {/* Checkbox — centered */}
+      <rect x="7" y="7" width="18" height="18" rx="4"
+        stroke="white" strokeWidth="2" fill="rgba(255,255,255,0.15)" />
+
+      {/* Checkmark */}
+      <polyline points="11,16 14,19 21,12"
+        stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
