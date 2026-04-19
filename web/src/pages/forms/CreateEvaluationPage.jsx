@@ -59,15 +59,6 @@ export default function CreateEvaluationPage() {
         setEvaluatorOptions(
           data.filter((item) => item.id !== currentUser?.id)
         );
-
-        const initialEvaluators = data
-          .filter((item) => item.id !== currentUser?.id)
-          .slice(0, 3)
-          .map((item) => item.id);
-        const initialEvaluatees = data.slice(0, 2).map((item) => item.id);
-
-        setEvaluatorIds((prev) => (prev.length ? prev : initialEvaluators));
-        setEvaluateeIds((prev) => (prev.length ? prev : initialEvaluatees));
       } catch (err) {
         if (!alive) return;
         const message = err.response?.data?.error?.message || 'Failed to load users for assignment.';
@@ -186,24 +177,29 @@ export default function CreateEvaluationPage() {
 
   return (
     <div className="create-eval-v7">
+      {/* Top-left page header */}
       <div className="page-header-block">
-        <div className="breadcrumb">Dashboard / Forms Created / Create Evaluation</div>
+        <div className="breadcrumb">
+          Dashboard / Forms Created / <span>Create Evaluation</span>
+        </div>
         <div className="page-title">Create Your Evaluation Form</div>
         <div className="page-sub">Set up a peer evaluation by reviewing the criteria and assigning participants.</div>
       </div>
 
+      {/* Centered stepper */}
       <div className="stepper" id="stepper">
-        <div className={`step ${step >= 1 ? 'done' : 'inactive'}`}>
-          <div className={`step-circle ${step >= 1 ? 'done' : step === 1 ? 'active' : 'inactive'}`}>1</div>
-          <span className={`step-label ${step >= 1 ? '' : 'inactive'}`}>Overview of Criteria</span>
+        <div className="step">
+          <div className={`step-circle ${step >= 1 ? 'done' : 'inactive'}`}>1</div>
+          <span className={`step-label${step < 1 ? ' inactive' : ''}`}>Overview of Criteria</span>
         </div>
-        <div className={`step-connector ${step > 1 ? 'done' : ''}`} />
-        <div className={`step ${step >= 2 ? 'done' : 'inactive'}`}>
+        <div className={`step-connector${step > 1 ? ' done' : ''}`} />
+        <div className="step">
           <div className={`step-circle ${step === 2 ? 'active' : step > 2 ? 'done' : 'inactive'}`}>2</div>
-          <span className={`step-label ${step >= 2 ? '' : 'inactive'}`}>Details & People</span>
+          <span className={`step-label${step < 2 ? ' inactive' : ''}`}>Details &amp; People</span>
         </div>
       </div>
 
+      {/* Centered card */}
       <div className="card-center-wrap">
         <div className="content-card">
           <div className="card-body">
@@ -212,9 +208,9 @@ export default function CreateEvaluationPage() {
                 <div className="criteria-header">
                   <div>
                     <div className="criteria-title">Evaluation Criteria</div>
-                    <div className="criteria-sub">10 standardized criteria used across all evaluations.</div>
+                    <div className="criteria-sub">10 standardized criteria used across all evaluations. They cannot be modified.</div>
                   </div>
-                  <span className="readonly-pill">Read-only</span>
+                  <span className="readonly-pill">⊘ Read-only</span>
                 </div>
                 <div className="criteria-grid">
                   {criteriaOptions.map((item, index) => (
@@ -259,7 +255,7 @@ export default function CreateEvaluationPage() {
                   </div>
                 </div>
 
-                <div className="form-group" style={{ marginBottom: '20px' }}>
+                <div className="form-group" style={{ marginBottom: '16px' }}>
                   <label className="form-label">
                     Description <span className="req">*</span>
                   </label>
@@ -301,17 +297,12 @@ export default function CreateEvaluationPage() {
                       />
                     </div>
                     {evaluatorSearch.trim() && (
-                      <div className="chips-area" style={{ minHeight: 'auto', maxHeight: '140px', overflowY: 'auto' }}>
+                      <div className="chips-area" style={{ minHeight: 'auto', maxHeight: '130px', overflowY: 'auto' }}>
                         {evaluatorOptions
                           .filter((item) => !evaluatorIds.includes(item.id))
                           .slice(0, 10)
                           .map((item) => (
-                            <button
-                              key={item.id}
-                              type="button"
-                              className="chip chip-blue"
-                              onClick={() => addEvaluatorById(item.id)}
-                            >
+                            <button key={item.id} type="button" className="chip chip-blue" onClick={() => addEvaluatorById(item.id)}>
                               {item.firstName} {item.lastName} ({item.email})
                             </button>
                           ))}
@@ -319,7 +310,8 @@ export default function CreateEvaluationPage() {
                     )}
                     <div className="chips-area">
                       {evaluatorUsers.map((user) => (
-                        <div className="chip chip-blue" key={user.id}>{`${user.firstName} ${user.lastName}`}
+                        <div className="chip chip-blue" key={user.id}>
+                          {`${user.firstName} ${user.lastName}`}
                           <svg className="chip-remove" viewBox="0 0 24 24" strokeWidth="2.5" onClick={() => removeEvaluator(user.id)}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </div>
                       ))}
@@ -346,17 +338,12 @@ export default function CreateEvaluationPage() {
                       />
                     </div>
                     {evaluateeSearch.trim() && (
-                      <div className="chips-area" style={{ minHeight: 'auto', maxHeight: '140px', overflowY: 'auto' }}>
+                      <div className="chips-area" style={{ minHeight: 'auto', maxHeight: '130px', overflowY: 'auto' }}>
                         {evaluateeOptions
                           .filter((item) => !evaluateeIds.includes(item.id))
                           .slice(0, 10)
                           .map((item) => (
-                            <button
-                              key={item.id}
-                              type="button"
-                              className="chip chip-green"
-                              onClick={() => addEvaluateeById(item.id)}
-                            >
+                            <button key={item.id} type="button" className="chip chip-green" onClick={() => addEvaluateeById(item.id)}>
                               {item.firstName} {item.lastName} ({item.email})
                             </button>
                           ))}
@@ -364,7 +351,8 @@ export default function CreateEvaluationPage() {
                     )}
                     <div className="chips-area">
                       {evaluateeUsers.map((user) => (
-                        <div className="chip chip-green" key={user.id}>{`${user.firstName} ${user.lastName}`}
+                        <div className="chip chip-green" key={user.id}>
+                          {`${user.firstName} ${user.lastName}`}
                           <svg className="chip-remove" viewBox="0 0 24 24" strokeWidth="2.5" onClick={() => removeEvaluatee(user.id)}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </div>
                       ))}
@@ -374,15 +362,19 @@ export default function CreateEvaluationPage() {
               </>
             )}
           </div>
+
+          {step === 1 && (
+            <div className="card-footer-note">
+              All 10 criteria are fixed and apply to every evaluation in the system.
+            </div>
+          )}
+
           <div className="card-body-actions">
             <button
               className="btn btn-ghost"
               type="button"
               onClick={() => {
-                if (step === 1) {
-                  navigate('/forms-created');
-                  return;
-                }
+                if (step === 1) { navigate('/forms-created'); return; }
                 setStep(1);
               }}
             >
@@ -393,16 +385,15 @@ export default function CreateEvaluationPage() {
               className="btn btn-primary"
               type="button"
               onClick={() => {
-                if (step === 1) {
-                  setStep(2);
-                  return;
-                }
+                if (step === 1) { setStep(2); return; }
                 handleSubmit();
               }}
               disabled={saving}
             >
-              <svg viewBox="0 0 24 24" strokeWidth="2"><polyline points="9 11 12 14 22 4"/></svg>
-              {step === 1 ? 'Continue' : saving ? 'Creating...' : 'Create Evaluation'}
+              {step === 1 ? 'Next Step' : saving ? 'Creating...' : 'Create Evaluation'}
+              {step === 1 && (
+                <svg viewBox="0 0 24 24" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              )}
             </button>
           </div>
         </div>
