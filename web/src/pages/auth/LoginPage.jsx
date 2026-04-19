@@ -2,22 +2,19 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Input, Button, Toast } from '../../components/ui';
+import PasswordInput from '../../components/ui/PasswordInput';
 import { GoogleIcon } from '../../components/icons/Icons';
-import AuthLayout from '../../features/auth/AuthLayout';
 import { createOAuthProvider } from '../../services/auth/OAuthProviderService';
+import '../../features/auth/AuthShell.css';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [toast, setToast] = useState(false);
-  const { login, loading } = useAuth();
-  const navigate = useNavigate();
-  const googleProvider = createOAuthProvider('google');
-
-  const handleGoogleLogin = () => {
-    window.location.href = googleProvider.loginUrl;
-  };
+  const [error, setError]       = useState('');
+  const [toast, setToast]       = useState(false);
+  const { login, loading }      = useAuth();
+  const navigate                = useNavigate();
+  const googleProvider          = createOAuthProvider('google');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,26 +29,25 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout>
-      <h1 className="auth-heading">Welcome back</h1>
-      <p className="auth-subheading">Sign in to your PeerTayo account</p>
+    <>
+      <h1 className="ash-form-heading">Welcome back</h1>
+      <p className="ash-form-sub">Sign in to your PeerTayo account</p>
 
-      {error && <div className="auth-error">{error}</div>}
+      {error && <div className="ash-error">{error}</div>}
 
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="ash-form" onSubmit={handleSubmit}>
         <Input
           label="Email address"
-          id="email"
+          id="login-email"
           type="email"
           placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <Input
+        <PasswordInput
           label="Password"
-          id="password"
-          type="password"
+          id="login-password"
           placeholder="Enter your password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -62,16 +58,18 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <div className="auth-divider">
-        <span>or</span>
-      </div>
+      <div className="ash-divider"><span>or</span></div>
 
-      <button className="auth-social-btn" type="button" onClick={handleGoogleLogin}>
+      <button
+        className="ash-social-btn"
+        type="button"
+        onClick={() => { window.location.href = googleProvider.loginUrl; }}
+      >
         <GoogleIcon size={17} />
         Continue with Google
       </button>
 
-      <p className="auth-footer-link">
+      <p className="ash-footer">
         Don't have an account? <Link to="/register">Create one</Link>
       </p>
 
@@ -82,6 +80,6 @@ export default function LoginPage() {
           duration={1500}
         />
       )}
-    </AuthLayout>
+    </>
   );
 }
