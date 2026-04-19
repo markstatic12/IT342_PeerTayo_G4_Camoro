@@ -9,6 +9,7 @@ import {
 import { listNotifications } from '../../services/notifications/notificationService';
 import './DashboardPage.css';
 
+/* ── Carousel slides ──────────────────────────────────────────────────── */
 const slides = [
   {
     eye: 'Feature Awareness',
@@ -27,97 +28,87 @@ const slides = [
   },
 ];
 
-const chartCriteria = [
-  { label: 'Quality of Work', short: 'Quality', cur: 5.0, color: '#3b82f6' },
-  { label: 'Reliability', short: 'Reliab.', cur: 4.5, color: '#a78bfa' },
-  { label: 'Collaboration', short: 'Collab.', cur: 4.8, color: '#22c55e' },
-  { label: 'Communication', short: 'Comm.', cur: 4.2, color: '#06b6d4' },
-  { label: 'Initiative', short: 'Init.', cur: 5.0, color: '#f97316' },
-  { label: 'Problem Solving', short: 'Problem', cur: 4.4, color: '#3b82f6' },
-  { label: 'Professionalism', short: 'Prof.', cur: 4.6, color: '#eab308' },
-  { label: 'Time Management', short: 'Time', cur: 4.3, color: '#a78bfa' },
-  { label: 'Adaptability', short: 'Adapt.', cur: 3.6, color: '#ef4444' },
-  { label: 'Contribution', short: 'Contrib.', cur: 4.8, color: '#22c55e' },
-];
-
+/* ── Criteria metadata ────────────────────────────────────────────────── */
 const criteriaMetaById = {
-  1: { label: 'Quality of Work', short: 'Quality', color: '#3b82f6' },
-  2: { label: 'Reliability & Dependability', short: 'Reliab.', color: '#a78bfa' },
-  3: { label: 'Collaboration & Teamwork', short: 'Collab.', color: '#22c55e' },
-  4: { label: 'Communication Skills', short: 'Comm.', color: '#06b6d4' },
-  5: { label: 'Initiative & Proactiveness', short: 'Init.', color: '#f97316' },
-  6: { label: 'Problem Solving', short: 'Problem', color: '#3b82f6' },
-  7: { label: 'Professionalism & Conduct', short: 'Prof.', color: '#eab308' },
-  8: { label: 'Time Management', short: 'Time', color: '#a78bfa' },
-  9: { label: 'Adaptability & Learning', short: 'Adapt.', color: '#ef4444' },
-  10: { label: 'Overall Contribution', short: 'Contrib.', color: '#22c55e' },
+  1:  { label: 'Quality of Work',          short: 'Quality',  color: '#3b82f6' },
+  2:  { label: 'Reliability & Dependability', short: 'Reliab.',  color: '#a78bfa' },
+  3:  { label: 'Collaboration & Teamwork', short: 'Collab.',  color: '#22c55e' },
+  4:  { label: 'Communication Skills',     short: 'Comm.',    color: '#06b6d4' },
+  5:  { label: 'Initiative & Proactiveness', short: 'Init.',  color: '#f97316' },
+  6:  { label: 'Problem Solving',          short: 'Problem',  color: '#3b82f6' },
+  7:  { label: 'Professionalism & Conduct', short: 'Prof.',   color: '#eab308' },
+  8:  { label: 'Time Management',          short: 'Time',     color: '#a78bfa' },
+  9:  { label: 'Adaptability & Learning',  short: 'Adapt.',   color: '#ef4444' },
+  10: { label: 'Overall Contribution',     short: 'Contrib.', color: '#22c55e' },
 };
 
-const activityFeed = [
-  {
-    color: 'dot-green',
-    title: 'Evaluation submitted',
-    message: 'Lara Santos completed her response for the review form.',
-    time: '2 min ago',
-    tag: 'Done',
-  },
-  {
-    color: 'dot-blue',
-    title: 'Pending review',
-    message: 'Ana Cruz has a review due in 1 day.',
-    time: '12 min ago',
-    tag: 'Pending',
-  },
-  {
-    color: 'dot-orange',
-    title: 'Form created',
-    message: 'Q1 team performance evaluation is ready for assignment.',
-    time: '1 hr ago',
-    tag: 'New',
-  },
-  {
-    color: 'dot-purple',
-    title: 'Reminder sent',
-    message: 'Reminder emails were sent to all evaluators.',
-    time: '3 hr ago',
-    tag: 'Alert',
-  },
-  {
-    color: 'dot-red',
-    title: 'Response late',
-    message: 'Ben Reyes has missed a submission deadline.',
-    time: '6 hr ago',
-    tag: 'Late',
-  },
-  {
-    color: 'dot-blue',
-    title: 'New respondent',
-    message: 'Cris Tan joined the evaluation group.',
-    time: 'Yesterday',
-    tag: 'Update',
-  },
-];
+/* ── Inline SVG icons for stat cards ─────────────────────────────────── */
+function IconStar({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
+}
+function IconClock({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+function IconCheck({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
+  );
+}
+function IconFile({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+    </svg>
+  );
+}
+function IconTrendUp({ size = 14 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+      <polyline points="17 6 23 6 23 12" />
+    </svg>
+  );
+}
+function IconArrowRight({ size = 13 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  );
+}
 
+/* ── Helpers ──────────────────────────────────────────────────────────── */
 function formatDateTime(isoString) {
   const date = new Date(isoString);
   return date.toLocaleString([], {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit',
   });
 }
 
 function formatDateLabel(date) {
   return date.toLocaleDateString([], {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
   });
 }
 
+/* ── Canvas line chart ────────────────────────────────────────────────── */
 function drawLineChart(canvas, criteriaData) {
   if (!canvas) return;
   const area = canvas.parentElement;
@@ -133,24 +124,19 @@ function drawLineChart(canvas, criteriaData) {
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   ctx.clearRect(0, 0, W, H);
 
-  const PAD_L = 32;
-  const PAD_R = 12;
-  const PAD_T = 14;
-  const PAD_B = 8;
+  const PAD_L = 32, PAD_R = 12, PAD_T = 14, PAD_B = 8;
   const gW = W - PAD_L - PAD_R;
   const gH = H - PAD_T - PAD_B;
   const n = criteriaData.length;
-  if (n === 0) return;
+  if (n < 2) return;
 
-  const scores = criteriaData.map((item) => item.cur);
-
-  const yOf = (value) => PAD_T + gH - ((value - 1) / 4) * gH;
-  const xOf = (index) => PAD_L + (index / (n - 1)) * gW;
+  const scores = criteriaData.map((d) => d.cur);
+  const yOf = (v) => PAD_T + gH - ((v - 1) / 4) * gH;
+  const xOf = (i) => PAD_L + (i / (n - 1)) * gW;
 
   ctx.font = '8px Inter, system-ui, sans-serif';
   ctx.textAlign = 'right';
-
-  for (let v = 1; v <= 5; v += 1) {
+  for (let v = 1; v <= 5; v++) {
     const y = yOf(v);
     ctx.beginPath();
     ctx.moveTo(PAD_L, y);
@@ -164,23 +150,20 @@ function drawLineChart(canvas, criteriaData) {
     ctx.fillText(v.toFixed(0), PAD_L - 5, y + 3);
   }
 
-  const points = criteriaData.map((_, index) => ({ x: xOf(index), y: yOf(scores[index]) }));
+  const pts = criteriaData.map((_, i) => ({ x: xOf(i), y: yOf(scores[i]) }));
 
   function drawCurve() {
     ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-    for (let i = 0; i < points.length - 1; i += 1) {
-      const cp1x = points[i].x + (points[i + 1].x - points[i].x) * 0.45;
-      const cp1y = points[i].y;
-      const cp2x = points[i + 1].x - (points[i + 1].x - points[i].x) * 0.45;
-      const cp2y = points[i + 1].y;
-      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, points[i + 1].x, points[i + 1].y);
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const cpx = (pts[i + 1].x - pts[i].x) * 0.45;
+      ctx.bezierCurveTo(pts[i].x + cpx, pts[i].y, pts[i + 1].x - cpx, pts[i + 1].y, pts[i + 1].x, pts[i + 1].y);
     }
   }
 
   drawCurve();
-  ctx.lineTo(points[points.length - 1].x, PAD_T + gH);
-  ctx.lineTo(points[0].x, PAD_T + gH);
+  ctx.lineTo(pts[pts.length - 1].x, PAD_T + gH);
+  ctx.lineTo(pts[0].x, PAD_T + gH);
   ctx.closePath();
   const grad = ctx.createLinearGradient(0, PAD_T, 0, PAD_T + gH);
   grad.addColorStop(0, 'rgba(59,130,246,0.22)');
@@ -201,25 +184,19 @@ function drawLineChart(canvas, criteriaData) {
 
   const highest = Math.max(...scores);
   const lowest = Math.min(...scores);
-
-  points.forEach((point, index) => {
-    const value = scores[index];
-    const isHigh = value === highest;
-    const isLow = value === lowest;
+  pts.forEach((pt, i) => {
+    const v = scores[i];
+    const isHigh = v === highest, isLow = v === lowest;
     const dotColor = isHigh ? '#60a5fa' : isLow ? '#ef4444' : '#3b82f6';
     const dotR = isHigh || isLow ? 4.5 : 3.5;
 
     ctx.beginPath();
-    ctx.arc(point.x, point.y, dotR + 3, 0, Math.PI * 2);
-    ctx.fillStyle = isHigh
-      ? 'rgba(59,130,246,0.18)'
-      : isLow
-      ? 'rgba(239,68,68,0.18)'
-      : 'rgba(59,130,246,0.1)';
+    ctx.arc(pt.x, pt.y, dotR + 3, 0, Math.PI * 2);
+    ctx.fillStyle = isHigh ? 'rgba(59,130,246,0.18)' : isLow ? 'rgba(239,68,68,0.18)' : 'rgba(59,130,246,0.1)';
     ctx.fill();
 
     ctx.beginPath();
-    ctx.arc(point.x, point.y, dotR, 0, Math.PI * 2);
+    ctx.arc(pt.x, pt.y, dotR, 0, Math.PI * 2);
     ctx.fillStyle = dotColor;
     ctx.shadowColor = dotColor;
     ctx.shadowBlur = 6;
@@ -227,7 +204,7 @@ function drawLineChart(canvas, criteriaData) {
     ctx.shadowBlur = 0;
 
     ctx.beginPath();
-    ctx.arc(point.x, point.y, dotR, 0, Math.PI * 2);
+    ctx.arc(pt.x, pt.y, dotR, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(12,15,24,0.9)';
     ctx.lineWidth = 1;
     ctx.stroke();
@@ -236,12 +213,12 @@ function drawLineChart(canvas, criteriaData) {
       ctx.font = '700 8.5px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = isHigh ? '#60a5fa' : '#ef4444';
-      const labelY = isHigh ? point.y - dotR - 5 : point.y + dotR + 11;
-      ctx.fillText(value.toFixed(1), point.x, labelY);
+      ctx.fillText(v.toFixed(1), pt.x, isHigh ? pt.y - dotR - 5 : pt.y + dotR + 11);
     }
   });
 }
 
+/* ══════════════════════════════════════════════════════════════════════ */
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -254,27 +231,22 @@ export default function DashboardPage() {
   const [slideIndex, setSlideIndex] = useState(0);
   const chartRef = useRef(null);
 
+  /* ── Derived chart data ─────────────────────────────────────────────── */
   const chartData = useMemo(() => {
     const averages = myResults?.questionAverages;
-    if (!Array.isArray(averages) || averages.length === 0) return chartCriteria;
-
+    if (!Array.isArray(averages) || averages.length === 0) return [];
     return averages.map((item) => {
       const meta = criteriaMetaById[item.criteriaId] || {
-        label: `Criteria ${item.criteriaId}`,
-        short: `C${item.criteriaId}`,
-        color: '#3b82f6',
+        label: `Criteria ${item.criteriaId}`, short: `C${item.criteriaId}`, color: '#3b82f6',
       };
-
-      return {
-        ...meta,
-        cur: Number(item.average ?? 0),
-      };
+      return { ...meta, cur: Number(item.average ?? 0) };
     });
   }, [myResults]);
 
+  /* ── Data loading ───────────────────────────────────────────────────── */
   useEffect(() => {
     let mounted = true;
-    const loadEvaluations = async () => {
+    (async () => {
       setLoading(true);
       setError('');
       try {
@@ -284,7 +256,6 @@ export default function DashboardPage() {
           getMyResults(),
           listNotifications(),
         ]);
-
         if (mounted) {
           setCreatedEvaluations(created);
           setPendingEvaluations(pending);
@@ -292,107 +263,152 @@ export default function DashboardPage() {
           setNotifications(notices);
         }
       } catch {
-        if (mounted) setError('Unable to load evaluations right now.');
+        if (mounted) setError('Unable to load dashboard data right now.');
       } finally {
         if (mounted) setLoading(false);
       }
-    };
-
-    loadEvaluations();
-    return () => {
-      mounted = false;
-    };
+    })();
+    return () => { mounted = false; };
   }, []);
 
+  /* ── Carousel auto-advance ──────────────────────────────────────────── */
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      setSlideIndex((current) => (current + 1) % slides.length);
-    }, 4200);
-    return () => window.clearInterval(interval);
+    const id = window.setInterval(() => setSlideIndex((c) => (c + 1) % slides.length), 4200);
+    return () => window.clearInterval(id);
   }, []);
 
+  /* ── Chart draw / resize ────────────────────────────────────────────── */
   useEffect(() => {
     if (chartRef.current) drawLineChart(chartRef.current, chartData);
   }, [chartData]);
 
   useEffect(() => {
-    const listener = () => {
-      if (chartRef.current) drawLineChart(chartRef.current, chartData);
-    };
-    window.addEventListener('resize', listener);
-    listener();
-    return () => window.removeEventListener('resize', listener);
+    const fn = () => { if (chartRef.current) drawLineChart(chartRef.current, chartData); };
+    window.addEventListener('resize', fn);
+    fn();
+    return () => window.removeEventListener('resize', fn);
   }, [chartData]);
 
+  /* ── Computed values ────────────────────────────────────────────────── */
   const now = new Date();
   const todayLabel = formatDateLabel(now);
-  const pendingDue = pendingEvaluations.filter((evaluation) => {
-    const deadline = evaluation.deadline ? new Date(evaluation.deadline) : null;
-    if (!deadline) return false;
-    const diff = (deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+
+  const pendingDue = pendingEvaluations.filter((ev) => {
+    const dl = ev.deadline ? new Date(ev.deadline) : null;
+    if (!dl) return false;
+    const diff = (dl.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
     return diff >= 0 && diff <= 2;
   }).length;
+
   const closedCount = createdEvaluations.reduce((sum, item) => {
-    const progress = item.submissionProgress || '0/0';
-    const [submitted] = progress.split('/').map(Number);
+    const [submitted] = (item.submissionProgress || '0/0').split('/').map(Number);
     return sum + (Number.isFinite(submitted) ? submitted : 0);
   }, 0);
+
   const overallScore = useMemo(() => {
-    if (typeof myResults?.overallAverage === 'number') {
-      return myResults.overallAverage;
-    }
-    const total = chartData.reduce((sum, item) => sum + item.cur, 0);
-    return total / chartData.length;
+    if (typeof myResults?.overallAverage === 'number') return myResults.overallAverage;
+    if (chartData.length === 0) return 0;
+    return chartData.reduce((s, d) => s + d.cur, 0) / chartData.length;
   }, [chartData, myResults]);
 
   const highestCriterion = useMemo(() => {
-    return chartData.reduce((best, item) => (item.cur > best.cur ? item : best), chartData[0]);
+    if (!chartData.length) return null;
+    return chartData.reduce((b, d) => (d.cur > b.cur ? d : b), chartData[0]);
   }, [chartData]);
 
   const lowestCriterion = useMemo(() => {
-    return chartData.reduce((worst, item) => (item.cur < worst.cur ? item : worst), chartData[0]);
+    if (!chartData.length) return null;
+    return chartData.reduce((w, d) => (d.cur < w.cur ? d : w), chartData[0]);
   }, [chartData]);
 
+  /* ── Stat cards config ──────────────────────────────────────────────── */
   const stats = [
-    { label: 'Overall Avg Score', value: overallScore.toFixed(1), variant: 'blue' },
-    { label: 'Pending Evaluations', value: pendingDue, variant: 'orange' },
-    { label: 'Evaluations Submitted', value: closedCount, variant: 'green' },
-    { label: 'Forms Created', value: createdEvaluations.length, variant: 'warn' },
+    {
+      label: 'Overall Avg Score',
+      value: overallScore.toFixed(1),
+      variant: 'blue',
+      icon: <IconStar size={15} />,
+      delta: overallScore > 0 ? '↑ +0.5 from last eval' : null,
+      deltaClass: 'd-up',
+      action: 'View My Results',
+      route: '/my-results',
+    },
+    {
+      label: 'Pending Evaluations',
+      value: pendingEvaluations.length,
+      variant: 'orange',
+      icon: <IconClock size={15} />,
+      delta: pendingDue > 0 ? `⚠ ${pendingDue} due in 2 days` : null,
+      deltaClass: 'd-warn',
+      action: 'View Pending',
+      route: '/evaluations',
+    },
+    {
+      label: 'Evaluations Submitted',
+      value: closedCount,
+      variant: 'green',
+      icon: <IconCheck size={15} />,
+      delta: closedCount > 0 ? '↑ 100% completion rate' : null,
+      deltaClass: 'd-up',
+      action: 'My Completed Forms',
+      route: '/completed',
+    },
+    {
+      label: 'Forms Created',
+      value: createdEvaluations.length,
+      variant: 'warn',
+      icon: <IconFile size={15} />,
+      delta: createdEvaluations.length > 0 ? `↑ ${createdEvaluations.filter(e => e.status !== 'CLOSED').length} still active` : null,
+      deltaClass: 'd-up',
+      action: 'Manage Forms',
+      route: '/forms-created',
+    },
   ];
 
+  /* ── Activity items ─────────────────────────────────────────────────── */
+  const dotColors = ['dot-green', 'dot-blue', 'dot-orange', 'dot-purple', 'dot-red'];
+  const tagMap = { Done: 'done', New: 'new', Pending: 'pending', Updated: 'update', Assigned: 'update', Score: 'done', Closed: 'late' };
+
   const activityItems = notifications.length
-    ? notifications.slice(0, 6).map((item, index) => ({
-        color: ['dot-green', 'dot-blue', 'dot-orange', 'dot-purple', 'dot-red'][index % 5],
+    ? notifications.slice(0, 7).map((item, i) => ({
+        color: dotColors[i % 5],
         title: item.message,
         message: '',
         time: item.createdAt ? formatDateTime(item.createdAt) : 'Now',
         tag: item.isRead ? 'Done' : 'New',
       }))
     : pendingEvaluations.length
-    ? pendingEvaluations.slice(0, 6).map((evaluation, index) => ({
-        color: ['dot-green', 'dot-blue', 'dot-orange', 'dot-purple', 'dot-red'][index % 5],
-        title: `Pending: ${evaluation.title}`,
-        message: `Evaluatee ${evaluation.evaluateeName}`,
-        time: evaluation.deadline ? formatDateTime(evaluation.deadline) : 'No deadline',
+    ? pendingEvaluations.slice(0, 7).map((ev, i) => ({
+        color: dotColors[i % 5],
+        title: `Pending: ${ev.title}`,
+        message: ev.evaluateeName ? `Evaluatee: ${ev.evaluateeName}` : '',
+        time: ev.deadline ? formatDateTime(ev.deadline) : 'No deadline',
         tag: 'Pending',
       }))
-    : activityFeed;
+    : [];
 
   const activeSlide = slides[slideIndex];
 
+  /* ════════════════════════════════════════════════════════════════════ */
   return (
-    <div className="dashboard-page">
-      <div className="shell">
-        <div className="left-col">
-          <div className="greeting-header">
+    <div className="db-page">
+      <div className="db-shell">
+
+        {/* ── LEFT COLUMN ─────────────────────────────────────────────── */}
+        <div className="db-left">
+
+          {/* Greeting banner */}
+          <div className="gh-banner">
             <div className="gh-left">
               <div className="gh-hello">
-                Hello, <span>{user?.firstName ? `${user.firstName}` : 'Mark Anton'}</span> 👋
+                Hello, <span>{user?.firstName ?? 'there'}</span> 👋
               </div>
-              <div className="gh-sub">{todayLabel}</div>
+              <div className="gh-date">{todayLabel}</div>
               <div className="gh-alert">
                 <span className="gh-alert-dot" />
-                {pendingDue} evaluations due in 2 days
+                {pendingDue > 0
+                  ? `${pendingDue} evaluation${pendingDue !== 1 ? 's' : ''} due in 2 days`
+                  : 'No upcoming deadlines'}
               </div>
             </div>
             <div className="gh-carousel">
@@ -419,62 +435,77 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Stat cards */}
           <div className="stat-row">
-            {stats.map((stat) => (
-              <div key={stat.label} className={`sc c-${stat.variant}`}>
-                <div className={`sc-icon ic-${stat.variant}`}>
-                  <span />
-                </div>
-                <div className="sc-body">
-                  <div className="sc-val">{stat.value}</div>
-                  <div className="sc-label">{stat.label}</div>
-                  <div className={`sc-delta ${stat.variant === 'green' ? 'd-up' : stat.variant === 'orange' ? 'd-warn' : 'd-up'}`}>
-                    {stat.variant === 'warn'
-                      ? '↑ 2 still active'
-                      : stat.variant === 'green'
-                      ? '↑ 100% completion rate'
-                      : stat.variant === 'orange'
-                      ? '⚠ 2 due in 2 days'
-                      : '↑ +0.5 from last eval'}
+            {stats.map((s) => (
+              <div key={s.label} className={`sc c-${s.variant}`}>
+                <div className={`sc-icon-wrap ic-${s.variant}`}>{s.icon}</div>
+                <div className="sc-val">{s.value}</div>
+                <div className="sc-label">{s.label}</div>
+                {s.delta && (
+                  <div className={`sc-delta ${s.deltaClass}`}>
+                    <IconTrendUp size={10} />
+                    {s.delta}
                   </div>
-                </div>
+                )}
+                <button className="sc-action" type="button" onClick={() => navigate(s.route)}>
+                  {s.action}
+                  <IconArrowRight size={11} />
+                </button>
               </div>
             ))}
           </div>
 
+          {/* Analytics card */}
           <div className="analytics-card">
             <div className="ac-head">
               <div>
-                <div className="ac-title">Team performance overview</div>
-                <div className="ac-sub">Track average scores across evaluation criteria.</div>
+                <div className="ac-title">My Performance Analytics</div>
+                <div className="ac-sub">
+                  Per-criterion avg · {myResults?.totalResponses ?? 0} peer responses · rated 1–5
+                </div>
               </div>
-              <span className="ac-badge">✓ Above 4.0 goal</span>
+              {chartData.length > 0 && overallScore >= 4.0 && (
+                <span className="ac-badge">✓ Above 4.0 goal</span>
+              )}
             </div>
             <div className="ac-body">
-              <div className="lg-wrap">
-                <canvas id="lineChart" ref={chartRef} />
-              </div>
-              <div className="lg-x-labels">
-                {chartData.map((item) => (
-                  <div key={item.label} className="lg-x-label">
-                    {item.short}
+              <div className="ac-chart-col">
+                <div className="lg-wrap">
+                  {chartData.length > 0 ? (
+                    <canvas ref={chartRef} />
+                  ) : (
+                    <div className="ac-empty">No performance data yet.</div>
+                  )}
+                </div>
+                {chartData.length > 0 && (
+                  <div className="lg-x-labels">
+                    {chartData.map((d) => (
+                      <div key={d.label} className="lg-x-label">{d.short}</div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
               <div className="ac-indicators">
                 <div className="ac-ind-box high">
                   <div className="ac-ind-label">▲ Highest</div>
-                  <div className="ac-ind-val">{Math.max(...chartData.map((item) => item.cur)).toFixed(1)}</div>
-                  <div className="ac-ind-crit">{highestCriterion.label}</div>
+                  <div className="ac-ind-val">
+                    {chartData.length > 0 ? Math.max(...chartData.map((d) => d.cur)).toFixed(1) : '—'}
+                  </div>
+                  <div className="ac-ind-crit">{highestCriterion?.label ?? '—'}</div>
                 </div>
                 <div className="ac-ind-box low">
                   <div className="ac-ind-label">▼ Lowest</div>
-                  <div className="ac-ind-val">{Math.min(...chartData.map((item) => item.cur)).toFixed(1)}</div>
-                  <div className="ac-ind-crit">{lowestCriterion.label}</div>
+                  <div className="ac-ind-val">
+                    {chartData.length > 0 ? Math.min(...chartData.map((d) => d.cur)).toFixed(1) : '—'}
+                  </div>
+                  <div className="ac-ind-crit">{lowestCriterion?.label ?? '—'}</div>
                 </div>
                 <div className="ac-ind-avg-box">
                   <div className="ac-ind-avg-label">Avg Score</div>
-                  <div className="ac-ind-avg-val">{overallScore.toFixed(1)}</div>
+                  <div className="ac-ind-avg-val">
+                    {chartData.length > 0 ? overallScore.toFixed(1) : '—'}
+                  </div>
                   <div className="ac-ind-avg-sub">across {chartData.length} criteria</div>
                 </div>
               </div>
@@ -482,31 +513,39 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="right-col">
+        {/* ── RIGHT COLUMN ────────────────────────────────────────────── */}
+        <div className="db-right">
           <div className="act-card">
             <div className="act-head">
-              <div className="act-head-left">
-                <div className="ac-title">Recent activity</div>
-                <div className="ac-sub">Live update stream of evaluation events.</div>
+              <div>
+                <div className="act-title">Recent Activity</div>
+                <div className="act-sub">Last 7 days</div>
               </div>
-              <span className="act-see-all">See all</span>
+              <button className="act-view-all" type="button" onClick={() => navigate('/evaluations')}>
+                View all <IconArrowRight size={11} />
+              </button>
             </div>
+
             <div className="act-list">
-              {loading && <div className="ac-sub">Loading dashboard activity...</div>}
-              {!loading && error && <div className="ac-sub">{error}</div>}
-              {activityItems.map((item) => (
-                <div key={`${item.title}-${item.time}`} className="act-item">
+              {loading && <div className="act-empty">Loading activity…</div>}
+              {!loading && error && <div className="act-empty">{error}</div>}
+              {!loading && !error && activityItems.length === 0 && (
+                <div className="act-empty">No recent activity yet.</div>
+              )}
+              {activityItems.map((item, i) => (
+                <div key={`${item.title}-${i}`} className="act-item">
                   <div className="act-timeline">
                     <div className={`act-dot ${item.color}`} />
                     <div className="act-line" />
                   </div>
                   <div className="act-body">
-                    <div className="act-msg">
-                      <strong>{item.title}</strong> {item.message}
-                    </div>
+                    <div className="act-msg">{item.title}</div>
+                    {item.message && <div className="act-msg-sub">{item.message}</div>}
                     <div className="act-meta">
                       <span className="act-time">{item.time}</span>
-                      <span className={`act-tag tag-${item.tag.toLowerCase()}`}>{item.tag}</span>
+                      <span className={`act-tag tag-${(tagMap[item.tag] ?? item.tag).toLowerCase()}`}>
+                        {item.tag}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -514,6 +553,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
