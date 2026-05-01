@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -7,7 +7,6 @@ import {
   EvaluationsIcon,
   ReportsIcon,
   FormsIcon,
-  RespondentsIcon,
   SettingsIcon,
   LogoutIcon,
 } from '../components/icons/Icons';
@@ -20,17 +19,19 @@ const mainMenu = [
   { to: '/reports', label: 'Reports', icon: ReportsIcon },
 ];
 
-const manageMenu = [
-  { to: '/forms-created', label: 'Forms Created', icon: FormsIcon },
-  { to: '/respondents', label: 'Respondents', icon: RespondentsIcon },
-];
-
 export default function Sidebar() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showToast, setShowToast] = useState(false);
+
+  // Memoize isFacilitator to ensure it updates when user changes
+  const isFacilitator = useMemo(() => {
+    return user?.roles?.some(
+      (r) => (typeof r === 'string' ? r : r?.name)?.toUpperCase() === 'FACILITATOR'
+    );
+  }, [user]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -53,6 +54,7 @@ export default function Sidebar() {
       <nav className="sidebar__nav">
         <div className="sidebar__section">
           <span className="sidebar__section-title">Main Menu</span>
+          {/* eslint-disable-next-line no-unused-vars */}
           {mainMenu.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
@@ -68,18 +70,30 @@ export default function Sidebar() {
 
         <div className="sidebar__section">
           <span className="sidebar__section-title">Manage</span>
-          {manageMenu.map(({ to, label, icon: Icon }) => (
+          {isFacilitator && (
             <NavLink
-              key={to}
-              to={to}
+              to="/forms-created"
               className={({ isActive }) => `sidebar__link${isActive ? ' active' : ''}`}
             >
-              <Icon size={18} />
-              {label}
+              <FormsIcon size={18} />
+              Forms Created
             </NavLink>
-          ))}
+          )}
         </div>
       </nav>
+
+      {/* Role badge */}
+      {isFacilitator && (
+        <div className="sidebar__role-badge">
+          <span className="sidebar__role-icon">
+            <FormsIcon size={13} />
+          </span>
+          <div>
+            <div className="sidebar__role-title">You're a <span>Facilitator.</span></div>
+            <div className="sidebar__role-sub">Create &amp; manage evals.</div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="sidebar__footer">

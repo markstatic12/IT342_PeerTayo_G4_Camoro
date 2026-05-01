@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   getMyResults,
@@ -221,7 +221,8 @@ function drawLineChart(canvas, criteriaData) {
 /* ══════════════════════════════════════════════════════════════════════ */
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const location = useLocation();
+  const { user, promoteToFacilitator } = useAuth();
   const [createdEvaluations, setCreatedEvaluations] = useState([]);
   const [pendingEvaluations, setPendingEvaluations] = useState([]);
   const [myResults, setMyResults] = useState(null);
@@ -230,6 +231,11 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
   const [slideIndex, setSlideIndex] = useState(0);
   const chartRef = useRef(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(
+    location.state?.upgradeRequired === 'FACILITATOR'
+  );
+  const [promoting, setPromoting] = useState(false);
+  const [promoteError, setPromoteError] = useState('');
 
   /* ── Derived chart data ─────────────────────────────────────────────── */
   const chartData = useMemo(() => {
@@ -250,12 +256,19 @@ export default function DashboardPage() {
       setLoading(true);
       setError('');
       try {
-        const [created, pending, results, notices] = await Promise.all([
-          listCreatedEvaluations(),
+        const promises = [
           listPendingEvaluations(),
           getMyResults(),
           listNotifications(),
-        ]);
+        ];
+        // Only fetch created evaluations for facilitators
+        const isFac = user?.roles?.some(
+          (r) => (typeof r === 'string' ? r : r?.name)?.toUpperCase() === 'FACILITATOR'
+        );
+        if (isFac) promises.unshift(listCreatedEvaluations());
+        else promises.unshift(Promise.resolve([]));
+
+        const [created, pending, results, notices] = await Promise.all(promises);
         if (mounted) {
           setCreatedEvaluations(created);
           setPendingEvaluations(pending);
@@ -269,7 +282,7 @@ export default function DashboardPage() {
       }
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [user?.id, user?.roles]);
 
   /* ── Carousel auto-advance ──────────────────────────────────────────── */
   useEffect(() => {
@@ -321,8 +334,14 @@ export default function DashboardPage() {
     return chartData.reduce((w, d) => (d.cur < w.cur ? d : w), chartData[0]);
   }, [chartData]);
 
+  const isFacilitator = useMemo(() => {
+    return user?.roles?.some(
+      (r) => (typeof r === 'string' ? r : r?.name)?.toUpperCase() === 'FACILITATOR'
+    );
+  }, [user]);
+
   /* ── Stat cards config ──────────────────────────────────────────────── */
-  const stats = [
+  const allStats = [
     {
       label: 'Overall Avg Score',
       value: overallScore.toFixed(1),
@@ -332,6 +351,7 @@ export default function DashboardPage() {
       deltaClass: 'd-up',
       action: 'View My Results',
       route: '/my-results',
+      showAlways: true,
     },
     {
       label: 'Pending Evaluations',
@@ -342,6 +362,7 @@ export default function DashboardPage() {
       deltaClass: 'd-warn',
       action: 'View Pending',
       route: '/evaluations',
+      showAlways: true,
     },
     {
       label: 'Evaluations Submitted',
@@ -352,6 +373,7 @@ export default function DashboardPage() {
       deltaClass: 'd-up',
       action: 'My Completed Forms',
       route: '/completed',
+      showAlways: true,
     },
     {
       label: 'Forms Created',
@@ -362,8 +384,11 @@ export default function DashboardPage() {
       deltaClass: 'd-up',
       action: 'Manage Forms',
       route: '/forms-created',
+      showAlways: false, // facilitator only
     },
   ];
+
+  const stats = allStats.filter((s) => s.showAlways || isFacilitator);
 
   /* ── Activity items ─────────────────────────────────────────────────── */
   const dotColors = ['dot-green', 'dot-blue', 'dot-orange', 'dot-purple', 'dot-red'];
@@ -388,6 +413,19 @@ export default function DashboardPage() {
     : [];
 
   const activeSlide = slides[slideIndex];
+
+  const handlePromote = async () => {
+    setPromoting(true);
+    setPromoteError('');
+    const result = await promoteToFacilitator();
+    setPromoting(false);
+    if (result.success) {
+      setShowUpgradeModal(false);
+      navigate('/forms-created/new');
+    } else {
+      setPromoteError(result.message);
+    }
+  };
 
   /* ════════════════════════════════════════════════════════════════════ */
   return (
@@ -418,8 +456,12 @@ export default function DashboardPage() {
                 <div className="ghc-body">{activeSlide.body}</div>
               </div>
               <div className="ghc-right">
-                <button className="ghc-btn" type="button" onClick={() => navigate('/forms-created')}>
-                  Create Evaluation →
+                <button
+                  className="ghc-btn"
+                  type="button"
+                  onClick={() => isFacilitator ? navigate('/forms-created/new') : setShowUpgradeModal(true)}
+                >
+                  {isFacilitator ? 'Create Evaluation →' : 'Create Now →'}
                 </button>
                 <div className="ghc-dots">
                   {slides.map((_, idx) => (
@@ -555,6 +597,41 @@ export default function DashboardPage() {
         </div>
 
       </div>
+
+      {/* ── Facilitator Upgrade Modal ──────────────────────────────────── */}
+      {showUpgradeModal && (
+        <div className="db-overlay" onClick={(e) => e.target === e.currentTarget && setShowUpgradeModal(false)}>
+          <div className="db-upgrade-modal">
+            <div className="db-upgrade-icon">✦</div>
+            <div className="db-upgrade-title">Become a Facilitator</div>
+            <div className="db-upgrade-body">
+              Creating evaluation forms requires the <strong>Facilitator</strong> role.
+              As a Facilitator you can create forms, assign evaluators and evaluatees,
+              and view aggregated results.
+            </div>
+            {promoteError && <div className="db-upgrade-error">{promoteError}</div>}
+            <div className="db-upgrade-actions">
+              <button
+                className="db-upgrade-btn db-upgrade-btn--ghost"
+                type="button"
+                onClick={() => setShowUpgradeModal(false)}
+                disabled={promoting}
+              >
+                Cancel
+              </button>
+              <button
+                className="db-upgrade-btn db-upgrade-btn--primary"
+                type="button"
+                onClick={handlePromote}
+                disabled={promoting}
+              >
+                {promoting ? 'Upgrading…' : 'Yes, make me a Facilitator'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

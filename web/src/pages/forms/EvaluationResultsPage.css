@@ -1,0 +1,245 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   EvaluationResultsPage — table style matching FormsCreatedPage
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.er-page {
+  padding: 22px 22px 40px;
+  color: #f1f5f9;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: calc(100vh - var(--topbar-height));
+}
+
+/* ── Back breadcrumb ────────────────────────────────────────────────── */
+.er-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3b82f6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 20px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: opacity 150ms;
+}
+.er-back:hover { opacity: 0.75; }
+
+/* ── State messages ─────────────────────────────────────────────────── */
+.er-state {
+  padding: 48px 0;
+  font-size: 13px;
+  color: #475569;
+  text-align: center;
+}
+.er-state--error { color: #f87171; }
+
+/* ── Eval header ────────────────────────────────────────────────────── */
+.er-header { margin-bottom: 20px; }
+
+.er-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.4px;
+  margin: 0 0 8px;
+}
+
+.er-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+.er-meta__dot { color: #334155; }
+
+/* Status badge — same system as FormsCreatedPage */
+.er-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+.er-badge--active    { background: rgba(34,197,94,0.1);   color: #22c55e; border: 1px solid rgba(34,197,94,0.22); }
+.er-badge--closed    { background: rgba(234,179,8,0.1);   color: #eab308; border: 1px solid rgba(234,179,8,0.22); }
+.er-badge--attention { background: rgba(249,115,22,0.1);  color: #fb923c; border: 1px solid rgba(249,115,22,0.22); }
+.er-badge--expired   { background: rgba(239,68,68,0.1);   color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+.er-badge--archived  { background: rgba(167,139,250,0.1); color: #a78bfa; border: 1px solid rgba(167,139,250,0.2); }
+
+/* ── Section label ──────────────────────────────────────────────────── */
+.er-section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+.er-section-count {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #475569;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TABLE — mirrors FormsCreatedPage exactly
+   ══════════════════════════════════════════════════════════════════════ */
+.er-table-wrap {
+  background: #111827;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.er-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.er-table thead tr {
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.er-table th {
+  padding: 11px 16px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.er-table th:last-child { text-align: left; }
+
+.er-row {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 150ms;
+}
+.er-row:last-child { border-bottom: none; }
+.er-row:hover { background: rgba(59,130,246,0.04); }
+
+.er-row td {
+  padding: 14px 16px;
+  vertical-align: middle;
+}
+
+/* Evaluatee name cell */
+.er-row__name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.er-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+  letter-spacing: -0.3px;
+}
+
+.er-row__name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 2px;
+}
+.er-row__sub {
+  font-size: 11px;
+  color: #475569;
+}
+
+/* Avg score */
+.er-score {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-block;
+}
+.er-score--high { background: rgba(34,197,94,0.1);  color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
+.er-score--mid  { background: rgba(234,179,8,0.1);  color: #eab308; border: 1px solid rgba(234,179,8,0.2); }
+.er-score--low  { background: rgba(239,68,68,0.1);  color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+.er-score--none { color: #475569; }
+
+/* Progress */
+.er-row__progress { min-width: 130px; }
+
+.er-progress-bar {
+  height: 5px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+.er-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, rgba(59,130,246,0.7));
+  border-radius: 3px;
+  transition: width 500ms cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 0 6px rgba(59,130,246,0.4);
+}
+.er-progress-fill--full {
+  background: linear-gradient(90deg, #22c55e, rgba(34,197,94,0.7));
+  box-shadow: 0 0 6px rgba(34,197,94,0.4);
+}
+.er-progress-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10.5px;
+  color: #64748b;
+}
+
+/* Actions */
+.er-row__actions { width: 130px; }
+
+.er-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #f8fafc;
+  background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.25);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms, border-color 150ms, transform 150ms;
+}
+.er-view-btn:hover {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .er-table th:nth-child(2),
+  .er-table td:nth-child(2) { display: none; }
+}
