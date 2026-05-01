@@ -2,8 +2,14 @@ package edu.cit.camoro.peertayo.service;
 
 import edu.cit.camoro.peertayo.dto.request.CreateEvaluationRequest;
 import edu.cit.camoro.peertayo.dto.request.SubmitEvaluationRequest;
+import edu.cit.camoro.peertayo.dto.request.UpdateEvaluationRequest;
 import edu.cit.camoro.peertayo.dto.response.*;
-import edu.cit.camoro.peertayo.entity.*;
+import edu.cit.camoro.peertayo.entity.Criterion;
+import edu.cit.camoro.peertayo.entity.EvaluationAssignment;
+import edu.cit.camoro.peertayo.entity.EvaluationForm;
+import edu.cit.camoro.peertayo.entity.Notification;
+import edu.cit.camoro.peertayo.entity.Rating;
+import edu.cit.camoro.peertayo.entity.User;
 import edu.cit.camoro.peertayo.exception.BusinessRuleException;
 import edu.cit.camoro.peertayo.exception.ResourceNotFoundException;
 import edu.cit.camoro.peertayo.repository.*;
@@ -25,12 +31,10 @@ public class EvaluationService {
     private final RatingRepository ratingRepository;
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
 
     @Transactional
     public CreatedEvaluationResponse create(CreateEvaluationRequest request, String creatorEmail) {
         User creator = getUserByEmail(creatorEmail);
-        ensureFacilitatorRole(creator);
 
         EvaluationForm evaluation = EvaluationForm.builder()
                 .title(request.getTitle().trim())
@@ -151,6 +155,9 @@ public class EvaluationService {
             ratingRepository.saveAll(ratings);
             assignment.setSubmitted(true);
             assignment.setSubmittedAt(LocalDateTime.now());
+            if (request.getComment() != null && !request.getComment().isBlank()) {
+                assignment.setComment(request.getComment().trim());
+            }
         }
 
         evaluationAssignmentRepository.saveAll(assignments);
@@ -167,6 +174,7 @@ public class EvaluationService {
         if (submittedAssignments.isEmpty()) {
             return MyResultsResponse.builder()
                     .overallAverage(0.0)
+                    .totalResponses(0)
                     .questionAverages(Collections.emptyList())
                     .comments(Collections.emptyList())
                     .build();
@@ -187,10 +195,16 @@ public class EvaluationService {
 
         double overall = ratings.stream().mapToInt(Rating::getRating).average().orElse(0);
 
+        List<String> comments = submittedAssignments.stream()
+                .map(EvaluationAssignment::getComment)
+                .filter(c -> c != null && !c.isBlank())
+                .toList();
+
         return MyResultsResponse.builder()
                 .overallAverage(overall)
+                .totalResponses(submittedAssignments.size())
                 .questionAverages(criterionAverages)
-                .comments(Collections.emptyList())
+                .comments(comments)
                 .build();
     }
 
@@ -206,10 +220,50 @@ public class EvaluationService {
                             .id(evaluation.getId())
                             .title(evaluation.getTitle())
                             .deadline(evaluation.getDeadline())
+                            .createdAt(evaluation.getCreatedAt())
+                            .description(evaluation.getDescription())
+                            .status(evaluation.getStatus())
                             .submissionProgress(submitted + "/" + total)
                             .build();
                 })
                 .toList();
+    }
+
+    @Transactional
+    public CreatedEvaluationListItemResponse updateEvaluation(Long id, UpdateEvaluationRequest request, String email) {
+        User creator = getUserByEmail(email);
+        EvaluationForm evaluation = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
+                .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+
+        evaluation.setTitle(request.getTitle().trim());
+        evaluation.setDescription(request.getDescription().trim());
+        evaluation.setDeadline(request.getDeadline());
+        if (request.getStatus() != null && !request.getStatus().isBlank()) {
+            evaluation.setStatus(request.getStatus());
+        }
+
+        EvaluationForm saved = evaluationFormRepository.save(evaluation);
+        long total = evaluationAssignmentRepository.countByEvaluation(saved);
+        long submitted = evaluationAssignmentRepository.countByEvaluationAndSubmittedTrue(saved);
+
+        return CreatedEvaluationListItemResponse.builder()
+                .id(saved.getId())
+                .title(saved.getTitle())
+                .deadline(saved.getDeadline())
+                .createdAt(saved.getCreatedAt())
+                .description(saved.getDescription())
+                .status(saved.getStatus())
+                .submissionProgress(submitted + "/" + total)
+                .build();
+    }
+
+    @Transactional
+    public void deleteEvaluation(Long id, String email) {
+        User creator = getUserByEmail(email);
+        EvaluationForm evaluation = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
+                .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+        evaluationAssignmentRepository.deleteAllByEvaluation(evaluation);
+        evaluationFormRepository.delete(evaluation);
     }
 
     @Transactional(readOnly = true)
@@ -218,13 +272,31 @@ public class EvaluationService {
         EvaluationForm evaluation = evaluationFormRepository.findByIdAndCreatedBy(evaluationId, creator)
                 .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
 
-        List<EvaluationAssignment> submittedAssignments = evaluationAssignmentRepository.findAllByEvaluationAndSubmittedTrue(evaluation);
-        Map<Long, List<EvaluationAssignment>> byEvaluatee = submittedAssignments.stream()
+        // All assignments for this evaluation (submitted + pending)
+        List<EvaluationAssignment> allAssignments = evaluationAssignmentRepository.findAllByEvaluation(evaluation);
+
+        // Group ALL assignments by evaluatee to get total assigned per evaluatee
+        Map<Long, List<EvaluationAssignment>> allByEvaluatee = allAssignments.stream()
+                .collect(Collectors.groupingBy(a -> a.getEvaluatee().getId()));
+
+        // Group only submitted assignments by evaluatee for ratings
+        Map<Long, List<EvaluationAssignment>> submittedByEvaluatee = allAssignments.stream()
+                .filter(EvaluationAssignment::isSubmitted)
                 .collect(Collectors.groupingBy(a -> a.getEvaluatee().getId()));
 
         List<EvaluateeResultResponse> evaluatees = new ArrayList<>();
-        for (Map.Entry<Long, List<EvaluationAssignment>> entry : byEvaluatee.entrySet()) {
-            List<Rating> ratings = ratingRepository.findAllByAssignmentInAndActiveTrue(entry.getValue());
+        for (Map.Entry<Long, List<EvaluationAssignment>> entry : allByEvaluatee.entrySet()) {
+            Long evaluateeId = entry.getKey();
+            User evaluatee = entry.getValue().get(0).getEvaluatee();
+            int total = entry.getValue().size();
+
+            List<EvaluationAssignment> submitted = submittedByEvaluatee.getOrDefault(evaluateeId, Collections.emptyList());
+            int submittedCount = submitted.size();
+
+            List<Rating> ratings = submitted.isEmpty()
+                    ? Collections.emptyList()
+                    : ratingRepository.findAllByAssignmentInAndActiveTrue(submitted);
+
             Map<Long, List<Rating>> byCriterion = ratings.stream()
                     .collect(Collectors.groupingBy(r -> r.getCriterion().getId()));
 
@@ -236,11 +308,12 @@ public class EvaluationService {
                     .sorted(Comparator.comparing(CriterionAverageResponse::getCriteriaId))
                     .toList();
 
-            User evaluatee = entry.getValue().get(0).getEvaluatee();
             evaluatees.add(EvaluateeResultResponse.builder()
-                    .userId(entry.getKey())
+                    .userId(evaluateeId)
                     .evaluateeName(fullName(evaluatee))
-                    .overallAverage(ratings.stream().mapToInt(Rating::getRating).average().orElse(0))
+                    .overallAverage(ratings.isEmpty() ? 0.0 : ratings.stream().mapToInt(Rating::getRating).average().orElse(0))
+                    .submittedResponses(submittedCount)
+                    .totalResponses(total)
                     .criteriaAverages(criterionAverages)
                     .build());
         }
@@ -254,17 +327,6 @@ public class EvaluationService {
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-    }
-
-    private void ensureFacilitatorRole(User user) {
-        Role facilitatorRole = roleRepository.findByName(ERole.FACILITATOR)
-                .orElseGet(() -> roleRepository.save(new Role(null, ERole.FACILITATOR)));
-
-        boolean hasRole = user.getRoles().stream().anyMatch(role -> role.getName() == ERole.FACILITATOR);
-        if (!hasRole) {
-            user.getRoles().add(facilitatorRole);
-            userRepository.save(user);
-        }
     }
 
     private String fullName(User user) {
