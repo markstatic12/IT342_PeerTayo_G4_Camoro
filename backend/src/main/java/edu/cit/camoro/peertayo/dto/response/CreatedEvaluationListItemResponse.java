@@ -11,5 +11,8 @@ public class CreatedEvaluationListItemResponse {
     private Long id;
     private String title;
     private LocalDateTime deadline;
+    private LocalDateTime createdAt;
     private String submissionProgress;
+    private String status;
+    private String description;
 }

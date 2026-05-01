@@ -22,4 +22,6 @@ public interface EvaluationAssignmentRepository extends JpaRepository<Evaluation
     long countByEvaluationAndSubmittedTrue(EvaluationForm evaluation);
 
     List<EvaluationAssignment> findAllByEvaluationAndSubmittedTrue(EvaluationForm evaluation);
+
+    void deleteAllByEvaluation(EvaluationForm evaluation);
 }

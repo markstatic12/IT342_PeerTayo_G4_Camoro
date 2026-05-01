@@ -35,4 +35,7 @@ public class EvaluationAssignment {
 
     @Column(name = "submitted_at")
     private LocalDateTime submittedAt;
+
+    @Column(name = "comment", length = 1000)
+    private String comment;
 }
