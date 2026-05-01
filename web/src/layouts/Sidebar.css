@@ -162,3 +162,46 @@
 .sidebar__confirm-btn--danger:hover:not(:disabled) {
   background: #dc2626;
 }
+
+/* ── Role badge ─────────────────────────────────────────────────────── */
+.sidebar__role-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 1rem 1rem;
+  padding: 10px 12px;
+  background: rgba(59, 130, 246, 0.07);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 10px;
+}
+
+.sidebar__role-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.sidebar__role-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.sidebar__role-title span {
+  color: #3b82f6;
+}
+
+.sidebar__role-sub {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 2px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}

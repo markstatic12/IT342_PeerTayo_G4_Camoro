@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api/axios';
 import { authSession } from '../utils/auth/AuthSession';
 import { authEventBus, AUTH_EVENTS } from '../utils/auth/AuthEventBus';
-import { adaptAuthPayload, adaptUserPayload } from '../utils/auth/AuthResponseAdapter';
+import { adaptAuthPayload } from '../utils/auth/AuthResponseAdapter';
 
 const AuthContext = createContext(null);
 
@@ -11,6 +11,26 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => authSession.getUser());
   const [token, setToken] = useState(() => authSession.getToken());
   const [loading, setLoading] = useState(false);
+
+  // On mount, if a token exists refresh it so roles are always current from DB
+  useEffect(() => {
+    const storedToken = authSession.getToken();
+    if (!storedToken) return;
+
+    api.post('/auth/refresh', null, {
+      headers: { Authorization: `Bearer ${storedToken}` },
+    }).then((res) => {
+      const { user: userData, token: newToken } = adaptAuthPayload(res.data.data);
+      if (userData) setUser(userData);
+      if (newToken) setToken(newToken);
+    }).catch(() => {
+      // Token is expired or invalid — clear session and let the user log in again
+      authSession.clearSession();
+      setUser(null);
+      setToken(null);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     authSession.setToken(token);
@@ -71,9 +91,10 @@ export function AuthProvider({ children }) {
       const res = await api.get('/auth/me', {
         headers: { Authorization: `Bearer ${jwt}` },
       });
-      const { user: userData } = adaptUserPayload(res.data.data);
+      // /auth/me returns { user: UserResponse } — extract the nested user directly
+      const userData = res.data?.data?.user ?? null;
       setToken(jwt);
-      setUser(userData);
+      if (userData) setUser(userData);
       return { success: true, user: userData };
     } catch {
       return { success: false, message: 'Failed to fetch user info after Google sign-in' };
@@ -85,11 +106,25 @@ export function AuthProvider({ children }) {
 
     try {
       const res = await api.get('/auth/me');
-      const { user: userData } = adaptUserPayload(res.data.data);
-      setUser(userData);
+      // /auth/me returns { user: UserResponse } — extract the nested user directly
+      const userData = res.data?.data?.user ?? null;
+      if (userData) setUser(userData);
       return { success: true, user: userData };
     } catch {
       return { success: false, message: 'Unable to refresh current user' };
+    }
+  };
+
+  const promoteToFacilitator = async () => {
+    try {
+      const res = await api.post('/auth/promote-to-facilitator');
+      const { user: userData, token: newToken } = adaptAuthPayload(res.data.data);
+      if (userData) setUser(userData);
+      if (newToken) setToken(newToken);
+      return { success: true, user: userData };
+    } catch (err) {
+      const msg = err.response?.data?.error?.message || 'Promotion failed';
+      return { success: false, message: msg };
     }
   };
 
@@ -118,6 +153,7 @@ export function AuthProvider({ children }) {
         logout,
         loginWithToken,
         refreshCurrentUser,
+        promoteToFacilitator,
         isAuthenticated: !!token,
       }}
     >

@@ -631,3 +631,95 @@
 @media (max-width: 480px) {
   .stat-row { grid-template-columns: 1fr; }
 }
+
+/* ── Facilitator Upgrade Modal ─────────────────────────────────────── */
+.db-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.db-upgrade-modal {
+  background: #13161f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 36px 32px 28px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+.db-upgrade-icon {
+  font-size: 28px;
+  color: #3b82f6;
+  margin-bottom: 12px;
+}
+
+.db-upgrade-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 10px;
+}
+
+.db-upgrade-body {
+  font-size: 0.875rem;
+  color: #8b99b5;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.db-upgrade-body strong {
+  color: #cbd5e1;
+}
+
+.db-upgrade-error {
+  font-size: 0.8rem;
+  color: #ef4444;
+  margin-bottom: 14px;
+}
+
+.db-upgrade-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.db-upgrade-btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+}
+
+.db-upgrade-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.db-upgrade-btn--ghost {
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+}
+
+.db-upgrade-btn--ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.db-upgrade-btn--primary {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.db-upgrade-btn--primary:hover:not(:disabled) {
+  background: #2563eb;
+}

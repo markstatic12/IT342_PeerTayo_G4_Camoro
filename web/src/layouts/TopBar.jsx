@@ -9,7 +9,9 @@ export default function TopBar() {
     (user?.firstName?.charAt(0) || '') + (user?.lastName?.charAt(0) || '');
 
   const roleName =
-    user?.roles?.includes('FACILITATOR') ? 'Facilitator' : 'Respondent';
+    user?.roles?.some((r) => (typeof r === 'string' ? r : r?.name)?.toUpperCase() === 'FACILITATOR')
+      ? 'Facilitator'
+      : 'Respondent';
 
   return (
     <header className="topbar">
