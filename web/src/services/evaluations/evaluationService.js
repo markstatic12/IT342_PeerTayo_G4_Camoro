@@ -2,12 +2,12 @@ import api from '../../api/axios';
 
 const basePath = '/evaluations';
 
-export async function listEvaluations() {
+export async function listCreatedEvaluations() {
   const response = await api.get(`${basePath}/created`);
   return response.data?.data?.evaluations ?? [];
 }
 
-export async function getEvaluation(id) {
+export async function getEvaluationResults(id) {
   const response = await api.get(`${basePath}/${id}/results`);
   return response.data?.data;
 }
@@ -17,9 +17,13 @@ export async function createEvaluation(payload) {
   return response.data?.data?.evaluation;
 }
 
-export async function listCreatedEvaluations() {
-  const response = await api.get(`${basePath}/created`);
-  return response.data?.data?.evaluations ?? [];
+export async function updateEvaluation(id, payload) {
+  const response = await api.put(`${basePath}/${id}`, payload);
+  return response.data?.data?.evaluation;
+}
+
+export async function deleteEvaluation(id) {
+  await api.delete(`${basePath}/${id}`);
 }
 
 export async function listPendingEvaluations() {

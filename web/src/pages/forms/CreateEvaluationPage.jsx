@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { createEvaluation } from '../../services/evaluations/evaluationService';
@@ -20,7 +20,7 @@ const criteriaOptions = [
 
 export default function CreateEvaluationPage() {
   const navigate = useNavigate();
-  const { user: currentUser, refreshCurrentUser } = useAuth();
+  const { user: currentUser } = useAuth();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     title: '',
@@ -165,8 +165,7 @@ export default function CreateEvaluationPage() {
         evaluateeIds,
         evaluatorIds,
       });
-      await refreshCurrentUser();
-      navigate('/dashboard');
+      navigate('/forms-created');
     } catch (err) {
       const message = err.response?.data?.error?.message || 'Failed to create evaluation.';
       setError(message);
