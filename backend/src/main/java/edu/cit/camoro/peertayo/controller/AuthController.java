@@ -18,6 +18,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -43,10 +45,24 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(
+    public ResponseEntity<ApiResponse<Map<String, UserResponse>>> getCurrentUser(
             @AuthenticationPrincipal UserDetails userDetails) {
         UserResponse userResponse = authService.getCurrentUser(userDetails.getUsername());
-        return ResponseEntity.ok(ApiResponse.ok(userResponse));
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("user", userResponse)));
+    }
+
+    @PostMapping("/promote-to-facilitator")
+    public ResponseEntity<ApiResponse<AuthResponse>> promoteToFacilitator(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        AuthResponse authResponse = authService.promoteToFacilitator(userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(authResponse));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<AuthResponse>> refresh(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        AuthResponse authResponse = authService.refreshSession(userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(authResponse));
     }
 
     @PostMapping("/logout")

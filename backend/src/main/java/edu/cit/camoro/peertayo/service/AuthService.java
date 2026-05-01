@@ -58,6 +58,7 @@ public class AuthService {
         return buildAuthResponse(user, token);
     }
 
+    @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -102,6 +103,32 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return toUserResponse(user);
+    }
+
+    @Transactional(readOnly = true)
+    public AuthResponse refreshSession(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        // Re-load UserDetails so the new token carries the latest roles from DB
+        String token = generateTokenForEmail(user.getEmail());
+        return buildAuthResponse(user, token);
+    }
+
+    @Transactional
+    public AuthResponse promoteToFacilitator(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        boolean alreadyFacilitator = user.getRoles().stream()
+                .anyMatch(r -> r.getName() == ERole.FACILITATOR);
+        if (!alreadyFacilitator) {
+            Role facilitatorRole = getOrCreateRole(ERole.FACILITATOR);
+            user.getRoles().add(facilitatorRole);
+            userRepository.save(user);
+        }
+        // Always issue a fresh token so the new ROLE_FACILITATOR authority is included
+        String token = generateTokenForEmail(user.getEmail());
+        return buildAuthResponse(user, token);
     }
 
     private Role getOrCreateRole(ERole roleName) {
