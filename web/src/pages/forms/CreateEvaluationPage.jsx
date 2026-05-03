@@ -38,6 +38,14 @@ export default function CreateEvaluationPage() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [error, setError] = useState('');
 
+  // Scroll to top of the layout content area whenever the step changes
+  useEffect(() => {
+    const container = document.querySelector('.app-layout__content');
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [step]);
+
   const updateField = (field) => (event) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
   };

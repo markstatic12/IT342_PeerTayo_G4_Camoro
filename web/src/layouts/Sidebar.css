@@ -47,6 +47,7 @@
   letter-spacing: 0.14em;
   padding: 0 0.5rem;
   margin-bottom: 0.5rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .sidebar__link {
@@ -61,6 +62,7 @@
   transition: all 150ms ease;
   text-decoration: none;
   margin-bottom: 0.25rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .sidebar__link:hover {
@@ -99,6 +101,7 @@
   width: 100%;
   text-align: left;
   text-decoration: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .sidebar__footer-link:hover {
@@ -107,60 +110,7 @@
 }
 
 .sidebar__confirm {
-  padding: 0.75rem;
-  border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  margin-top: 0.5rem;
-}
-
-.sidebar__confirm-text {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #f8fafc;
-  margin: 0 0 0.6rem;
-  line-height: 1.4;
-}
-
-.sidebar__confirm-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.sidebar__confirm-btn {
-  flex: 1;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: 0.75rem;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 150ms ease;
-}
-
-.sidebar__confirm-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.sidebar__confirm-btn--cancel {
-  background: #111827;
-  border-color: rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
-}
-
-.sidebar__confirm-btn--cancel:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.08);
-  color: #f8fafc;
-}
-
-.sidebar__confirm-btn--danger {
-  background: #ef4444;
-  color: #fff;
-}
-
-.sidebar__confirm-btn--danger:hover:not(:disabled) {
-  background: #dc2626;
+  display: none; /* removed — replaced by modal overlay */
 }
 
 /* ── Role badge ─────────────────────────────────────────────────────── */
@@ -204,4 +154,104 @@
   color: #64748b;
   margin-top: 2px;
   font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ── Logout modal overlay ───────────────────────────────────────────── */
+.sidebar__logout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.sidebar__logout-modal {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 32px 28px 26px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  animation: logout-modal-in 0.18s ease;
+}
+
+@keyframes logout-modal-in {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.sidebar__logout-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.sidebar__logout-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.sidebar__logout-body {
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.sidebar__logout-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.sidebar__logout-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s, background 0.15s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.sidebar__logout-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sidebar__logout-btn--cancel {
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar__logout-btn--cancel:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+}
+
+.sidebar__logout-btn--danger {
+  background: #ef4444;
+  color: #fff;
+}
+
+.sidebar__logout-btn--danger:hover:not(:disabled) {
+  background: #dc2626;
 }

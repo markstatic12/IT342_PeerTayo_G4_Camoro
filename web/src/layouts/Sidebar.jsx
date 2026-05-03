@@ -22,7 +22,7 @@ const mainMenu = [
 export default function Sidebar() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
@@ -37,7 +37,7 @@ export default function Sidebar() {
     setIsLoggingOut(true);
     await logout();
     setIsLoggingOut(false);
-    setShowConfirm(false);
+    setShowModal(false);
     setShowToast(true);
     setTimeout(() => navigate('/login', { replace: true }), 1800);
   };
@@ -102,19 +102,36 @@ export default function Sidebar() {
           Settings
         </NavLink>
 
-        {showConfirm ? (
-          <div className="sidebar__confirm">
-            <p className="sidebar__confirm-text">Sign out of PeerTayo?</p>
-            <div className="sidebar__confirm-actions">
+        <button className="sidebar__footer-link" onClick={() => setShowModal(true)}>
+          <LogoutIcon size={18} />
+          Sign Out
+        </button>
+      </div>
+
+      {/* Logout confirmation modal */}
+      {showModal && (
+        <div
+          className="sidebar__logout-overlay"
+          onClick={(e) => e.target === e.currentTarget && !isLoggingOut && setShowModal(false)}
+        >
+          <div className="sidebar__logout-modal">
+            <div className="sidebar__logout-icon">
+              <LogoutIcon size={22} />
+            </div>
+            <div className="sidebar__logout-title">Sign out of PeerTayo?</div>
+            <div className="sidebar__logout-body">
+              You'll need to sign back in to access your evaluations and forms.
+            </div>
+            <div className="sidebar__logout-actions">
               <button
-                className="sidebar__confirm-btn sidebar__confirm-btn--cancel"
-                onClick={() => setShowConfirm(false)}
+                className="sidebar__logout-btn sidebar__logout-btn--cancel"
+                onClick={() => setShowModal(false)}
                 disabled={isLoggingOut}
               >
                 Cancel
               </button>
               <button
-                className="sidebar__confirm-btn sidebar__confirm-btn--danger"
+                className="sidebar__logout-btn sidebar__logout-btn--danger"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
               >
@@ -122,13 +139,8 @@ export default function Sidebar() {
               </button>
             </div>
           </div>
-        ) : (
-          <button className="sidebar__footer-link" onClick={() => setShowConfirm(true)}>
-            <LogoutIcon size={18} />
-            Sign Out
-          </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {showToast && (
         <Toast
