@@ -1,4 +1,4 @@
-package com.example.peertayo_mobile.auth
+package com.example.peertayo_mobile.auth.register
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.peertayo_mobile.MainActivity
+import com.example.peertayo_mobile.auth.login.LoginActivity
 import com.example.peertayo_mobile.databinding.ActivityRegisterBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,7 +31,6 @@ class RegisterActivity : AppCompatActivity() {
             val lastName = binding.etLastName.text.toString()
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
-            
             viewModel.register(firstName, lastName, email, password)
         }
 

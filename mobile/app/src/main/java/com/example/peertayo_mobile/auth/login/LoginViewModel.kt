@@ -1,13 +1,12 @@
-package com.example.peertayo_mobile.auth
+package com.example.peertayo_mobile.auth.login
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.peertayo_mobile.api.ApiService
-import com.example.peertayo_mobile.api.LoginRequest
-import com.example.peertayo_mobile.api.User
-import com.example.peertayo_mobile.utils.TokenManager
+import com.example.peertayo_mobile.core.api.ApiService
+import com.example.peertayo_mobile.core.api.LoginRequest
+import com.example.peertayo_mobile.core.utils.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +21,6 @@ class LoginViewModel @Inject constructor(
     val loginState: LiveData<LoginState> = _loginState
 
     fun login(email: String, password: String) {
-        // Validate
         if (email.isBlank() || password.isBlank()) {
             _loginState.value = LoginState.Error("Email and password are required")
             return
@@ -33,7 +31,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = apiService.login(LoginRequest(email.trim(), password))
-                
+
                 if (response.isSuccessful && response.body()?.success == true) {
                     val authResponse = response.body()?.data
                     if (authResponse != null) {
@@ -51,10 +49,4 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
-}
-
-sealed class LoginState {
-    object Loading : LoginState()
-    data class Success(val user: User) : LoginState()
-    data class Error(val message: String) : LoginState()
 }

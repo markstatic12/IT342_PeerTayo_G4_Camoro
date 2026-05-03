@@ -1,10 +1,12 @@
-package com.example.peertayo_mobile.api
+package com.example.peertayo_mobile.core.api
 
+import com.example.peertayo_mobile.auth.shared.AuthResponse
+import com.example.peertayo_mobile.auth.shared.User
 import retrofit2.Response
 import retrofit2.http.*
 
 /**
- * API endpoints for authentication
+ * Retrofit API interface — all backend endpoints.
  */
 interface ApiService {
 
@@ -20,4 +22,3 @@ interface ApiService {
     @POST("api/v1/auth/logout")
     suspend fun logout(@Header("Authorization") token: String): Response<ApiResponse<Unit>>
 }
-

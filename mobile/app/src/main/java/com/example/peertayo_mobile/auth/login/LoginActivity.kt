@@ -1,4 +1,4 @@
-package com.example.peertayo_mobile.auth
+package com.example.peertayo_mobile.auth.login
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.peertayo_mobile.MainActivity
+import com.example.peertayo_mobile.auth.register.RegisterActivity
 import com.example.peertayo_mobile.databinding.ActivityLoginBinding
 import dagger.hilt.android.AndroidEntryPoint
 

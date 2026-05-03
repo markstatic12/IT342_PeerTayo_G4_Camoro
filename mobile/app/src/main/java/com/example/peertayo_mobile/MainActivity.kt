@@ -4,9 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.peertayo_mobile.auth.LoginActivity
+import com.example.peertayo_mobile.auth.login.LoginActivity
+import com.example.peertayo_mobile.core.utils.TokenManager
 import com.example.peertayo_mobile.databinding.ActivityMainBinding
-import com.example.peertayo_mobile.utils.TokenManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    
+
     @Inject
     lateinit var tokenManager: TokenManager
 
@@ -23,14 +23,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Check if logged in
         if (!tokenManager.isLoggedIn()) {
             navigateToLogin()
             return
         }
 
         binding.tvWelcome.text = "Welcome to PeerTayo!"
-        
+
         binding.btnLogout.setOnClickListener {
             tokenManager.clearToken()
             Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()

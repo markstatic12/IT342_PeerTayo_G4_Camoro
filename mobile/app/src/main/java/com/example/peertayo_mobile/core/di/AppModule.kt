@@ -1,7 +1,7 @@
-package com.example.peertayo_mobile.di
+package com.example.peertayo_mobile.core.di
 
-import com.example.peertayo_mobile.api.ApiService
-import com.example.peertayo_mobile.utils.Constants
+import com.example.peertayo_mobile.core.api.ApiService
+import com.example.peertayo_mobile.core.utils.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 /**
- * Hilt module for dependency injection
+ * Hilt DI module — provides Retrofit, OkHttpClient, and ApiService singletons.
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -26,7 +26,6 @@ object AppModule {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
-        
         return OkHttpClient.Builder()
             .addInterceptor(logging)
             .connectTimeout(30, TimeUnit.SECONDS)

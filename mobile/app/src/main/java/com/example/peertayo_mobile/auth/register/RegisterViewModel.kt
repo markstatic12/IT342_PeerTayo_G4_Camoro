@@ -1,13 +1,12 @@
-package com.example.peertayo_mobile.auth
+package com.example.peertayo_mobile.auth.register
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.peertayo_mobile.api.ApiService
-import com.example.peertayo_mobile.api.RegisterRequest
-import com.example.peertayo_mobile.api.User
-import com.example.peertayo_mobile.utils.TokenManager
+import com.example.peertayo_mobile.core.api.ApiService
+import com.example.peertayo_mobile.core.api.RegisterRequest
+import com.example.peertayo_mobile.core.utils.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +21,6 @@ class RegisterViewModel @Inject constructor(
     val registerState: LiveData<RegisterState> = _registerState
 
     fun register(firstName: String, lastName: String, email: String, password: String) {
-        // Validate
         if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {
             _registerState.value = RegisterState.Error("All fields are required")
             return
@@ -44,7 +42,7 @@ class RegisterViewModel @Inject constructor(
                     password
                 )
                 val response = apiService.register(request)
-                
+
                 if (response.isSuccessful && response.body()?.success == true) {
                     val authResponse = response.body()?.data
                     if (authResponse != null) {
@@ -62,10 +60,4 @@ class RegisterViewModel @Inject constructor(
             }
         }
     }
-}
-
-sealed class RegisterState {
-    object Loading : RegisterState()
-    data class Success(val user: User) : RegisterState()
-    data class Error(val message: String) : RegisterState()
 }
