@@ -1,7 +1,7 @@
 package edu.cit.camoro.peertayo.auth.security;
 
-import edu.cit.camoro.peertayo.auth.dto.response.AuthResponse;
-import edu.cit.camoro.peertayo.auth.service.AuthService;
+import edu.cit.camoro.peertayo.auth.oauth2.GoogleOAuth2Service;
+import edu.cit.camoro.peertayo.auth.token.AuthResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final AuthService authService;
+    private final GoogleOAuth2Service googleOAuth2Service;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
@@ -35,7 +35,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
 
         try {
-            AuthResponse authResponse = authService.authenticateWithGoogleOAuth2User(oAuth2User);
+            AuthResponse authResponse = googleOAuth2Service.authenticate(oAuth2User);
             String encodedToken = URLEncoder.encode(authResponse.getToken(), StandardCharsets.UTF_8);
             response.sendRedirect(frontendUrl + "/auth/callback?token=" + encodedToken);
         } catch (IllegalArgumentException ex) {

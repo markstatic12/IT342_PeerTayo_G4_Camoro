@@ -1,7 +1,7 @@
 package edu.cit.camoro.peertayo.user.controller;
 
 import edu.cit.camoro.peertayo.auth.entity.User;
-import edu.cit.camoro.peertayo.auth.dto.response.UserResponse;
+import edu.cit.camoro.peertayo.auth.shared.UserResponse;
 import edu.cit.camoro.peertayo.auth.repository.UserRepository;
 import edu.cit.camoro.peertayo.shared.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
