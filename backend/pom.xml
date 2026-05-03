@@ -99,6 +99,27 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- H2 in-memory DB for tests (avoids hitting real Supabase) -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Spring Security Test -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JsonPath for test assertions -->
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Google OAuth 2.0 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
