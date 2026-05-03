@@ -7,11 +7,6 @@ export async function listCreatedEvaluations() {
   return response.data?.data?.evaluations ?? [];
 }
 
-export async function getEvaluationResults(id) {
-  const response = await api.get(`${basePath}/${id}/results`);
-  return response.data?.data;
-}
-
 export async function createEvaluation(payload) {
   const response = await api.post(basePath, payload);
   return response.data?.data?.evaluation;
@@ -24,19 +19,4 @@ export async function updateEvaluation(id, payload) {
 
 export async function deleteEvaluation(id) {
   await api.delete(`${basePath}/${id}`);
-}
-
-export async function listPendingEvaluations() {
-  const response = await api.get(`${basePath}/pending`);
-  return response.data?.data?.evaluations ?? [];
-}
-
-export async function submitEvaluation(id, payload) {
-  const response = await api.post(`${basePath}/${id}/submit`, payload);
-  return response.data?.data;
-}
-
-export async function getMyResults() {
-  const response = await api.get(`${basePath}/my-results`);
-  return response.data?.data?.results;
 }

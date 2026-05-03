@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/context/AuthContext';
-import {
-  getMyResults,
-  listCreatedEvaluations,
-  listPendingEvaluations,
-} from '../evaluation/service/evaluationService';
-import { listNotifications } from '../notification/service/notificationService';
+import { listCreatedEvaluations } from '../evaluation/form/evaluationFormService';
+import { listPendingEvaluations } from '../evaluation/submission/evaluationSubmissionService';
+import { getMyResults } from '../evaluation/results/evaluationResultsService';
+import { listNotifications } from '../notification/list/notificationService';
 import './DashboardPage.css';
 
 /* ── Carousel slides ──────────────────────────────────────────────────── */

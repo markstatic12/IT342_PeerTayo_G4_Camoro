@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/context/AuthContext';
-import { createEvaluation } from '../service/evaluationService';
-import { searchUsers } from '../../user/service/userService';
+import { createEvaluation } from './evaluationFormService';
+import { searchUsers } from '../../user/search/userService';
 import './CreateEvaluationPage.css';
 
 const criteriaOptions = [

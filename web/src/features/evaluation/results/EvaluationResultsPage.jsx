@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getEvaluationResults, listCreatedEvaluations } from '../service/evaluationService';
+import { getEvaluationResults } from './evaluationResultsService';
+import { listCreatedEvaluations } from '../form/evaluationFormService';
 import './EvaluationResultsPage.css';
 
 /* ── Helpers ──────────────────────────────────────────────────────────── */
