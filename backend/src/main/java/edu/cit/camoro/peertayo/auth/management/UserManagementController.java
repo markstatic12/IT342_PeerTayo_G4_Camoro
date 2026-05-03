@@ -1,8 +1,8 @@
-package edu.cit.camoro.peertayo.user.controller;
+package edu.cit.camoro.peertayo.auth.management;
 
 import edu.cit.camoro.peertayo.auth.entity.User;
-import edu.cit.camoro.peertayo.auth.shared.UserResponse;
 import edu.cit.camoro.peertayo.auth.repository.UserRepository;
+import edu.cit.camoro.peertayo.auth.shared.UserResponse;
 import edu.cit.camoro.peertayo.shared.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserManagementController {
 
     private final UserRepository userRepository;
 
@@ -25,17 +25,15 @@ public class UserController {
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(name = "q", required = false) String query) {
 
-        String normalizedQuery = query == null ? "" : query.trim();
+        String q = query == null ? "" : query.trim();
 
-        List<User> matches = normalizedQuery.isEmpty()
+        List<User> matches = q.isEmpty()
                 ? userRepository.findTop20ByOrderByFirstNameAsc()
                 : userRepository
                 .findTop20ByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderByFirstNameAsc(
-                        normalizedQuery, normalizedQuery, normalizedQuery);
+                        q, q, q);
 
-        List<UserResponse> users = matches.stream()
-                .map(this::toResponse)
-                .toList();
+        List<UserResponse> users = matches.stream().map(this::toResponse).toList();
         return ResponseEntity.ok(ApiResponse.ok(Map.of("users", users)));
     }
 

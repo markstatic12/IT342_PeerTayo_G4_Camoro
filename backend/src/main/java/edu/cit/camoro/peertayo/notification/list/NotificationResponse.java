@@ -1,4 +1,4 @@
-package edu.cit.camoro.peertayo.notification.dto.response;
+package edu.cit.camoro.peertayo.notification.list;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;

@@ -1,8 +1,7 @@
-package edu.cit.camoro.peertayo.notification.service;
+package edu.cit.camoro.peertayo.notification.markread;
 
 import edu.cit.camoro.peertayo.auth.entity.User;
 import edu.cit.camoro.peertayo.auth.repository.UserRepository;
-import edu.cit.camoro.peertayo.notification.dto.response.NotificationResponse;
 import edu.cit.camoro.peertayo.notification.entity.Notification;
 import edu.cit.camoro.peertayo.notification.repository.NotificationRepository;
 import edu.cit.camoro.peertayo.shared.exception.ResourceNotFoundException;
@@ -10,25 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
-public class NotificationService {
+public class MarkReadService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
-
-    @Transactional(readOnly = true)
-    public List<NotificationResponse> getNotifications(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        return notificationRepository.findAllByUserOrderByCreatedAtDesc(user)
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
 
     @Transactional
     public void markAsRead(Long id, String email) {
@@ -44,14 +30,5 @@ public class NotificationService {
 
         notification.setRead(true);
         notificationRepository.save(notification);
-    }
-
-    private NotificationResponse toResponse(Notification notification) {
-        return NotificationResponse.builder()
-                .id(notification.getId())
-                .message(notification.getMessage())
-                .isRead(notification.isRead())
-                .createdAt(notification.getCreatedAt())
-                .build();
     }
 }
