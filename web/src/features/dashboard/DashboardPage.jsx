@@ -359,7 +359,7 @@ export default function DashboardPage() {
       delta: pendingDue > 0 ? `⚠ ${pendingDue} due in 2 days` : null,
       deltaClass: 'd-warn',
       action: 'View Pending',
-      route: '/evaluations',
+      route: '/pending-evaluations',
       showAlways: true,
     },
     {
@@ -427,7 +427,7 @@ export default function DashboardPage() {
 
   /* ════════════════════════════════════════════════════════════════════ */
   return (
-    <div className="db-page">
+    <div className="db-page animate-page">
       <div className="db-shell">
 
         {/* ── LEFT COLUMN ─────────────────────────────────────────────── */}
@@ -561,7 +561,7 @@ export default function DashboardPage() {
                 <div className="act-title">Recent Activity</div>
                 <div className="act-sub">Last 7 days</div>
               </div>
-              <button className="act-view-all" type="button" onClick={() => navigate('/evaluations')}>
+              <button className="act-view-all" type="button" onClick={() => navigate('/pending-evaluations')}>
                 View all <IconArrowRight size={11} />
               </button>
             </div>
