@@ -1,4 +1,4 @@
-package edu.cit.camoro.peertayo.user;
+package edu.cit.camoro.peertayo.auth.management;
 
 import edu.cit.camoro.peertayo.TestHelper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@DisplayName("User Search API")
-class UserControllerTest {
+@DisplayName("User Management API")
+class UserManagementControllerTest {
 
     @Autowired MockMvc mockMvc;
 
