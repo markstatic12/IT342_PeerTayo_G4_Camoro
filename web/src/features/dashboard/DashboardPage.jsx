@@ -122,7 +122,7 @@ function drawLineChart(canvas, criteriaData) {
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   ctx.clearRect(0, 0, W, H);
 
-  const PAD_L = 32, PAD_R = 12, PAD_T = 14, PAD_B = 8;
+    const PAD_L = 32, PAD_R = 12, PAD_T = 28, PAD_B = 8;
   const gW = W - PAD_L - PAD_R;
   const gH = H - PAD_T - PAD_B;
   const n = criteriaData.length;
@@ -132,7 +132,7 @@ function drawLineChart(canvas, criteriaData) {
   const yOf = (v) => PAD_T + gH - ((v - 1) / 4) * gH;
   const xOf = (i) => PAD_L + (i / (n - 1)) * gW;
 
-  ctx.font = '8px Inter, system-ui, sans-serif';
+  ctx.font = '8px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.textAlign = 'right';
   for (let v = 1; v <= 5; v++) {
     const y = yOf(v);
@@ -170,7 +170,12 @@ function drawLineChart(canvas, criteriaData) {
   ctx.fillStyle = grad;
   ctx.fill();
 
-  ctx.save();
+  drawCurve();
+  ctx.strokeStyle = 'rgba(91,157,255,0.25)';
+  ctx.lineWidth = 5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
   drawCurve();
   ctx.strokeStyle = '#3b82f6';
   ctx.lineWidth = 2.2;
@@ -178,14 +183,14 @@ function drawLineChart(canvas, criteriaData) {
   ctx.shadowColor = '#3b82f6';
   ctx.shadowBlur = 8;
   ctx.stroke();
-  ctx.restore();
+  ctx.shadowBlur = 0;
 
   const highest = Math.max(...scores);
   const lowest = Math.min(...scores);
   pts.forEach((pt, i) => {
     const v = scores[i];
     const isHigh = v === highest, isLow = v === lowest;
-    const dotColor = isHigh ? '#3b82f6' : isLow ? '#ef4444' : '#3b82f6';
+    const dotColor = isHigh ? '#60a5fa' : isLow ? '#ef4444' : '#3b82f6';
     const dotR = isHigh || isLow ? 4.5 : 3.5;
 
     ctx.beginPath();
@@ -204,14 +209,18 @@ function drawLineChart(canvas, criteriaData) {
     ctx.beginPath();
     ctx.arc(pt.x, pt.y, dotR, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(12,15,24,0.9)';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
     if (isHigh || isLow) {
-      ctx.font = '700 8.5px Inter, system-ui, sans-serif';
+      ctx.font = '700 8.5px "DM Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillStyle = isHigh ? '#3b82f6' : '#ef4444';
-      ctx.fillText(v.toFixed(1), pt.x, isHigh ? pt.y - dotR - 5 : pt.y + dotR + 11);
+      ctx.fillStyle = isHigh ? '#60a5fa' : '#ef4444';
+        ctx.fillText(
+          v.toFixed(1),
+          pt.x,
+          isHigh ? Math.max(PAD_T - 6, pt.y - dotR - 5) : pt.y + dotR + 11
+        );
     }
   });
 }
@@ -516,7 +525,9 @@ export default function DashboardPage() {
               <div className="ac-chart-col">
                 <div className="lg-wrap">
                   {chartData.length > 0 ? (
-                    <canvas ref={chartRef} />
+                    <div className="lg-canvas-area">
+                      <canvas ref={chartRef} />
+                    </div>
                   ) : (
                     <div className="ac-empty">No performance data yet.</div>
                   )}

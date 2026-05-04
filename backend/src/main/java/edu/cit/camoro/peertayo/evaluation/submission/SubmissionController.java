@@ -20,9 +20,26 @@ public class SubmissionController {
 
     @GetMapping("/pending")
     public ResponseEntity<ApiResponse<Map<String, List<PendingEvaluationResponse>>>> getPending(
-            @AuthenticationPrincipal UserDetails userDetails) {
-        List<PendingEvaluationResponse> data = submissionService.getPending(userDetails.getUsername());
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(name = "archived", defaultValue = "false") boolean archived) {
+        List<PendingEvaluationResponse> data = submissionService.getPending(userDetails.getUsername(), archived);
         return ResponseEntity.ok(ApiResponse.ok(Map.of("evaluations", data)));
+    }
+
+    @PostMapping("/pending/{evaluationId}/archive")
+    public ResponseEntity<ApiResponse<Map<String, String>>> archivePending(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        submissionService.setArchivedForEvaluation(evaluationId, userDetails.getUsername(), true);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("message", "Evaluation archived")));
+    }
+
+    @PostMapping("/pending/{evaluationId}/unarchive")
+    public ResponseEntity<ApiResponse<Map<String, String>>> unarchivePending(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        submissionService.setArchivedForEvaluation(evaluationId, userDetails.getUsername(), false);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("message", "Evaluation unarchived")));
     }
 
     @GetMapping("/submitted/summary")

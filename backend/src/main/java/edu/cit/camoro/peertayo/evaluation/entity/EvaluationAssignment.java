@@ -39,4 +39,12 @@ public class EvaluationAssignment {
 
     @Column(name = "comment", length = 1000)
     private String comment;
+
+    @Column(name = "archived_by_evaluator", nullable = false)
+    @Builder.Default
+    private boolean archivedByEvaluator = false;
+
+    @Column(name = "archived_by_evaluatee", nullable = false)
+    @Builder.Default
+    private boolean archivedByEvaluatee = false;
 }

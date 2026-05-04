@@ -11,6 +11,7 @@ import DashboardPage from './features/dashboard/DashboardPage';
 import FormsCreatedPage from './features/evaluation/form/FormsCreatedPage';
 import CreateEvaluationPage from './features/evaluation/form/CreateEvaluationPage';
 import EvaluationResultsPage from './features/evaluation/results/EvaluationResultsPage';
+import MyResultsPage from './features/evaluation/results/MyResultsPage';
 import PendingEvaluationsPage from './features/evaluation/submission/PendingEvaluationsPage';
 import EvaluateFormPage from './features/evaluation/submission/EvaluateFormPage';
 
@@ -33,7 +34,7 @@ export default function App() {
 
               {/* Respondent routes */}
               <Route path="/pending-evaluations" element={<PendingEvaluationsPage />} />
-              <Route path="/my-results"  element={<div style={{padding:32,color:'#94a3b8'}}>My Results — coming soon</div>} />
+              <Route path="/my-results"  element={<MyResultsPage />} />
               <Route path="/completed"   element={<div style={{padding:32,color:'#94a3b8'}}>My Completed Forms — coming soon</div>} />
               <Route path="/settings"    element={<div style={{padding:32,color:'#94a3b8'}}>Settings — coming soon</div>} />
 
