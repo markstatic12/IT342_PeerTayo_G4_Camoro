@@ -12,8 +12,8 @@
 .db-shell {
   display: flex;
   min-height: calc(100vh - var(--topbar-height));
-  padding: 22px 22px 28px;
-  gap: 18px;
+  padding: 16px 16px 22px;
+  gap: 14px;
 }
 
 /* ── Columns ────────────────────────────────────────────────────────── */
@@ -22,11 +22,11 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .db-right {
-  width: 268px;
+  width: 248px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -198,12 +198,12 @@
   background: #111827;
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px 14px;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   cursor: default;
 }
 
@@ -222,13 +222,13 @@
 
 /* icon badge */
 .sc-icon-wrap {
-  width: 30px;
-  height: 30px;
-  border-radius: 7px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 .ic-blue   { background: rgba(59, 130, 246, 0.14); color: #3b82f6; }
 .ic-orange { background: rgba(249, 115, 22, 0.12);  color: #fb923c; }
@@ -237,18 +237,18 @@
 
 .sc-val {
   font-family: 'DM Mono', monospace;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 900;
   color: #f8fafc;
   line-height: 1;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
 }
 
 .sc-label {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
   color: #94a3b8;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-family);
 }
 
 .sc-delta {

@@ -1,6 +1,5 @@
 /* -------------------------------------------------------------------------------
-   TopBar — Horizontal header bar with notifications and profile
-   Dark chrome for the dashboard UI
+   TopBar - Compact horizontal header matching the reference design
    ------------------------------------------------------------------------------- */
 
 .topbar {
@@ -12,21 +11,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  padding: 0 20px 0 24px;
   background: rgba(11, 14, 24, 0.95);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   z-index: 90;
+  backdrop-filter: blur(20px);
 }
 
 .topbar__search {
   position: relative;
   flex: 1;
-  max-width: 480px;
+  max-width: 440px;
 }
 
 .topbar__search-icon {
   position: absolute;
-  left: 12px;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
   color: #64748b;
@@ -35,54 +35,67 @@
 
 .topbar__search-input {
   width: 100%;
-  padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+  padding: 7px 12px 7px 32px;
   font-family: var(--font-family);
-  font-size: 0.875rem;
-  color: #f8fafc;
-  background: #0c1220;
-  border: 1.5px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-full);
+  font-size: 12px;
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
   transition: border-color 150ms ease;
+  outline: none;
 }
 
 .topbar__search-input::placeholder {
-  color: #64748b;
+  color: #4a5568;
 }
 
 .topbar__search-input:focus {
-  outline: none;
-  border-color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .topbar__right {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 10px;
 }
 
 .topbar__icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  color: #94a3b8;
+  width: 34px;
+  height: 34px;
+  color: #8b99b5;
   background: rgba(255, 255, 255, 0.04);
-  border: none;
-  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
   cursor: pointer;
+  position: relative;
   transition: all 150ms ease;
 }
 
 .topbar__icon-btn:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.13);
+  color: #f1f5f9;
 }
 
 .topbar__profile {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 8px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+
+.topbar__profile:hover {
+  border-color: rgba(255, 255, 255, 0.13);
 }
 
 .topbar__user-info {
@@ -99,26 +112,28 @@
 }
 
 .topbar__user-name {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 700;
+  color: #f1f5f9;
+  line-height: 1;
 }
 
 .topbar__user-role {
-  font-size: 0.75rem;
-  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-top: 1px;
 }
 
 .topbar__avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-full);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
   background: #3b82f6;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 700;
-  border: 2px solid rgba(59, 130, 246, 0.35);
+  font-size: 10px;
+  font-weight: 800;
 }
