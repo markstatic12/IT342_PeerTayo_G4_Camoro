@@ -434,7 +434,7 @@ export default function PendingEvaluationsPage() {
                   title="View archived evaluations"
                   onClick={() => setFilter(prev => prev === 'archived' ? 'all' : 'archived')}
                 >
-                  <SvgArchive /> {filter === 'archived' ? 'Exit Archives' : 'Archives'}
+                  <SvgArchive /> Archives
                 </button>
               </div>
 
