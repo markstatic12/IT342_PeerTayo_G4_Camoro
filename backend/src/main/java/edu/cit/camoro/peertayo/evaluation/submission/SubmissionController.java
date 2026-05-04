@@ -1,0 +1,36 @@
+package edu.cit.camoro.peertayo.evaluation.submission;
+
+import edu.cit.camoro.peertayo.shared.response.ApiResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/v1/evaluations")
+@RequiredArgsConstructor
+public class SubmissionController {
+
+    private final SubmissionService submissionService;
+
+    @GetMapping("/pending")
+    public ResponseEntity<ApiResponse<Map<String, List<PendingEvaluationResponse>>>> getPending(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        List<PendingEvaluationResponse> data = submissionService.getPending(userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("evaluations", data)));
+    }
+
+    @PostMapping("/{id}/submit")
+    public ResponseEntity<ApiResponse<Map<String, String>>> submit(
+            @PathVariable Long id,
+            @Valid @RequestBody SubmitEvaluationRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        submissionService.submit(id, userDetails.getUsername(), request);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("message", "Evaluation submitted successfully")));
+    }
+}

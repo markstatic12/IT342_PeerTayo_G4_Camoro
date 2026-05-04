@@ -1,16 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './routes/ProtectedRoute';
-import RoleProtectedRoute from './routes/RoleProtectedRoute';
-import AppLayout from './layouts/AppLayout';
+import { AuthProvider } from './features/auth/context/AuthContext';
+import ProtectedRoute from './shared/routes/ProtectedRoute';
+import RoleProtectedRoute from './shared/routes/RoleProtectedRoute';
+import AppLayout from './shared/layouts/AppLayout';
 import AuthShell from './features/auth/AuthShell';
-import AuthCallbackPage from './features/auth/AuthCallbackPage';
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import DashboardPage from './pages/dashboard/DashboardPage';
-import FormsCreatedPage from './pages/forms/FormsCreatedPage';
-import CreateEvaluationPage from './pages/forms/CreateEvaluationPage';
-import EvaluationResultsPage from './pages/forms/EvaluationResultsPage';
+import AuthCallbackPage from './features/auth/callback/AuthCallbackPage';
+import LoginPage from './features/auth/login/LoginPage';
+import RegisterPage from './features/auth/register/RegisterPage';
+import DashboardPage from './features/dashboard/DashboardPage';
+import FormsCreatedPage from './features/evaluation/form/FormsCreatedPage';
+import CreateEvaluationPage from './features/evaluation/form/CreateEvaluationPage';
+import EvaluationResultsPage from './features/evaluation/results/EvaluationResultsPage';
 
 export default function App() {
   return (

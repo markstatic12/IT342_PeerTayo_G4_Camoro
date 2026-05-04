@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { LogoIcon } from '../../components/icons/Icons';
+import { LogoIcon } from '../../shared/components/icons/Icons';
 import './AuthShell.css';
 
 const features = [
