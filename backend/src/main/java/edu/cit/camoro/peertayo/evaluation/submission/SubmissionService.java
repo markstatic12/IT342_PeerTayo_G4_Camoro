@@ -51,19 +51,23 @@ public class SubmissionService {
     }
 
     @Transactional
-    public void submit(Long evaluationId, String email, SubmitEvaluationRequest request) {
+    public void submit(Long assignmentId, String email, SubmitEvaluationRequest request) {
         User currentUser = getUser(email);
-        EvaluationForm evaluation = evaluationFormRepository.findById(evaluationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+        EvaluationAssignment assignment = evaluationAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
 
-        if (evaluation.getDeadline().isBefore(LocalDateTime.now()))
-            throw new BusinessRuleException("EVAL-001", "Cannot submit evaluation after the deadline");
+        if (!assignment.getEvaluator().getId().equals(currentUser.getId())) {
+            throw new BusinessRuleException("EVAL-003", "You are not authorized to submit this evaluation");
+        }
 
-        List<EvaluationAssignment> assignments = evaluationAssignmentRepository
-                .findAllByEvaluationAndEvaluatorAndSubmittedFalse(evaluation, currentUser);
-
-        if (assignments.isEmpty())
+        if (assignment.isSubmitted()) {
             throw new BusinessRuleException("EVAL-002", "You have already submitted this evaluation");
+        }
+
+        EvaluationForm evaluation = assignment.getEvaluation();
+        if (evaluation.getDeadline().isBefore(LocalDateTime.now())) {
+            throw new BusinessRuleException("EVAL-001", "Cannot submit evaluation after the deadline");
+        }
 
         List<Long> criterionIds = request.getResponses().stream()
                 .map(SubmitEvaluationRequest.ResponseItem::getCriteriaId).distinct().toList();
@@ -71,22 +75,24 @@ public class SubmissionService {
         Map<Long, Criterion> criterionMap = criterionRepository.findAllByIdInAndActiveTrue(criterionIds)
                 .stream().collect(Collectors.toMap(Criterion::getId, c -> c));
 
-        if (criterionMap.size() != criterionIds.size())
+        if (criterionMap.size() != criterionIds.size()) {
             throw new BusinessRuleException("VALID-001", "One or more criteria are invalid");
-
-        for (EvaluationAssignment assignment : assignments) {
-            ratingRepository.saveAll(request.getResponses().stream()
-                    .map(item -> Rating.builder()
-                            .assignment(assignment)
-                            .criterion(criterionMap.get(item.getCriteriaId()))
-                            .rating(item.getRating()).active(true).build())
-                    .toList());
-            assignment.setSubmitted(true);
-            assignment.setSubmittedAt(LocalDateTime.now());
-            if (request.getComment() != null && !request.getComment().isBlank())
-                assignment.setComment(request.getComment().trim());
         }
-        evaluationAssignmentRepository.saveAll(assignments);
+
+        ratingRepository.saveAll(request.getResponses().stream()
+                .map(item -> Rating.builder()
+                        .assignment(assignment)
+                        .criterion(criterionMap.get(item.getCriteriaId()))
+                        .rating(item.getRating()).active(true).build())
+                .toList());
+
+        assignment.setSubmitted(true);
+        assignment.setSubmittedAt(LocalDateTime.now());
+        if (request.getComment() != null && !request.getComment().isBlank()) {
+            assignment.setComment(request.getComment().trim());
+        }
+        
+        evaluationAssignmentRepository.save(assignment);
     }
 
     private User getUser(String email) {

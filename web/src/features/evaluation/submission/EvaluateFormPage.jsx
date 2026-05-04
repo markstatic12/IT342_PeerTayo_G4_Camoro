@@ -104,9 +104,10 @@ export default function EvaluateFormPage() {
         })),
         comment: comment.trim() || undefined,
       };
-      // form.id = evaluationForm id; evaluatee.assignmentId is stored on the backend
-      if (form?.id) {
-        await submitEvaluation(form.id, payload);
+      // Use the specific assignment ID for this peer
+      const assignmentId = evaluatee?.assignmentId;
+      if (assignmentId) {
+        await submitEvaluation(assignmentId, payload);
       }
       setSubmitted(true);
     } catch (err) {
