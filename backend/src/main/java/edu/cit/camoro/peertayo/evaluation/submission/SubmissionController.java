@@ -25,6 +25,17 @@ public class SubmissionController {
         return ResponseEntity.ok(ApiResponse.ok(Map.of("evaluations", data)));
     }
 
+    @GetMapping("/submitted/summary")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getSubmittedSummary(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        long submittedThisMonth = submissionService.getSubmittedThisMonthCount(userDetails.getUsername());
+        long totalSubmitted = submissionService.getSubmittedCount(userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(Map.of(
+            "submittedThisMonth", submittedThisMonth,
+            "totalSubmitted", totalSubmitted
+        )));
+    }
+
     @PostMapping("/{id}/submit")
     public ResponseEntity<ApiResponse<Map<String, String>>> submit(
             @PathVariable Long id,

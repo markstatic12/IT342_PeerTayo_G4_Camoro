@@ -11,3 +11,8 @@ export async function submitEvaluation(id, payload) {
   const response = await api.post(`${basePath}/${id}/submit`, payload);
   return response.data?.data;
 }
+
+export async function getSubmittedSummary() {
+  const response = await api.get(`${basePath}/submitted/summary`);
+  return response.data?.data;
+}

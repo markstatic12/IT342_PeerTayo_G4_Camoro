@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listPendingEvaluations } from './evaluationSubmissionService';
+import { getSubmittedSummary, listPendingEvaluations } from './evaluationSubmissionService';
 import './PendingEvaluationsPage.css';
 
 /* ─── Helpers ─────────────────────────────────────────────── */
@@ -283,6 +283,7 @@ export default function PendingEvaluationsPage() {
   const [filter, setFilter]       = useState('all');
   const [search, setSearch]       = useState('');
   const [archivedIds, setArchivedIds] = useState([]);
+  const [submittedThisMonth, setSubmittedThisMonth] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -291,10 +292,17 @@ export default function PendingEvaluationsPage() {
       setError('');
       try {
         // Returns: [{ id, assignmentId, title, deadline, evaluateeName }, ...]
-        const flat = await listPendingEvaluations();
-        if (mounted) setRawList(flat);
+        const [flat, summary] = await Promise.all([
+          listPendingEvaluations(),
+          getSubmittedSummary(),
+        ]);
+        if (mounted) {
+          setRawList(flat);
+          setSubmittedThisMonth(summary?.submittedThisMonth ?? 0);
+        }
       } catch {
         if (mounted) setError('Unable to load pending evaluations right now.');
+        if (mounted) setSubmittedThisMonth(0);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -401,7 +409,7 @@ export default function PendingEvaluationsPage() {
             <div className="sum-card s-green">
               <div className="sum-icon si-green"><SvgCheck /></div>
               <div>
-                <div className="sum-val">0</div>
+                <div className="sum-val">{submittedThisMonth}</div>
                 <div className="sum-lbl">Submitted This Month</div>
                 <div className="sum-delta sd-green">Keep it up!</div>
               </div>

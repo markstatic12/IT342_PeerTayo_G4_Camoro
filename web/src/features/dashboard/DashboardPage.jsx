@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/context/AuthContext';
 import { listCreatedEvaluations } from '../evaluation/form/evaluationFormService';
-import { listPendingEvaluations } from '../evaluation/submission/evaluationSubmissionService';
+import { getSubmittedSummary, listPendingEvaluations } from '../evaluation/submission/evaluationSubmissionService';
 import { getMyResults } from '../evaluation/results/evaluationResultsService';
 import { listNotifications } from '../notification/list/notificationService';
 import './DashboardPage.css';
@@ -225,6 +225,7 @@ export default function DashboardPage() {
   const [pendingEvaluations, setPendingEvaluations] = useState([]);
   const [myResults, setMyResults] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [submittedSummary, setSubmittedSummary] = useState({ submittedThisMonth: 0, totalSubmitted: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [slideIndex, setSlideIndex] = useState(0);
@@ -256,6 +257,7 @@ export default function DashboardPage() {
       try {
         const promises = [
           listPendingEvaluations(),
+          getSubmittedSummary(),
           getMyResults(),
           listNotifications(),
         ];
@@ -266,10 +268,14 @@ export default function DashboardPage() {
         if (isFac) promises.unshift(listCreatedEvaluations());
         else promises.unshift(Promise.resolve([]));
 
-        const [created, pending, results, notices] = await Promise.all(promises);
+        const [created, pending, summary, results, notices] = await Promise.all(promises);
         if (mounted) {
           setCreatedEvaluations(created);
           setPendingEvaluations(pending);
+          setSubmittedSummary({
+            submittedThisMonth: summary?.submittedThisMonth ?? 0,
+            totalSubmitted: summary?.totalSubmitted ?? 0,
+          });
           setMyResults(results ?? null);
           setNotifications(notices);
         }
@@ -311,10 +317,7 @@ export default function DashboardPage() {
     return diff >= 0 && diff <= 2;
   }).length;
 
-  const closedCount = createdEvaluations.reduce((sum, item) => {
-    const [submitted] = (item.submissionProgress || '0/0').split('/').map(Number);
-    return sum + (Number.isFinite(submitted) ? submitted : 0);
-  }, 0);
+  const closedCount = submittedSummary.totalSubmitted;
 
   const overallScore = useMemo(() => {
     if (typeof myResults?.overallAverage === 'number') return myResults.overallAverage;

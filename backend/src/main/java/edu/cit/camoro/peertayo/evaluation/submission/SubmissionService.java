@@ -50,6 +50,23 @@ public class SubmissionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public long getSubmittedThisMonthCount(String email) {
+        User currentUser = getUser(email);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.withDayOfMonth(1).toLocalDate().atStartOfDay();
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusNanos(1);
+
+        return evaluationAssignmentRepository
+                .countByEvaluatorAndSubmittedTrueAndSubmittedAtBetween(currentUser, startOfMonth, endOfMonth);
+    }
+
+    @Transactional(readOnly = true)
+    public long getSubmittedCount(String email) {
+        User currentUser = getUser(email);
+        return evaluationAssignmentRepository.countByEvaluatorAndSubmittedTrue(currentUser);
+    }
+
     @Transactional
     public void submit(Long assignmentId, String email, SubmitEvaluationRequest request) {
         User currentUser = getUser(email);
