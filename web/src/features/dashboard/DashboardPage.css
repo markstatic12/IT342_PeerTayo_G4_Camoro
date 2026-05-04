@@ -4,16 +4,18 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 .db-page {
-  min-height: calc(100vh - var(--topbar-height));
+  height: calc(100vh - var(--topbar-height));
+  overflow: hidden;
   color: #f1f5f9;
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .db-shell {
   display: flex;
-  min-height: calc(100vh - var(--topbar-height));
+  height: 100%;
   padding: 16px 16px 22px;
   gap: 14px;
+  overflow: hidden;
 }
 
 /* ── Columns ────────────────────────────────────────────────────────── */
@@ -23,6 +25,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .db-right {
@@ -30,6 +34,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -295,6 +300,8 @@
   flex-direction: column;
   gap: 14px;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .ac-head {
@@ -334,7 +341,9 @@
 .ac-body {
   display: flex;
   gap: 14px;
-  min-height: 200px;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
   align-items: stretch;
 }
 
@@ -350,11 +359,21 @@
   flex: 1;
   min-height: 0;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
-.lg-wrap canvas {
-  width: 100%;
-  height: 100%;
+.lg-canvas-area {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.lg-canvas-area canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
   display: block;
 }
 
