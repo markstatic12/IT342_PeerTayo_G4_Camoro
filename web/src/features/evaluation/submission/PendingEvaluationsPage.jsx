@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSubmittedSummary, listPendingEvaluations } from './evaluationSubmissionService';
+import {
+  archivePendingEvaluation,
+  getSubmittedSummary,
+  listPendingEvaluations,
+  unarchivePendingEvaluation,
+} from './evaluationSubmissionService';
 import './PendingEvaluationsPage.css';
 
 /* ─── Helpers ─────────────────────────────────────────────── */
@@ -141,7 +146,11 @@ function EvalCard({ form, isSelected, onSelect, onArchive, isArchived }) {
             <div className={`ec-menu${menuOpen ? ' open' : ''}`}>
               <div
                 className="ec-menu-item mi-archive"
-                onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onArchive(form.id); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuOpen(false);
+                  onArchive(form.id, isArchived);
+                }}
               >
                 <SvgArchive /> {isArchived ? 'Unarchive' : 'Archive'}
               </div>
@@ -292,12 +301,15 @@ export default function PendingEvaluationsPage() {
       setError('');
       try {
         // Returns: [{ id, assignmentId, title, deadline, evaluateeName }, ...]
-        const [flat, summary] = await Promise.all([
-          listPendingEvaluations(),
+        const [active, archived, summary] = await Promise.all([
+          listPendingEvaluations({ archived: false }),
+          listPendingEvaluations({ archived: true }),
           getSubmittedSummary(),
         ]);
         if (mounted) {
-          setRawList(flat);
+          const archivedFormIds = new Set(archived.map((item) => item.id));
+          setRawList([...active, ...archived]);
+          setArchivedIds(Array.from(archivedFormIds));
           setSubmittedThisMonth(summary?.submittedThisMonth ?? 0);
         }
       } catch {
@@ -314,13 +326,33 @@ export default function PendingEvaluationsPage() {
   const forms = useMemo(() => groupByForm(rawList), [rawList]);
 
   // Derived totals
-  const urgentCount = forms.filter((f) => {
+  const activeForms = useMemo(
+    () => forms.filter((f) => !archivedIds.includes(f.id)),
+    [forms, archivedIds]
+  );
+  const urgentCount = activeForms.filter((f) => {
     const dl = daysLeft(f.deadline);
     return dl !== null && dl <= 3;
   }).length;
-
-  // Total pending evaluatee assignments
-  const totalPending = rawList.length;
+  const totalPending = useMemo(
+    () => rawList.filter((item) => !archivedIds.includes(item.id)).length,
+    [rawList, archivedIds]
+  );
+  const handleArchive = useCallback(async (id, isArchived) => {
+    try {
+      if (isArchived) {
+        await unarchivePendingEvaluation(id);
+      } else {
+        await archivePendingEvaluation(id);
+      }
+      setArchivedIds((prev) =>
+        isArchived ? prev.filter((i) => i !== id) : [...prev, id]
+      );
+      if (selectedId === id) setSelectedId(null);
+    } catch {
+      setError('Unable to update archive status right now.');
+    }
+  }, [selectedId]);
 
   // Filtered forms
   const visible = useMemo(() => forms.filter((f) => {
@@ -355,12 +387,7 @@ export default function PendingEvaluationsPage() {
     navigate('/evaluate', { state: { form, evaluatee: ev } });
   }, [navigate]);
 
-  const handleArchive = useCallback((id) => {
-    setArchivedIds(prev => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
-    if (selectedId === id) setSelectedId(null);
-  }, [selectedId]);
+  
 
   return (
     <div className="pe-page animate-page">
