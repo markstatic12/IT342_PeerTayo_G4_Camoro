@@ -53,6 +53,38 @@ public class SubmissionController {
         )));
     }
 
+    @GetMapping("/completed")
+    public ResponseEntity<ApiResponse<Map<String, CompletedFormsResponse>>> getCompletedForms(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(name = "archived", required = false) Boolean archived) {
+        CompletedFormsResponse data = submissionService.getCompletedForms(userDetails.getUsername(), archived);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("completed", data)));
+    }
+
+    @PostMapping("/completed/{evaluationId}/archive")
+    public ResponseEntity<ApiResponse<Map<String, String>>> archiveCompletedForm(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        submissionService.setCompletedArchived(evaluationId, userDetails.getUsername(), true);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("message", "Completed form archived")));
+    }
+
+    @PostMapping("/completed/{evaluationId}/unarchive")
+    public ResponseEntity<ApiResponse<Map<String, String>>> unarchiveCompletedForm(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        submissionService.setCompletedArchived(evaluationId, userDetails.getUsername(), false);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("message", "Completed form unarchived")));
+    }
+
+    @DeleteMapping("/completed/{evaluationId}")
+    public ResponseEntity<ApiResponse<Map<String, String>>> deleteCompletedForm(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        submissionService.deleteCompletedForm(evaluationId, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("message", "Completed form deleted")));
+    }
+
     @PostMapping("/{id}/submit")
     public ResponseEntity<ApiResponse<Map<String, String>>> submit(
             @PathVariable Long id,

@@ -85,6 +85,76 @@ public class SubmissionService {
         return evaluationAssignmentRepository.countByEvaluatorAndSubmittedTrue(currentUser);
     }
 
+        @Transactional(readOnly = true)
+        public CompletedFormsResponse getCompletedForms(String email, Boolean archived) {
+        User currentUser = getUser(email);
+
+        List<EvaluationAssignment> allSubmitted = evaluationAssignmentRepository
+            .findAllByEvaluatorAndSubmittedTrue(currentUser);
+
+        if (allSubmitted.isEmpty()) {
+            return CompletedFormsResponse.builder()
+                .totalSubmitted(0)
+                .submittedThisMonth((int) getSubmittedThisMonthCount(email))
+                .avgScoreGiven(0.0)
+                .forms(List.of())
+                .build();
+        }
+
+        List<EvaluationAssignment> filteredAssignments = archived == null
+            ? allSubmitted
+            : evaluationAssignmentRepository
+                .findAllByEvaluatorAndSubmittedTrueAndArchivedByEvaluatorOrderByEvaluationDeadlineDesc(currentUser, archived);
+
+        List<Rating> allRatings = ratingRepository.findAllByAssignmentInAndActiveTrue(allSubmitted);
+        double avgScoreGiven = allRatings.isEmpty()
+            ? 0.0
+            : allRatings.stream().mapToInt(Rating::getRating).average().orElse(0);
+
+        List<CompletedFormResponse> forms = buildCompletedForms(filteredAssignments);
+
+        return CompletedFormsResponse.builder()
+            .totalSubmitted(allSubmitted.size())
+            .submittedThisMonth((int) getSubmittedThisMonthCount(email))
+            .avgScoreGiven(avgScoreGiven)
+            .forms(forms)
+            .build();
+        }
+
+        @Transactional
+        public void setCompletedArchived(Long evaluationId, String email, boolean archived) {
+        User currentUser = getUser(email);
+        EvaluationForm evaluation = evaluationFormRepository.findById(evaluationId)
+            .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+
+        List<EvaluationAssignment> assignments = evaluationAssignmentRepository
+            .findAllByEvaluationAndEvaluatorAndSubmittedTrue(evaluation, currentUser);
+
+        if (assignments.isEmpty()) {
+            throw new ResourceNotFoundException("Completed evaluation not found");
+        }
+
+        assignments.forEach(a -> a.setArchivedByEvaluator(archived));
+        evaluationAssignmentRepository.saveAll(assignments);
+        }
+
+    @Transactional
+    public void deleteCompletedForm(Long evaluationId, String email) {
+        User currentUser = getUser(email);
+        EvaluationForm evaluation = evaluationFormRepository.findById(evaluationId)
+            .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+
+        List<EvaluationAssignment> assignments = evaluationAssignmentRepository
+            .findAllByEvaluationAndEvaluatorAndSubmittedTrue(evaluation, currentUser);
+
+        if (assignments.isEmpty()) {
+            throw new ResourceNotFoundException("Completed evaluation not found");
+        }
+
+        ratingRepository.deleteAllByAssignmentIn(assignments);
+        evaluationAssignmentRepository.deleteAll(assignments);
+    }
+
     @Transactional
     public void submit(Long assignmentId, String email, SubmitEvaluationRequest request) {
         User currentUser = getUser(email);
@@ -129,6 +199,72 @@ public class SubmissionService {
         
         evaluationAssignmentRepository.save(assignment);
     }
+
+        private List<CompletedFormResponse> buildCompletedForms(List<EvaluationAssignment> assignments) {
+        if (assignments.isEmpty()) return List.of();
+
+        Map<Long, List<EvaluationAssignment>> byEvaluation = assignments.stream()
+            .collect(Collectors.groupingBy(a -> a.getEvaluation().getId()));
+
+        List<Rating> ratings = ratingRepository.findAllByAssignmentInAndActiveTrue(assignments);
+        Map<Long, List<Rating>> ratingsByAssignment = ratings.stream()
+            .collect(Collectors.groupingBy(r -> r.getAssignment().getId()));
+
+        return byEvaluation.values().stream()
+            .map(group -> {
+                EvaluationForm evaluation = group.get(0).getEvaluation();
+                String creatorName = fullName(evaluation.getCreatedBy());
+
+                List<CompletedEvaluateeResponse> evaluatees = group.stream()
+                    .map(assignment -> {
+                    List<CompletedCriterionResponse> criteria = ratingsByAssignment
+                        .getOrDefault(assignment.getId(), List.of())
+                        .stream()
+                        .map(r -> CompletedCriterionResponse.builder()
+                            .criteriaId(r.getCriterion().getId())
+                            .criteriaName(r.getCriterion().getTitle())
+                            .criteriaDescription(r.getCriterion().getDescription())
+                            .rating(r.getRating())
+                            .build())
+                        .sorted((a, b) -> a.getCriteriaId().compareTo(b.getCriteriaId()))
+                        .toList();
+
+                    return CompletedEvaluateeResponse.builder()
+                        .assignmentId(assignment.getId())
+                        .evaluateeName(fullName(assignment.getEvaluatee()))
+                        .submittedAt(assignment.getSubmittedAt())
+                        .comment(assignment.getComment())
+                        .criteria(criteria)
+                        .build();
+                    })
+                    .sorted((a, b) -> b.getSubmittedAt().compareTo(a.getSubmittedAt()))
+                    .toList();
+
+                LocalDateTime latestSubmittedAt = group.stream()
+                    .map(EvaluationAssignment::getSubmittedAt)
+                    .filter(java.util.Objects::nonNull)
+                    .max(LocalDateTime::compareTo)
+                    .orElse(null);
+
+                boolean archived = group.stream().allMatch(EvaluationAssignment::isArchivedByEvaluator);
+
+                return CompletedFormResponse.builder()
+                    .evaluationId(evaluation.getId())
+                    .title(evaluation.getTitle())
+                    .creatorName(creatorName)
+                    .submittedAt(latestSubmittedAt)
+                    .totalEvaluatees(group.size())
+                    .archived(archived)
+                    .evaluatees(evaluatees)
+                    .build();
+            })
+            .sorted((a, b) -> {
+                if (a.getSubmittedAt() == null) return 1;
+                if (b.getSubmittedAt() == null) return -1;
+                return b.getSubmittedAt().compareTo(a.getSubmittedAt());
+            })
+            .toList();
+        }
 
     private User getUser(String email) {
         return userRepository.findByEmail(email)
