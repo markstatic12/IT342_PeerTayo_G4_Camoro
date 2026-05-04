@@ -253,6 +253,11 @@
   background: rgba(6,182,212,0.2);
   border-color: rgba(6,182,212,0.4);
 }
+.btn-archive.active {
+  background: var(--pe-teal);
+  color: #fff;
+  border-color: var(--pe-teal);
+}
 .btn-archive svg {
   width: 12px;
   height: 12px;

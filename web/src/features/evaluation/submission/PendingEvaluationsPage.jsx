@@ -102,7 +102,7 @@ const SvgTrash = () => (
 );
 
 /* ─── EvalCard (list item with 3-dot menu) ────────────────── */
-function EvalCard({ form, isSelected, onSelect }) {
+function EvalCard({ form, isSelected, onSelect, onArchive, isArchived }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const dotsRef = useRef(null);
 
@@ -141,9 +141,9 @@ function EvalCard({ form, isSelected, onSelect }) {
             <div className={`ec-menu${menuOpen ? ' open' : ''}`}>
               <div
                 className="ec-menu-item mi-archive"
-                onClick={(e) => { e.stopPropagation(); setMenuOpen(false); alert(`"${form.title}" archived.`); }}
+                onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onArchive(form.id); }}
               >
-                <SvgArchive /> Archive
+                <SvgArchive /> {isArchived ? 'Unarchive' : 'Archive'}
               </div>
               <div
                 className="ec-menu-item mi-delete"
@@ -282,6 +282,7 @@ export default function PendingEvaluationsPage() {
   const [selectedId, setSelectedId] = useState(null);
   const [filter, setFilter]       = useState('all');
   const [search, setSearch]       = useState('');
+  const [archivedIds, setArchivedIds] = useState([]);
 
   useEffect(() => {
     let mounted = true;
@@ -315,15 +316,26 @@ export default function PendingEvaluationsPage() {
 
   // Filtered forms
   const visible = useMemo(() => forms.filter((f) => {
-    const dl = daysLeft(f.deadline);
-    if (filter === 'urgent' && !(dl !== null && dl <= 3)) return false;
-    if (filter === 'missed' && !(dl !== null && dl < 0)) return false;
+    const isArchived = archivedIds.includes(f.id);
+    
+    // If viewing archives, only show archived items
+    if (filter === 'archived') {
+      if (!isArchived) return false;
+    } else {
+      // If viewing active lists, hide archived items
+      if (isArchived) return false;
+      
+      const dl = daysLeft(f.deadline);
+      if (filter === 'urgent' && !(dl !== null && dl <= 3)) return false;
+      if (filter === 'missed' && !(dl !== null && dl < 0)) return false;
+    }
+
     if (search) {
       const q = search.toLowerCase();
       if (!(f.title ?? '').toLowerCase().includes(q)) return false;
     }
     return true;
-  }), [forms, filter, search]);
+  }), [forms, filter, search, archivedIds]);
 
   const selectedForm = forms.find((f) => f.id === selectedId) ?? null;
 
@@ -334,6 +346,13 @@ export default function PendingEvaluationsPage() {
   const handleStartEvaluate = useCallback((form, ev) => {
     navigate('/evaluate', { state: { form, evaluatee: ev } });
   }, [navigate]);
+
+  const handleArchive = useCallback((id) => {
+    setArchivedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+    if (selectedId === id) setSelectedId(null);
+  }, [selectedId]);
 
   return (
     <div className="pe-page animate-page">
@@ -410,8 +429,12 @@ export default function PendingEvaluationsPage() {
                     </div>
                   ))}
                 </div>
-                <button className="btn-archive" title="View archived evaluations">
-                  <SvgArchive /> Archives
+                <button 
+                  className={`btn-archive${filter === 'archived' ? ' active' : ''}`} 
+                  title="View archived evaluations"
+                  onClick={() => setFilter(prev => prev === 'archived' ? 'all' : 'archived')}
+                >
+                  <SvgArchive /> {filter === 'archived' ? 'Exit Archives' : 'Archives'}
                 </button>
               </div>
 
@@ -427,6 +450,8 @@ export default function PendingEvaluationsPage() {
                       form={f}
                       isSelected={selectedId === f.id}
                       onSelect={handleSelect}
+                      onArchive={handleArchive}
+                      isArchived={archivedIds.includes(f.id)}
                     />
                   ))
                 )}
