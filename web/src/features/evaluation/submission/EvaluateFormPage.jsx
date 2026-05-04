@@ -104,13 +104,20 @@ export default function EvaluateFormPage() {
         })),
         comment: comment.trim() || undefined,
       };
-      // Use the specific assignment ID for this peer
+    try {
       const assignmentId = evaluatee?.assignmentId;
-      if (assignmentId) {
-        await submitEvaluation(assignmentId, payload);
+      
+      // Safety check to prevent //submit 404 errors
+      if (!assignmentId) {
+        console.error('EvaluateFormPage: Missing assignmentId', { form, evaluatee });
+        setError('Missing assignment ID. Please return to the pending list and try again.');
+        return;
       }
+      
+      await submitEvaluation(assignmentId, payload);
       setSubmitted(true);
     } catch (err) {
+      console.error('Submission error:', err);
       const msg = err?.response?.data?.message ?? 'Submission failed. Please try again.';
       setError(msg);
     } finally {
