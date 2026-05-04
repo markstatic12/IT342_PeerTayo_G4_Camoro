@@ -94,9 +94,8 @@ export default function EvaluateFormPage() {
     if (!allRated) return;
     setSubmitting(true);
     setError('');
+    
     try {
-      // Backend expects: POST /evaluations/{evaluationFormId}/submit
-      // Body: { responses: [{ criteriaId, rating }], comment }
       const payload = {
         responses: CRITERIA.map((_, i) => ({
           criteriaId: i + 1,   // criteria IDs are 1-indexed on the backend
@@ -104,13 +103,14 @@ export default function EvaluateFormPage() {
         })),
         comment: comment.trim() || undefined,
       };
-    try {
+
       const assignmentId = evaluatee?.assignmentId;
       
       // Safety check to prevent //submit 404 errors
       if (!assignmentId) {
         console.error('EvaluateFormPage: Missing assignmentId', { form, evaluatee });
         setError('Missing assignment ID. Please return to the pending list and try again.');
+        setSubmitting(false);
         return;
       }
       
@@ -282,7 +282,7 @@ export default function EvaluateFormPage() {
           </div>
 
           {error && (
-            <div style={{ color: 'var(--ef-red)', fontSize: 12, textAlign: 'center' }}>
+            <div style={{ color: 'var(--ef-red)', fontSize: 12, textAlign: 'center', marginTop: 10 }}>
               {error}
             </div>
           )}
