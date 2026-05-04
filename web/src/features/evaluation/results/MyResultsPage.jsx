@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { archiveMyResult, getMyResults, unarchiveMyResult } from './evaluationResultsService';
 import './MyResultsPage.css';
 
@@ -70,23 +70,25 @@ export default function MyResultsPage() {
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const refreshResults = useCallback(async (message = 'Unable to load results right now.') => {
+    try {
+      const data = await getMyResults();
+      setResults(data ?? null);
+    } catch {
+      setError(message);
+    }
+  }, []);
+
   useEffect(() => {
     let alive = true;
     (async () => {
       setLoading(true);
       setError('');
-      try {
-        const data = await getMyResults();
-        if (!alive) return;
-        setResults(data ?? null);
-      } catch {
-        if (alive) setError('Unable to load results right now.');
-      } finally {
-        if (alive) setLoading(false);
-      }
+      await refreshResults();
+      if (alive) setLoading(false);
     })();
     return () => { alive = false; };
-  }, []);
+  }, [refreshResults]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -124,7 +126,7 @@ export default function MyResultsPage() {
       list = [...list].sort((a, b) => new Date(b.submittedAt ?? 0) - new Date(a.submittedAt ?? 0));
     }
     return list;
-  }, [evaluations, search, filter]);
+  }, [evaluations, search, filter, showArchived]);
 
   const selected = useMemo(
     () => evaluations.find((ev) => String(ev.evaluationId) === String(selectedId)) || null,
@@ -160,6 +162,7 @@ export default function MyResultsPage() {
         };
       });
       if (!isArchived) setSelectedId(null);
+      await refreshResults('Unable to refresh results right now.');
     } catch {
       setError('Unable to update archive status right now.');
     }
@@ -248,12 +251,12 @@ export default function MyResultsPage() {
             <div className="eval-list-col">
               <div className="filter-row">
                 <div className="filter-tabs">
-                  <div className={`ftab${filter === 'all' ? ' active' : ''}`} onClick={() => setFilter('all')}>All</div>
-                  <div className={`ftab${filter === 'highest' ? ' active' : ''}`} onClick={() => setFilter('highest')}>Highest</div>
-                  <div className={`ftab${filter === 'recent' ? ' active' : ''}`} onClick={() => setFilter('recent')}>Most Recent</div>
+                  <div className={`ftab${filter === 'all' && !showArchived ? ' active' : ''}`} onClick={() => setFilter('all')}>All</div>
+                  <div className={`ftab${filter === 'highest' && !showArchived ? ' active' : ''}`} onClick={() => setFilter('highest')}>Highest</div>
+                  <div className={`ftab${filter === 'recent' && !showArchived ? ' active' : ''}`} onClick={() => setFilter('recent')}>Most Recent</div>
                 </div>
                 <button
-                  className="btn-archive"
+                  className={`btn-archive${showArchived ? ' active' : ''}`}
                   type="button"
                   title="View archived evaluations"
                   onClick={() => setShowArchived((prev) => !prev)}

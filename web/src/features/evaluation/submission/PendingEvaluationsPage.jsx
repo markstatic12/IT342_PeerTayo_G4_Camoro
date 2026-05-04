@@ -294,33 +294,32 @@ export default function PendingEvaluationsPage() {
   const [archivedIds, setArchivedIds] = useState([]);
   const [submittedThisMonth, setSubmittedThisMonth] = useState(0);
 
+  const refreshPending = useCallback(async (message = 'Unable to load pending evaluations right now.') => {
+    try {
+      const [active, archived, summary] = await Promise.all([
+        listPendingEvaluations({ archived: false }),
+        listPendingEvaluations({ archived: true }),
+        getSubmittedSummary(),
+      ]);
+      const archivedFormIds = new Set(archived.map((item) => item.id));
+      setRawList([...active, ...archived]);
+      setArchivedIds(Array.from(archivedFormIds));
+      setSubmittedThisMonth(summary?.submittedThisMonth ?? 0);
+    } catch {
+      setError(message);
+    }
+  }, []);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
       setLoading(true);
       setError('');
-      try {
-        // Returns: [{ id, assignmentId, title, deadline, evaluateeName }, ...]
-        const [active, archived, summary] = await Promise.all([
-          listPendingEvaluations({ archived: false }),
-          listPendingEvaluations({ archived: true }),
-          getSubmittedSummary(),
-        ]);
-        if (mounted) {
-          const archivedFormIds = new Set(archived.map((item) => item.id));
-          setRawList([...active, ...archived]);
-          setArchivedIds(Array.from(archivedFormIds));
-          setSubmittedThisMonth(summary?.submittedThisMonth ?? 0);
-        }
-      } catch {
-        if (mounted) setError('Unable to load pending evaluations right now.');
-        if (mounted) setSubmittedThisMonth(0);
-      } finally {
-        if (mounted) setLoading(false);
-      }
+      await refreshPending();
+      if (mounted) setLoading(false);
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [refreshPending]);
 
   // Group flat API list into forms with evaluatees arrays
   const forms = useMemo(() => groupByForm(rawList), [rawList]);
@@ -349,6 +348,7 @@ export default function PendingEvaluationsPage() {
         isArchived ? prev.filter((i) => i !== id) : [...prev, id]
       );
       if (selectedId === id) setSelectedId(null);
+      await refreshPending('Unable to refresh pending evaluations right now.');
     } catch {
       setError('Unable to update archive status right now.');
     }
