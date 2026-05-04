@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,28 +29,28 @@ public class ResultsService {
     @Transactional(readOnly = true)
     public MyResultsResponse getMyResults(String email) {
         User me = getUser(email);
-
-        List<EvaluationAssignment> submitted = evaluationAssignmentRepository.findAll().stream()
-                .filter(a -> Objects.equals(a.getEvaluatee().getId(), me.getId()) && a.isSubmitted())
-                .toList();
+        List<EvaluationAssignment> submitted = evaluationAssignmentRepository
+                .findAllByEvaluateeAndSubmittedTrue(me);
 
         if (submitted.isEmpty()) {
             return MyResultsResponse.builder()
                     .overallAverage(0.0).totalResponses(0)
                     .questionAverages(Collections.emptyList())
-                    .comments(Collections.emptyList()).build();
+                    .comments(Collections.emptyList())
+                    .evaluations(Collections.emptyList())
+                    .build();
         }
 
         List<Rating> ratings = ratingRepository.findAllByAssignmentInAndActiveTrue(submitted);
 
-        List<CriterionAverageResponse> criterionAverages = ratings.stream()
-                .collect(Collectors.groupingBy(r -> r.getCriterion().getId()))
+        List<CriterionAverageResponse> criterionAverages = toCriterionAverages(ratings);
+
+        List<MyEvaluationResultResponse> evaluations = submitted.stream()
+                .collect(Collectors.groupingBy(EvaluationAssignment::getEvaluation))
                 .entrySet().stream()
-                .map(e -> CriterionAverageResponse.builder()
-                        .criteriaId(e.getKey())
-                        .average(e.getValue().stream().mapToInt(Rating::getRating).average().orElse(0))
-                        .build())
-                .sorted(Comparator.comparing(CriterionAverageResponse::getCriteriaId))
+                .map(entry -> buildEvaluationSummary(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparing(MyEvaluationResultResponse::getSubmittedAt,
+                        Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
 
         return MyResultsResponse.builder()
@@ -58,6 +59,7 @@ public class ResultsService {
                 .questionAverages(criterionAverages)
                 .comments(submitted.stream().map(EvaluationAssignment::getComment)
                         .filter(c -> c != null && !c.isBlank()).toList())
+                .evaluations(evaluations)
                 .build();
     }
 
@@ -89,15 +91,7 @@ public class ResultsService {
                     ? Collections.emptyList()
                     : ratingRepository.findAllByAssignmentInAndActiveTrue(submittedList);
 
-            List<CriterionAverageResponse> criterionAverages = ratings.stream()
-                    .collect(Collectors.groupingBy(r -> r.getCriterion().getId()))
-                    .entrySet().stream()
-                    .map(c -> CriterionAverageResponse.builder()
-                            .criteriaId(c.getKey())
-                            .average(c.getValue().stream().mapToInt(Rating::getRating).average().orElse(0))
-                            .build())
-                    .sorted(Comparator.comparing(CriterionAverageResponse::getCriteriaId))
-                    .toList();
+            List<CriterionAverageResponse> criterionAverages = toCriterionAverages(ratings);
 
             evaluatees.add(EvaluateeResultResponse.builder()
                     .userId(evaluateeId)
@@ -113,6 +107,74 @@ public class ResultsService {
         return EvaluationResultsResponse.builder()
                 .evaluationId(evaluation.getId())
                 .evaluatees(evaluatees)
+                .build();
+    }
+
+        @Transactional
+        public void setMyResultsArchived(Long evaluationId, String email, boolean archived) {
+                User me = getUser(email);
+                List<EvaluationAssignment> assignments = evaluationAssignmentRepository
+                                .findAllByEvaluationIdAndEvaluatee(evaluationId, me)
+                                .stream()
+                                .filter(EvaluationAssignment::isSubmitted)
+                                .toList();
+
+                if (assignments.isEmpty()) {
+                        throw new ResourceNotFoundException("Evaluation results not found");
+                }
+
+                assignments.forEach(a -> a.setArchivedByEvaluatee(archived));
+                evaluationAssignmentRepository.saveAll(assignments);
+        }
+
+    private List<CriterionAverageResponse> toCriterionAverages(List<Rating> ratings) {
+        return ratings.stream()
+                .collect(Collectors.groupingBy(r -> r.getCriterion().getId()))
+                .entrySet().stream()
+                .map(entry -> CriterionAverageResponse.builder()
+                        .criteriaId(entry.getKey())
+                        .criteriaName(entry.getValue().get(0).getCriterion().getTitle())
+                        .average(entry.getValue().stream().mapToInt(Rating::getRating).average().orElse(0))
+                        .build())
+                .sorted(Comparator.comparing(CriterionAverageResponse::getCriteriaId))
+                .toList();
+    }
+
+        private MyEvaluationResultResponse buildEvaluationSummary(EvaluationForm evaluation, List<EvaluationAssignment> assignments) {
+        List<Rating> ratings = ratingRepository.findAllByAssignmentInAndActiveTrue(assignments);
+        List<CriterionAverageResponse> criterionAverages = toCriterionAverages(ratings);
+        double overallAverage = ratings.stream().mapToInt(Rating::getRating).average().orElse(0);
+
+        List<EvaluationCommentResponse> comments = assignments.stream()
+                .filter(a -> a.getComment() != null && !a.getComment().isBlank())
+                .map(a -> EvaluationCommentResponse.builder()
+                        .comment(a.getComment())
+                        .submittedAt(a.getSubmittedAt())
+                        .build())
+                .sorted(Comparator.comparing(EvaluationCommentResponse::getSubmittedAt,
+                        Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+
+        LocalDateTime latestSubmittedAt = assignments.stream()
+                .map(EvaluationAssignment::getSubmittedAt)
+                .filter(Objects::nonNull)
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+
+        String creatorName = (evaluation.getCreatedBy().getFirstName() + " " + evaluation.getCreatedBy().getLastName()).trim();
+
+        boolean archived = assignments.stream().allMatch(EvaluationAssignment::isArchivedByEvaluatee);
+
+        return MyEvaluationResultResponse.builder()
+                .evaluationId(evaluation.getId())
+                .title(evaluation.getTitle())
+                .createdByName(creatorName)
+                .submittedAt(latestSubmittedAt)
+                .responses(assignments.size())
+                .overallAverage(overallAverage)
+                .criteriaAverages(criterionAverages)
+                .comments(comments)
+                .archived(archived)
                 .build();
     }
 

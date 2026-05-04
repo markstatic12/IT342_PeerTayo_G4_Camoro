@@ -18,6 +18,12 @@ public interface EvaluationAssignmentRepository extends JpaRepository<Evaluation
 
     List<EvaluationAssignment> findAllByEvaluatorAndSubmittedFalseOrderByEvaluationDeadlineAsc(User evaluator);
 
+    List<EvaluationAssignment> findAllByEvaluatorAndSubmittedFalseAndArchivedByEvaluatorOrderByEvaluationDeadlineAsc(User evaluator, boolean archivedByEvaluator);
+
+    List<EvaluationAssignment> findAllByEvaluationIdAndEvaluatee(Long evaluationId, User evaluatee);
+
+    List<EvaluationAssignment> findAllByEvaluateeAndSubmittedTrue(User evaluatee);
+
     long countByEvaluation(EvaluationForm evaluation);
 
     long countByEvaluationAndSubmittedTrue(EvaluationForm evaluation);

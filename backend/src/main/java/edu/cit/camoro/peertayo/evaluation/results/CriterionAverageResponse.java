@@ -7,5 +7,6 @@ import lombok.Data;
 @Builder
 public class CriterionAverageResponse {
     private Long criteriaId;
+    private String criteriaName;
     private Double average;
 }

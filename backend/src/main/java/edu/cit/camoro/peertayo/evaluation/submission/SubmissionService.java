@@ -32,12 +32,12 @@ public class SubmissionService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public List<PendingEvaluationResponse> getPending(String email) {
+        public List<PendingEvaluationResponse> getPending(String email, boolean archived) {
         User currentUser = getUser(email);
         LocalDateTime now = LocalDateTime.now();
 
         return evaluationAssignmentRepository
-                .findAllByEvaluatorAndSubmittedFalseOrderByEvaluationDeadlineAsc(currentUser)
+            .findAllByEvaluatorAndSubmittedFalseAndArchivedByEvaluatorOrderByEvaluationDeadlineAsc(currentUser, archived)
                 .stream()
                 .filter(item -> item.getEvaluation().getDeadline().isAfter(now))
                 .map(item -> PendingEvaluationResponse.builder()
@@ -46,9 +46,27 @@ public class SubmissionService {
                         .title(item.getEvaluation().getTitle())
                         .deadline(item.getEvaluation().getDeadline())
                         .evaluateeName(fullName(item.getEvaluatee()))
+                .archived(item.isArchivedByEvaluator())
                         .build())
                 .toList();
     }
+
+        @Transactional
+        public void setArchivedForEvaluation(Long evaluationId, String email, boolean archived) {
+        User currentUser = getUser(email);
+        EvaluationForm evaluation = evaluationFormRepository.findById(evaluationId)
+            .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+
+        List<EvaluationAssignment> assignments = evaluationAssignmentRepository
+            .findAllByEvaluationAndEvaluatorAndSubmittedFalse(evaluation, currentUser);
+
+        if (assignments.isEmpty()) {
+            throw new ResourceNotFoundException("Pending evaluation not found");
+        }
+
+        assignments.forEach(a -> a.setArchivedByEvaluator(archived));
+        evaluationAssignmentRepository.saveAll(assignments);
+        }
 
     @Transactional(readOnly = true)
     public long getSubmittedThisMonthCount(String email) {

@@ -12,4 +12,5 @@ public class MyResultsResponse {
     private Integer totalResponses;
     private List<CriterionAverageResponse> questionAverages;
     private List<String> comments;
+    private List<MyEvaluationResultResponse> evaluations;
 }
