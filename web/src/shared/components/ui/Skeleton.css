@@ -1,0 +1,18 @@
+.skeleton-rect {
+  min-height: 1rem;
+}
+
+.skeleton-text {
+  height: 0.875rem;
+  width: 100%;
+}
+
+.skeleton-title {
+  height: 1.5rem;
+  width: 60%;
+}
+
+.skeleton-circle {
+  border-radius: 50%;
+  aspect-ratio: 1/1;
+}
