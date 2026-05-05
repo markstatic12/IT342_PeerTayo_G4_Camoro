@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { archiveMyResult, getMyResults, unarchiveMyResult } from './evaluationResultsService';
+import Skeleton from '../../../shared/components/ui/Skeleton';
 import './MyResultsPage.css';
 
 const CRITERIA_FALLBACK = [
@@ -195,7 +196,51 @@ export default function MyResultsPage() {
         </div>
       </div>
 
-      {loading && <div className="mr-state">Loading results…</div>}
+      {loading && (
+        <>
+          <div className="summary-strip">
+            {[1,2,3,4].map((i) => (
+              <div key={i} className="sum-card">
+                <Skeleton variant="circle" width="36px" height="36px" className="skeleton-stagger" />
+                <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+                  <Skeleton variant="title" width="40px" height="22px" className="skeleton-stagger" />
+                  <Skeleton variant="text" width="100px" height="10px" className="skeleton-stagger" />
+                  <Skeleton variant="text" width="80px" height="9px" className="skeleton-stagger" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="content-area">
+            <div className="eval-list-col">
+              <div className="filter-row">
+                <div style={{ display:'flex', gap:6 }}>
+                  {[1,2,3].map((i) => <Skeleton key={i} variant="rect" width="70px" height="28px" style={{ borderRadius:6 }} className="skeleton-stagger" />)}
+                </div>
+              </div>
+              <div className="eval-scroll">
+                {[1,2,3].map((i) => (
+                  <div key={i} className="eval-card selected" style={{ pointerEvents:'none' }}>
+                    <div className="ec-top">
+                      <Skeleton variant="text" width="65%" height="13px" className="skeleton-stagger" />
+                      <Skeleton variant="rect" width="40px" height="22px" style={{ borderRadius:6 }} className="skeleton-stagger" />
+                    </div>
+                    <Skeleton variant="text" width="50%" height="10px" style={{ marginTop:6 }} className="skeleton-stagger" />
+                    <div className="ec-bar-wrap" style={{ marginTop:8 }}>
+                      <Skeleton variant="rect" width="100%" height="5px" style={{ borderRadius:3 }} className="skeleton-stagger" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="detail-panel">
+              <div className="detail-empty">
+                <Skeleton variant="circle" width="40px" height="40px" style={{ margin:'0 auto 12px' }} className="skeleton-stagger" />
+                <Skeleton variant="text" width="60%" height="11px" style={{ margin:'0 auto' }} className="skeleton-stagger" />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
       {!loading && error && <div className="mr-state mr-state--error">{error}</div>}
 
       {!loading && !error && (
