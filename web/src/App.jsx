@@ -15,6 +15,7 @@ import MyResultsPage from './features/evaluation/results/MyResultsPage';
 import MyCompletedFormsPage from './features/evaluation/submission/MyCompletedFormsPage';
 import PendingEvaluationsPage from './features/evaluation/submission/PendingEvaluationsPage';
 import EvaluateFormPage from './features/evaluation/submission/EvaluateFormPage';
+import SettingsPage from './features/settings/SettingsPage';
 
 export default function App() {
   return (
@@ -37,7 +38,7 @@ export default function App() {
               <Route path="/pending-evaluations" element={<PendingEvaluationsPage />} />
               <Route path="/my-results"  element={<MyResultsPage />} />
               <Route path="/completed"   element={<MyCompletedFormsPage />} />
-              <Route path="/settings"    element={<div style={{padding:32,color:'#94a3b8'}}>Settings — coming soon</div>} />
+              <Route path="/settings"    element={<SettingsPage />} />
 
               {/* Facilitator-only routes */}
               <Route element={<RoleProtectedRoute role="FACILITATOR" />}>
