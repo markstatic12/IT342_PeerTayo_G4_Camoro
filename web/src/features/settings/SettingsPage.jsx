@@ -54,12 +54,12 @@ export default function SettingsPage() {
 
   /* ── Notification prefs (UI-only — no backend endpoint yet) ── */
   const [notifPrefs, setNotifPrefs] = useState({
-    assignedEmail: true,  assignedApp: true,
-    deadlineEmail: true,  deadlineApp: true,
-    resultsEmail:  true,  resultsApp:  false,
-    formCreatedEmail: false, formCreatedApp: true,
-    submissionEmail: true,   submissionApp: true,
-    systemEmail: false,      systemApp: true,
+    assignedApp: true,
+    deadlineApp: true,
+    resultsApp:  false,
+    formCreatedApp: true,
+    submissionApp: true,
+    systemApp: true,
   });
 
   /* ── Sync user into form on mount / user change ── */
@@ -381,13 +381,9 @@ export default function SettingsPage() {
                 <div className="card-head-left">
                   <div className="card-head-icon chi-blue"><SvgBell /></div>
                   <div>
-                    <div className="card-head-title">Notification Channels</div>
-                    <div className="card-head-sub">Choose how you receive each type of alert</div>
+                    <div className="card-head-title">In-App Notifications</div>
+                    <div className="card-head-sub">Choose which alerts appear inside PeerTayo</div>
                   </div>
-                </div>
-                <div style={{ display: 'flex', gap: 28, marginRight: 4 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: '#4a5568', textAlign: 'center', width: 42 }}>EMAIL</div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: '#4a5568', textAlign: 'center', width: 42 }}>IN-APP</div>
                 </div>
               </div>
 
@@ -412,11 +408,6 @@ export default function SettingsPage() {
                     <div className="notif-desc">{n.desc}</div>
                   </div>
                   <div className="notif-toggles">
-                    <label className="toggle">
-                      <input type="checkbox" checked={notifPrefs[`${n.key}Email`]}
-                        onChange={(e) => setNotifPrefs(p => ({ ...p, [`${n.key}Email`]: e.target.checked }))} />
-                      <span className="toggle-slider" />
-                    </label>
                     <label className="toggle">
                       <input type="checkbox" checked={notifPrefs[`${n.key}App`]}
                         onChange={(e) => setNotifPrefs(p => ({ ...p, [`${n.key}App`]: e.target.checked }))} />
