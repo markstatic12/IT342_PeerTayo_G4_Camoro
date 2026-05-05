@@ -21,7 +21,7 @@
 
 .fc-page-title {
   font-family: 'Syne', sans-serif;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
   color: #f8fafc;
   letter-spacing: -0.4px;
@@ -29,7 +29,7 @@
 }
 
 .fc-page-sub {
-  font-size: 11px;
+  font-size: 12px;
   color: #64748b;
   margin: 0;
 }
@@ -162,7 +162,7 @@
 
 .fc-stat__val {
   font-family: 'DM Mono', monospace;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 900;
   color: #f8fafc;
   line-height: 1;
@@ -174,7 +174,7 @@
 .fc-stat--closed .fc-stat__val { color: #eab308; }
 
 .fc-stat__lbl {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   color: #94a3b8;
 }
@@ -306,7 +306,7 @@
   margin-bottom: 2px;
 }
 .fc-row__desc {
-  font-size: 11px;
+  font-size: 11.5px;
   color: #64748b;
   white-space: nowrap;
   overflow: hidden;

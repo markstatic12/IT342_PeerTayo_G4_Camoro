@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getEvaluationResults } from './evaluationResultsService';
 import { listCreatedEvaluations } from '../form/evaluationFormService';
+import Skeleton from '../../../shared/components/ui/Skeleton';
 import './EvaluationResultsPage.css';
 
 /* ── Helpers ──────────────────────────────────────────────────────────── */
@@ -116,7 +117,44 @@ export default function EvaluationResultsPage() {
         <IconBack /> Forms Created
       </button>
 
-      {loading && <div className="er-state">Loading results…</div>}
+      {loading && (
+        <>
+          <div className="er-header">
+            <Skeleton variant="title" width="50%" height="22px" className="skeleton-stagger" />
+            <div style={{ display:'flex', gap:8, marginTop:8 }}>
+              <Skeleton variant="text" width="80px" height="10px" className="skeleton-stagger" />
+              <Skeleton variant="text" width="80px" height="10px" className="skeleton-stagger" />
+              <Skeleton variant="text" width="60px" height="10px" className="skeleton-stagger" />
+            </div>
+          </div>
+          <div className="er-table-wrap">
+            <table className="er-table">
+              <thead><tr><th>Evaluatee</th><th>Avg Score</th><th>Progress</th><th>Actions</th></tr></thead>
+              <tbody>
+                {[1,2,3].map((i) => (
+                  <tr key={i} className="er-row">
+                    <td className="er-row__name-cell">
+                      <div className="er-row__name-wrap">
+                        <Skeleton variant="circle" width="32px" height="32px" className="skeleton-stagger" />
+                        <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+                          <Skeleton variant="text" width="100px" height="12px" className="skeleton-stagger" />
+                          <Skeleton variant="text" width="70px" height="10px" className="skeleton-stagger" />
+                        </div>
+                      </div>
+                    </td>
+                    <td><Skeleton variant="rect" width="44px" height="22px" style={{ borderRadius:6 }} className="skeleton-stagger" /></td>
+                    <td className="er-row__progress">
+                      <Skeleton variant="rect" width="100%" height="6px" style={{ borderRadius:3 }} className="skeleton-stagger" />
+                      <Skeleton variant="text" width="30px" height="10px" style={{ marginTop:4 }} className="skeleton-stagger" />
+                    </td>
+                    <td><Skeleton variant="rect" width="90px" height="28px" style={{ borderRadius:7 }} className="skeleton-stagger" /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
       {!loading && error && <div className="er-state er-state--error">{error}</div>}
 
       {!loading && !error && (

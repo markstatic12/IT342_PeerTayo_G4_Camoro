@@ -5,6 +5,7 @@ import {
   updateEvaluation,
   deleteEvaluation,
 } from './evaluationFormService';
+import Skeleton from '../../../shared/components/ui/Skeleton';
 import './FormsCreatedPage.css';
 
 /* ── Helpers ──────────────────────────────────────────────────────────── */
@@ -384,26 +385,38 @@ export default function FormsCreatedPage() {
 
       {/* ── Stats strip ─────────────────────────────────────────────── */}
       <div className="fc-stats">
-        <div className="fc-stat fc-stat--total">
-          <div className="fc-stat__icon"><IconFile /></div>
-          <div className="fc-stat__val">{total}</div>
-          <div className="fc-stat__lbl">Total Forms</div>
-        </div>
-        <div className="fc-stat fc-stat--active">
-          <div className="fc-stat__icon"><IconCheck /></div>
-          <div className="fc-stat__val">{active}</div>
-          <div className="fc-stat__lbl">Active</div>
-        </div>
-        <div className="fc-stat fc-stat--warn">
-          <div className="fc-stat__icon"><IconAlert /></div>
-          <div className="fc-stat__val">{attention}</div>
-          <div className="fc-stat__lbl">Needs Attention</div>
-        </div>
-        <div className="fc-stat fc-stat--closed">
-          <div className="fc-stat__icon"><IconLock /></div>
-          <div className="fc-stat__val">{closed}</div>
-          <div className="fc-stat__lbl">Closed</div>
-        </div>
+        {loading ? (
+          [1,2,3,4].map((i) => (
+            <div key={i} className="fc-stat">
+              <Skeleton variant="circle" width="28px" height="28px" className="skeleton-stagger" />
+              <Skeleton variant="title" width="40px" height="24px" style={{ marginTop: 6 }} className="skeleton-stagger" />
+              <Skeleton variant="text" width="70%" height="10px" style={{ marginTop: 4 }} className="skeleton-stagger" />
+            </div>
+          ))
+        ) : (
+          <>
+            <div className="fc-stat fc-stat--total">
+              <div className="fc-stat__icon"><IconFile /></div>
+              <div className="fc-stat__val">{total}</div>
+              <div className="fc-stat__lbl">Total Forms</div>
+            </div>
+            <div className="fc-stat fc-stat--active">
+              <div className="fc-stat__icon"><IconCheck /></div>
+              <div className="fc-stat__val">{active}</div>
+              <div className="fc-stat__lbl">Active</div>
+            </div>
+            <div className="fc-stat fc-stat--warn">
+              <div className="fc-stat__icon"><IconAlert /></div>
+              <div className="fc-stat__val">{attention}</div>
+              <div className="fc-stat__lbl">Needs Attention</div>
+            </div>
+            <div className="fc-stat fc-stat--closed">
+              <div className="fc-stat__icon"><IconLock /></div>
+              <div className="fc-stat__val">{closed}</div>
+              <div className="fc-stat__lbl">Closed</div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* ── Filter tabs ─────────────────────────────────────────────── */}
@@ -425,7 +438,38 @@ export default function FormsCreatedPage() {
 
       {/* ── Table ───────────────────────────────────────────────────── */}
       <div className="fc-table-wrap">
-        {loading && <div className="fc-empty">Loading evaluations…</div>}
+        {loading && (
+          <table className="fc-table">
+            <thead>
+              <tr>
+                <th>Title</th><th>Status</th><th>Progress</th><th>Deadline</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1,2,3,4,5].map((i) => (
+                <tr key={i} className="fc-row">
+                  <td className="fc-row__title">
+                    <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+                      <Skeleton variant="text" width="60%" height="12px" className="skeleton-stagger" />
+                      <Skeleton variant="text" width="80%" height="10px" className="skeleton-stagger" />
+                    </div>
+                  </td>
+                  <td><Skeleton variant="rect" width="60px" height="20px" style={{ borderRadius:6 }} className="skeleton-stagger" /></td>
+                  <td className="fc-row__progress">
+                    <Skeleton variant="rect" width="100%" height="6px" style={{ borderRadius:3 }} className="skeleton-stagger" />
+                    <Skeleton variant="text" width="30px" height="10px" style={{ marginTop:4 }} className="skeleton-stagger" />
+                  </td>
+                  <td><Skeleton variant="text" width="80px" height="11px" className="skeleton-stagger" /></td>
+                  <td className="fc-row__actions">
+                    {[1,2,3,4].map((j) => (
+                      <Skeleton key={j} variant="circle" width="26px" height="26px" className="skeleton-stagger" />
+                    ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         {!loading && error && <div className="fc-empty fc-empty--error">{error}</div>}
         {!loading && !error && filtered.length === 0 && (
           <div className="fc-empty">

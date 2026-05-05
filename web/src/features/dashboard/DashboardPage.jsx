@@ -5,6 +5,7 @@ import { listCreatedEvaluations } from '../evaluation/form/evaluationFormService
 import { getSubmittedSummary, listPendingEvaluations } from '../evaluation/submission/evaluationSubmissionService';
 import { getMyResults } from '../evaluation/results/evaluationResultsService';
 import { listNotifications } from '../notification/list/notificationService';
+import Skeleton from '../../shared/components/ui/Skeleton';
 import './DashboardPage.css';
 
 /* ── Carousel slides ──────────────────────────────────────────────────── */
@@ -411,6 +412,7 @@ export default function DashboardPage() {
         message: '',
         time: item.createdAt ? formatDateTime(item.createdAt) : 'Now',
         tag: item.isRead ? 'Done' : 'New',
+        route: '/pending-evaluations',
       }))
     : pendingEvaluations.length
     ? pendingEvaluations.slice(0, 7).map((ev, i) => ({
@@ -419,6 +421,7 @@ export default function DashboardPage() {
         message: ev.evaluateeName ? `Evaluatee: ${ev.evaluateeName}` : '',
         time: ev.deadline ? formatDateTime(ev.deadline) : 'No deadline',
         tag: 'Pending',
+        route: '/pending-evaluations',
       }))
     : [];
 
@@ -489,23 +492,34 @@ export default function DashboardPage() {
 
           {/* Stat cards */}
           <div className="stat-row">
-            {stats.map((s) => (
-              <div key={s.label} className={`sc c-${s.variant}`}>
-                <div className={`sc-icon-wrap ic-${s.variant}`}>{s.icon}</div>
-                <div className="sc-val">{s.value}</div>
-                <div className="sc-label">{s.label}</div>
-                {s.delta && (
-                  <div className={`sc-delta ${s.deltaClass}`}>
-                    <IconTrendUp size={10} />
-                    {s.delta}
+            {loading
+              ? stats.map((s) => (
+                  <div key={s.label} className={`sc c-${s.variant} sc--skeleton`}>
+                    <Skeleton variant="circle" width="26px" height="26px" className="skeleton-stagger" />
+                    <Skeleton variant="title" width="48px" height="28px" style={{ marginTop: 4 }} className="skeleton-stagger" />
+                    <Skeleton variant="text" width="70%" height="10px" className="skeleton-stagger" />
+                    <Skeleton variant="text" width="50%" height="9px" style={{ marginTop: 4 }} className="skeleton-stagger" />
+                    <Skeleton variant="text" width="60%" height="10px" style={{ marginTop: 6 }} className="skeleton-stagger" />
                   </div>
-                )}
-                <button className="sc-action" type="button" onClick={() => navigate(s.route)}>
-                  {s.action}
-                  <IconArrowRight size={11} />
-                </button>
-              </div>
-            ))}
+                ))
+              : stats.map((s) => (
+                  <div key={s.label} className={`sc c-${s.variant}`}>
+                    <div className={`sc-icon-wrap ic-${s.variant}`}>{s.icon}</div>
+                    <div className="sc-val">{s.value}</div>
+                    <div className="sc-label">{s.label}</div>
+                    {s.delta && (
+                      <div className={`sc-delta ${s.deltaClass}`}>
+                        <IconTrendUp size={10} />
+                        {s.delta}
+                      </div>
+                    )}
+                    <button className="sc-action" type="button" onClick={() => navigate(s.route)}>
+                      {s.action}
+                      <IconArrowRight size={11} />
+                    </button>
+                  </div>
+                ))
+            }
           </div>
 
           {/* Analytics card */}
@@ -517,52 +531,80 @@ export default function DashboardPage() {
                   Per-criterion avg · {myResults?.totalResponses ?? 0} peer responses · rated 1–5
                 </div>
               </div>
-              {chartData.length > 0 && overallScore >= 4.0 && (
+              {!loading && chartData.length > 0 && overallScore >= 4.0 && (
                 <span className="ac-badge">✓ Above 4.0 goal</span>
               )}
             </div>
             <div className="ac-body">
-              <div className="ac-chart-col">
-                <div className="lg-wrap">
-                  {chartData.length > 0 ? (
-                    <div className="lg-canvas-area">
-                      <canvas ref={chartRef} />
+              {loading ? (
+                <>
+                  {/* Chart area skeleton */}
+                  <div className="ac-chart-col">
+                    <div className="lg-wrap">
+                      <Skeleton variant="rect" style={{ flex: 1, minHeight: 100, borderRadius: 10 }} className="skeleton-stagger" />
                     </div>
-                  ) : (
-                    <div className="ac-empty">No performance data yet.</div>
-                  )}
-                </div>
-                {chartData.length > 0 && (
-                  <div className="lg-x-labels">
-                    {chartData.map((d) => (
-                      <div key={d.label} className="lg-x-label">{d.short}</div>
+                    <div className="lg-x-labels" style={{ marginTop: 8 }}>
+                      {[...Array(5)].map((_, i) => (
+                        <Skeleton key={i} variant="text" width="100%" height="8px" className="skeleton-stagger" />
+                      ))}
+                    </div>
+                  </div>
+                  {/* Indicators skeleton */}
+                  <div className="ac-indicators">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="ac-ind-box" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                        <Skeleton variant="text" width="40%" height="8px" className="skeleton-stagger" />
+                        <Skeleton variant="title" width="48px" height="22px" style={{ marginTop: 6 }} className="skeleton-stagger" />
+                        <Skeleton variant="text" width="70%" height="8px" style={{ marginTop: 4 }} className="skeleton-stagger" />
+                      </div>
                     ))}
                   </div>
-                )}
-              </div>
-              <div className="ac-indicators">
-                <div className="ac-ind-box high">
-                  <div className="ac-ind-label">▲ Highest</div>
-                  <div className="ac-ind-val">
-                    {chartData.length > 0 ? Math.max(...chartData.map((d) => d.cur)).toFixed(1) : '—'}
+                </>
+              ) : (
+                <>
+                  <div className="ac-chart-col">
+                    <div className="lg-wrap">
+                      {chartData.length > 0 ? (
+                        <div className="lg-canvas-area">
+                          <canvas ref={chartRef} />
+                        </div>
+                      ) : (
+                        <div className="ac-empty">No performance data yet.</div>
+                      )}
+                    </div>
+                    {chartData.length > 0 && (
+                      <div className="lg-x-labels">
+                        {chartData.map((d) => (
+                          <div key={d.label} className="lg-x-label">{d.short}</div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div className="ac-ind-crit">{highestCriterion?.label ?? '—'}</div>
-                </div>
-                <div className="ac-ind-box low">
-                  <div className="ac-ind-label">▼ Lowest</div>
-                  <div className="ac-ind-val">
-                    {chartData.length > 0 ? Math.min(...chartData.map((d) => d.cur)).toFixed(1) : '—'}
+                  <div className="ac-indicators">
+                    <div className="ac-ind-box high">
+                      <div className="ac-ind-label">▲ Highest</div>
+                      <div className="ac-ind-val">
+                        {chartData.length > 0 ? Math.max(...chartData.map((d) => d.cur)).toFixed(1) : '—'}
+                      </div>
+                      <div className="ac-ind-crit">{highestCriterion?.label ?? '—'}</div>
+                    </div>
+                    <div className="ac-ind-box low">
+                      <div className="ac-ind-label">▼ Lowest</div>
+                      <div className="ac-ind-val">
+                        {chartData.length > 0 ? Math.min(...chartData.map((d) => d.cur)).toFixed(1) : '—'}
+                      </div>
+                      <div className="ac-ind-crit">{lowestCriterion?.label ?? '—'}</div>
+                    </div>
+                    <div className="ac-ind-avg-box">
+                      <div className="ac-ind-avg-label">Avg Score</div>
+                      <div className="ac-ind-avg-val">
+                        {chartData.length > 0 ? overallScore.toFixed(1) : '—'}
+                      </div>
+                      <div className="ac-ind-avg-sub">across {chartData.length} criteria</div>
+                    </div>
                   </div>
-                  <div className="ac-ind-crit">{lowestCriterion?.label ?? '—'}</div>
-                </div>
-                <div className="ac-ind-avg-box">
-                  <div className="ac-ind-avg-label">Avg Score</div>
-                  <div className="ac-ind-avg-val">
-                    {chartData.length > 0 ? overallScore.toFixed(1) : '—'}
-                  </div>
-                  <div className="ac-ind-avg-sub">across {chartData.length} criteria</div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -581,12 +623,31 @@ export default function DashboardPage() {
             </div>
 
             <div className="act-list">
-              {loading && <div className="act-empty">Loading activity…</div>}
+              {loading && (
+                <>
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="act-item act-item--skeleton">
+                      <div className="act-timeline">
+                        <Skeleton variant="circle" width="10px" height="10px" className="skeleton-stagger" />
+                        <div className="act-line" />
+                      </div>
+                      <div className="act-body">
+                        <Skeleton variant="text" width="85%" height="11px" className="skeleton-stagger" />
+                        <Skeleton variant="text" width="50%" height="9px" style={{ marginTop: 6 }} className="skeleton-stagger" />
+                        <div className="act-meta" style={{ marginTop: 6 }}>
+                          <Skeleton variant="text" width="60px" height="9px" className="skeleton-stagger" />
+                          <Skeleton variant="rect" width="36px" height="16px" style={{ borderRadius: 4 }} className="skeleton-stagger" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
               {!loading && error && <div className="act-empty">{error}</div>}
               {!loading && !error && activityItems.length === 0 && (
                 <div className="act-empty">No recent activity yet.</div>
               )}
-              {activityItems.map((item, i) => (
+              {!loading && activityItems.map((item, i) => (
                 <div key={`${item.title}-${i}`} className="act-item">
                   <div className="act-timeline">
                     <div className={`act-dot ${item.color}`} />
@@ -600,6 +661,15 @@ export default function DashboardPage() {
                       <span className={`act-tag tag-${(tagMap[item.tag] ?? item.tag).toLowerCase()}`}>
                         {item.tag}
                       </span>
+                      {item.route && (
+                        <button
+                          className="act-visit"
+                          type="button"
+                          onClick={() => navigate(item.route)}
+                        >
+                          Visit <IconArrowRight size={9} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
