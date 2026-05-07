@@ -1,11 +1,9 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/context/AuthContext';
 import { listCreatedEvaluations } from '../evaluation/form/evaluationFormService';
 import { getSubmittedSummary, listPendingEvaluations } from '../evaluation/submission/evaluationSubmissionService';
 import { getMyResults } from '../evaluation/results/evaluationResultsService';
-import { listNotifications } from '../notification/list/notificationService';
-import { markNotificationAsRead } from '../notification/markread/markReadService';
 import Skeleton from '../../shared/components/ui/Skeleton';
 import './DashboardPage.css';
 
@@ -235,7 +233,6 @@ export default function DashboardPage() {
   const [createdEvaluations, setCreatedEvaluations] = useState([]);
   const [pendingEvaluations, setPendingEvaluations] = useState([]);
   const [myResults, setMyResults] = useState(null);
-  const [notifications, setNotifications] = useState([]);
   const [submittedSummary, setSubmittedSummary] = useState({ submittedThisMonth: 0, totalSubmitted: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -246,7 +243,6 @@ export default function DashboardPage() {
   );
   const [promoting, setPromoting] = useState(false);
   const [promoteError, setPromoteError] = useState('');
-  const [rightTab, setRightTab] = useState('notifications'); // 'notifications' | 'activity'
 
   /* ── Derived chart data ─────────────────────────────────────────────── */
   const chartData = useMemo(() => {
@@ -271,16 +267,14 @@ export default function DashboardPage() {
           listPendingEvaluations(),
           getSubmittedSummary(),
           getMyResults(),
-          listNotifications(),
         ];
-        // Only fetch created evaluations for facilitators
         const isFac = user?.roles?.some(
           (r) => (typeof r === 'string' ? r : r?.name)?.toUpperCase() === 'FACILITATOR'
         );
         if (isFac) promises.unshift(listCreatedEvaluations());
         else promises.unshift(Promise.resolve([]));
 
-        const [created, pending, summary, results, notices] = await Promise.all(promises);
+        const [created, pending, summary, results] = await Promise.all(promises);
         if (mounted) {
           setCreatedEvaluations(created);
           setPendingEvaluations(pending);
@@ -289,7 +283,6 @@ export default function DashboardPage() {
             totalSubmitted: summary?.totalSubmitted ?? 0,
           });
           setMyResults(results ?? null);
-          setNotifications(notices);
         }
       } catch {
         if (mounted) setError('Unable to load dashboard data right now.');
@@ -407,18 +400,6 @@ export default function DashboardPage() {
   const tagMap = { Done: 'done', New: 'new', Pending: 'pending', Updated: 'update', Assigned: 'update', Score: 'done', Closed: 'late' };
 
   const activeSlide = slides[slideIndex];
-
-  /* ── Mark notification as read ──────────────────────────────────────── */
-  const handleMarkRead = useCallback(async (id) => {
-    try {
-      await markNotificationAsRead(id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-      );
-    } catch {
-      // silently ignore — not critical
-    }
-  }, []);
 
   /* ── Recent Activity — built from what the user has DONE ────────────── */
   const activityItems = useMemo(() => {
@@ -658,144 +639,60 @@ export default function DashboardPage() {
         {/* ── RIGHT COLUMN ────────────────────────────────────────────── */}
         <div className="db-right">
           <div className="act-card">
-            {/* Tab header */}
             <div className="act-head">
-              <div className="act-tabs">
-                <button
-                  className={`act-tab${rightTab === 'notifications' ? ' active' : ''}`}
-                  type="button"
-                  onClick={() => setRightTab('notifications')}
-                >
-                  Notifications
-                  {notifications.filter((n) => !n.isRead).length > 0 && (
-                    <span className="act-tab-badge">
-                      {notifications.filter((n) => !n.isRead).length}
-                    </span>
-                  )}
-                </button>
-                <button
-                  className={`act-tab${rightTab === 'activity' ? ' active' : ''}`}
-                  type="button"
-                  onClick={() => setRightTab('activity')}
-                >
-                  Recent Activity
-                </button>
+              <div>
+                <div className="act-title">Recent Activity</div>
+                <div className="act-sub">Your actions in the system</div>
               </div>
             </div>
 
-            {/* ── NOTIFICATIONS tab ── */}
-            {rightTab === 'notifications' && (
-              <div className="act-list">
-                {loading && (
-                  <>
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="act-item act-item--skeleton">
-                        <div className="act-timeline">
-                          <Skeleton variant="circle" width="10px" height="10px" className="skeleton-stagger" />
-                          <div className="act-line" />
-                        </div>
-                        <div className="act-body">
-                          <Skeleton variant="text" width="85%" height="11px" className="skeleton-stagger" />
-                          <Skeleton variant="text" width="50%" height="9px" style={{ marginTop: 6 }} className="skeleton-stagger" />
-                          <div className="act-meta" style={{ marginTop: 6 }}>
-                            <Skeleton variant="text" width="60px" height="9px" className="skeleton-stagger" />
-                            <Skeleton variant="rect" width="36px" height="16px" style={{ borderRadius: 4 }} className="skeleton-stagger" />
-                          </div>
-                        </div>
+            <div className="act-list">
+              {loading && (
+                <>
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="act-item act-item--skeleton">
+                      <div className="act-timeline">
+                        <Skeleton variant="circle" width="10px" height="10px" className="skeleton-stagger" />
+                        <div className="act-line" />
                       </div>
-                    ))}
-                  </>
-                )}
-                {!loading && notifications.length === 0 && (
-                  <div className="act-empty">No notifications yet.</div>
-                )}
-                {!loading && notifications.map((notif) => (
-                  <div
-                    key={notif.id}
-                    className={`act-item${!notif.isRead ? ' act-item--unread' : ''}`}
-                    onClick={() => !notif.isRead && handleMarkRead(notif.id)}
-                  >
-                    <div className="act-timeline">
-                      <div className={`act-dot${!notif.isRead ? ' dot-orange' : ' dot-green'}`} />
-                      <div className="act-line" />
+                      <div className="act-body">
+                        <Skeleton variant="text" width="85%" height="11px" className="skeleton-stagger" />
+                        <Skeleton variant="text" width="50%" height="9px" style={{ marginTop: 6 }} className="skeleton-stagger" />
+                      </div>
                     </div>
-                    <div className="act-body">
-                      <div className="act-msg">{notif.message}</div>
-                      <div className="act-meta">
-                        <span className="act-time">
-                          {notif.createdAt ? formatDateTime(notif.createdAt) : 'Now'}
-                        </span>
-                        <span className={`act-tag${!notif.isRead ? ' tag-new' : ' tag-done'}`}>
-                          {notif.isRead ? 'Read' : 'New'}
-                        </span>
+                  ))}
+                </>
+              )}
+              {!loading && activityItems.length === 0 && (
+                <div className="act-empty">No activity yet. Start by submitting an evaluation.</div>
+              )}
+              {!loading && activityItems.map((item, i) => (
+                <div key={i} className="act-item">
+                  <div className="act-timeline">
+                    <div className={`act-dot ${item.color}`} />
+                    <div className="act-line" />
+                  </div>
+                  <div className="act-body">
+                    <div className="act-msg">{item.title}</div>
+                    {item.message && <div className="act-msg-sub">{item.message}</div>}
+                    <div className="act-meta">
+                      <span className={`act-tag tag-${(tagMap[item.tag] ?? item.tag).toLowerCase()}`}>
+                        {item.tag}
+                      </span>
+                      {item.route && (
                         <button
                           className="act-visit"
                           type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (!notif.isRead) handleMarkRead(notif.id);
-                            navigate('/pending-evaluations');
-                          }}
+                          onClick={() => navigate(item.route)}
                         >
-                          View <IconArrowRight size={9} />
+                          Visit <IconArrowRight size={9} />
                         </button>
-                      </div>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-
-            {/* ── RECENT ACTIVITY tab ── */}
-            {rightTab === 'activity' && (
-              <div className="act-list">
-                {loading && (
-                  <>
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="act-item act-item--skeleton">
-                        <div className="act-timeline">
-                          <Skeleton variant="circle" width="10px" height="10px" className="skeleton-stagger" />
-                          <div className="act-line" />
-                        </div>
-                        <div className="act-body">
-                          <Skeleton variant="text" width="85%" height="11px" className="skeleton-stagger" />
-                          <Skeleton variant="text" width="50%" height="9px" style={{ marginTop: 6 }} className="skeleton-stagger" />
-                        </div>
-                      </div>
-                    ))}
-                  </>
-                )}
-                {!loading && activityItems.length === 0 && (
-                  <div className="act-empty">No activity yet. Start by submitting an evaluation.</div>
-                )}
-                {!loading && activityItems.map((item, i) => (
-                  <div key={i} className="act-item">
-                    <div className="act-timeline">
-                      <div className={`act-dot ${item.color}`} />
-                      <div className="act-line" />
-                    </div>
-                    <div className="act-body">
-                      <div className="act-msg">{item.title}</div>
-                      {item.message && <div className="act-msg-sub">{item.message}</div>}
-                      <div className="act-meta">
-                        <span className={`act-tag tag-${(tagMap[item.tag] ?? item.tag).toLowerCase()}`}>
-                          {item.tag}
-                        </span>
-                        {item.route && (
-                          <button
-                            className="act-visit"
-                            type="button"
-                            onClick={() => navigate(item.route)}
-                          >
-                            Visit <IconArrowRight size={9} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
