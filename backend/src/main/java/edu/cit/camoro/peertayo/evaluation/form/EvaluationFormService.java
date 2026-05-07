@@ -6,12 +6,17 @@ import edu.cit.camoro.peertayo.evaluation.entity.EvaluationAssignment;
 import edu.cit.camoro.peertayo.evaluation.entity.EvaluationForm;
 import edu.cit.camoro.peertayo.evaluation.repository.EvaluationAssignmentRepository;
 import edu.cit.camoro.peertayo.evaluation.repository.EvaluationFormRepository;
+import edu.cit.camoro.peertayo.notification.entity.Notification;
 import edu.cit.camoro.peertayo.notification.entity.NotificationType;
+import edu.cit.camoro.peertayo.notification.repository.NotificationRepository;
 import edu.cit.camoro.peertayo.notification.shared.NotificationService;
 import edu.cit.camoro.peertayo.shared.exception.BusinessRuleException;
 import edu.cit.camoro.peertayo.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -22,9 +27,12 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class EvaluationFormService {
 
+    private static final Logger log = LoggerFactory.getLogger(EvaluationFormService.class);
+
     private final EvaluationFormRepository evaluationFormRepository;
     private final EvaluationAssignmentRepository evaluationAssignmentRepository;
     private final NotificationService notificationService;
+    private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -63,17 +71,57 @@ public class EvaluationFormService {
 
         evaluationAssignmentRepository.saveAll(assignments);
 
-        // Notify each evaluator — respects their notification preferences
-        notificationService.sendToAll(
-                evaluators,
-                "You have been assigned to evaluate: " + saved.getTitle(),
-                NotificationType.EVALUATION_ASSIGNED
-        );
+        // Store evaluator list for post-commit notification (outside this transaction)
+        final List<User> evaluatorsForNotif = List.copyOf(evaluators);
+        final String formTitle = saved.getTitle();
+        final Long formId = saved.getId();
 
         return CreatedEvaluationResponse.builder()
-                .id(saved.getId()).title(saved.getTitle())
+                .id(formId).title(formTitle)
                 .deadline(saved.getDeadline()).createdBy(creator.getId())
                 .status(saved.getStatus()).build();
+    }
+
+    /**
+     * Send notifications in a NEW transaction so any failure here
+     * never affects the already-committed evaluation creation.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendAssignmentNotifications(List<User> evaluators, String formTitle) {
+        try {
+            notificationService.sendToAll(
+                    evaluators,
+                    "You have been assigned to evaluate: " + formTitle,
+                    NotificationType.EVALUATION_ASSIGNED
+            );
+        } catch (Exception e) {
+            log.warn("Failed to send assignment notifications (non-critical): {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Convenience overload — looks up users by ID then sends notifications.
+     * Runs in its own transaction so failures never affect the caller.
+     * Bypasses preference check to ensure delivery.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendAssignmentNotificationsById(List<Long> evaluatorIds, String formTitle) {
+        try {
+            List<User> evaluators = userRepository.findAllById(evaluatorIds);
+            List<Notification> toSave = evaluators.stream()
+                    .map(u -> Notification.builder()
+                            .user(u)
+                            .message("You have been assigned to evaluate: " + formTitle)
+                            .type(NotificationType.EVALUATION_ASSIGNED)
+                            .read(false)
+                            .build())
+                    .toList();
+            if (!toSave.isEmpty()) {
+                notificationRepository.saveAll(toSave);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to send assignment notifications (non-critical): {}", e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)
