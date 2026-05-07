@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../auth/context/AuthContext';
 import { updateProfile, changePassword } from './settingsService';
 import { getNotificationPreferences, updateNotificationPreferences } from '../notification/preferences/notificationPreferencesService';
+import Skeleton from '../../shared/components/ui/Skeleton';
 import './SettingsPage.css';
 
 /* ── Tiny SVG helpers ─────────────────────────────────────────────────── */
@@ -36,6 +37,7 @@ function getStrength(pwd) {
 export default function SettingsPage() {
   const { user, setUser, logout, refreshCurrentUser } = useAuth();
   const [activePanel, setActivePanel] = useState('profile');
+  const [pageLoading, setPageLoading] = useState(!user);
 
   /* ── Profile state ── */
   const [firstName, setFirstName] = useState('');
@@ -91,6 +93,7 @@ export default function SettingsPage() {
       setLastName(user.lastName ?? '');
       setEmail(user.email ?? '');
       setProfileDirty(false);
+      setPageLoading(false);
     }
   }, [user]);
 
@@ -193,8 +196,63 @@ export default function SettingsPage() {
       {/* ── Settings content ── */}
       <div className="settings-content">
 
+        {/* ── PAGE-LEVEL SKELETON (while user loads) ── */}
+        {pageLoading && (
+          <div className="settings-panel">
+            <div className="panel-header">
+              <Skeleton variant="title" width="140px" height="22px" />
+              <Skeleton variant="text" width="260px" height="12px" style={{ marginTop: 8 }} />
+            </div>
+            {/* Skeleton card 1 — avatar row + 3 field rows */}
+            <div className="settings-card">
+              <div className="card-head">
+                <div className="card-head-left">
+                  <Skeleton variant="circle" width="34px" height="34px" />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                    <Skeleton variant="text" width="120px" height="13px" />
+                    <Skeleton variant="text" width="180px" height="10px" />
+                  </div>
+                </div>
+              </div>
+              <div className="field-row" style={{ alignItems: 'center', gap: 24, padding: '20px' }}>
+                <Skeleton variant="rect" width="80px" height="80px" style={{ borderRadius: 16, flexShrink: 0 }} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <Skeleton variant="text" width="120px" height="13px" />
+                  <Skeleton variant="text" width="240px" height="10px" />
+                  <Skeleton variant="text" width="200px" height="10px" />
+                  <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                    <Skeleton variant="rect" width="110px" height="32px" style={{ borderRadius: 8 }} />
+                    <Skeleton variant="rect" width="90px" height="32px" style={{ borderRadius: 8 }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Skeleton card 2 — 3 field rows */}
+            <div className="settings-card">
+              <div className="card-head">
+                <div className="card-head-left">
+                  <Skeleton variant="circle" width="34px" height="34px" />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                    <Skeleton variant="text" width="140px" height="13px" />
+                    <Skeleton variant="text" width="160px" height="10px" />
+                  </div>
+                </div>
+              </div>
+              {[1, 2, 3].map((i) => (
+                <div className="field-row" key={i}>
+                  <div className="field-info">
+                    <Skeleton variant="text" width="90px" height="13px" />
+                    <Skeleton variant="text" width="220px" height="10px" style={{ marginTop: 5 }} />
+                  </div>
+                  <Skeleton variant="rect" width="220px" height="36px" style={{ borderRadius: 8 }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* ══ PROFILE ══ */}
-        {activePanel === 'profile' && (
+        {!pageLoading && activePanel === 'profile' && (
           <div className="settings-panel">
             <div className="panel-header">
               <div className="panel-title">Profile</div>
@@ -301,7 +359,7 @@ export default function SettingsPage() {
         )}
 
         {/* ══ PASSWORD & SECURITY ══ */}
-        {activePanel === 'password' && (
+        {!pageLoading && activePanel === 'password' && (
           <div className="settings-panel">
             <div className="panel-header">
               <div className="panel-title">Password &amp; Security</div>
@@ -391,7 +449,7 @@ export default function SettingsPage() {
         )}
 
         {/* ══ NOTIFICATIONS ══ */}
-        {activePanel === 'notifications' && (
+        {!pageLoading && activePanel === 'notifications' && (
           <div className="settings-panel">
             <div className="panel-header">
               <div className="panel-title">Notifications</div>
@@ -410,7 +468,16 @@ export default function SettingsPage() {
               </div>
 
               {notifLoading ? (
-                <div style={{ padding: '20px', color: '#64748b', fontSize: 12 }}>Loading preferences…</div>
+                /* ── Notification skeleton rows ── */
+                [1, 2, 3, 4, 5, 6].map((i) => (
+                  <div className="notif-row" key={i}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <Skeleton variant="text" width="180px" height="13px" />
+                      <Skeleton variant="text" width="280px" height="10px" />
+                    </div>
+                    <Skeleton variant="rect" width="42px" height="24px" style={{ borderRadius: 24, flexShrink: 0 }} />
+                  </div>
+                ))
               ) : (
                 [
                   { key: 'evaluationAssigned', label: 'New Evaluation Assigned',   desc: 'When a facilitator assigns you to an evaluation form' },
@@ -482,7 +549,7 @@ export default function SettingsPage() {
         )}
 
         {/* ══ ROLES & ACCESS ══ */}
-        {activePanel === 'roles' && (
+        {!pageLoading && activePanel === 'roles' && (
           <div className="settings-panel">
             <div className="panel-header">
               <div className="panel-title">Roles &amp; Access</div>
