@@ -1,9 +1,15 @@
+import { useState, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/context/AuthContext';
 import { SearchIcon, BellIcon } from '../components/icons/Icons';
+import NotificationDropdown from '../components/ui/NotificationDropdown';
 import './TopBar.css';
 
 export default function TopBar() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [notifOpen, setNotifOpen] = useState(false);
+  const bellRef = useRef(null);
 
   const initials =
     (user?.firstName?.charAt(0) || '') + (user?.lastName?.charAt(0) || '');
@@ -12,6 +18,8 @@ export default function TopBar() {
     user?.roles?.some((r) => (typeof r === 'string' ? r : r?.name)?.toUpperCase() === 'FACILITATOR')
       ? 'Facilitator'
       : 'Respondent';
+
+  const handleClose = useCallback(() => setNotifOpen(false), []);
 
   return (
     <header className="topbar">
@@ -27,9 +35,17 @@ export default function TopBar() {
       </div>
 
       <div className="topbar__right">
-        <button className="topbar__icon-btn" title="Notifications">
-          <BellIcon size={20} />
-        </button>
+        {/* Bell notification button */}
+        <div className="topbar__notif-wrap" ref={bellRef}>
+          <button
+            className="topbar__icon-btn"
+            title="Notifications"
+            onClick={() => setNotifOpen((o) => !o)}
+          >
+            <BellIcon size={20} />
+          </button>
+          <NotificationDropdown isOpen={notifOpen} onClose={handleClose} />
+        </div>
 
         <div className="topbar__profile">
           <div className="topbar__user-info">
