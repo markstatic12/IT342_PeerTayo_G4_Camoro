@@ -6,7 +6,7 @@ import Skeleton from './Skeleton';
 import { BellIcon, ClockIcon, CheckCircleIcon } from '../icons/Icons';
 import './NotificationDropdown.css';
 
-export default function NotificationDropdown({ isOpen, onClose }) {
+export default function NotificationDropdown({ isOpen, onClose, onCountChange }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const dropdownRef = useRef(null);
@@ -20,7 +20,10 @@ export default function NotificationDropdown({ isOpen, onClose }) {
         setLoading(true);
         try {
           const data = await listNotifications();
-          if (mounted) setNotifications(data);
+          if (mounted) {
+            setNotifications(data);
+            onCountChange?.(data.filter((n) => !n.isRead).length);
+          }
         } catch {
           // silently ignore
         } finally {
@@ -46,20 +49,26 @@ export default function NotificationDropdown({ isOpen, onClose }) {
   const handleMarkRead = useCallback(async (id) => {
     try {
       await markNotificationAsRead(id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-      );
+      setNotifications((prev) => {
+        const updated = prev.map((n) => (n.id === id ? { ...n, isRead: true } : n));
+        onCountChange?.(updated.filter((n) => !n.isRead).length);
+        return updated;
+      });
     } catch {
       // silently ignore
     }
-  }, []);
+  }, [onCountChange]);
 
   /* ── Mark all as read ── */
   const handleMarkAll = useCallback(async () => {
     const unread = notifications.filter((n) => !n.isRead);
     await Promise.allSettled(unread.map((n) => markNotificationAsRead(n.id)));
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-  }, [notifications]);
+    setNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, isRead: true }));
+      onCountChange?.(0);
+      return updated;
+    });
+  }, [notifications, onCountChange]);
 
   /* ── Visit notification ── */
   const handleVisit = useCallback((notif) => {
@@ -92,10 +101,10 @@ export default function NotificationDropdown({ isOpen, onClose }) {
         {loading ? (
           [1, 2, 3].map((i) => (
             <div key={i} className="nd-item nd-item--loading">
-              <Skeleton variant="circle" width="32px" height="32px" />
-              <div className="nd-item-content">
-                <Skeleton variant="text" width="80%" style={{ marginBottom: 4 }} />
-                <Skeleton variant="text" width="40%" height="10px" />
+              <Skeleton variant="circle" width="32px" height="32px" className="skeleton-stagger" />
+              <div className="nd-item-content" style={{ flex: 1 }}>
+                <Skeleton variant="text" width="85%" height="12px" style={{ marginBottom: 6 }} className="skeleton-stagger" />
+                <Skeleton variant="text" width="45%" height="10px" className="skeleton-stagger" />
               </div>
             </div>
           ))
