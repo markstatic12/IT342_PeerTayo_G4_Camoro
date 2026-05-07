@@ -6,8 +6,8 @@ import edu.cit.camoro.peertayo.evaluation.entity.EvaluationAssignment;
 import edu.cit.camoro.peertayo.evaluation.entity.EvaluationForm;
 import edu.cit.camoro.peertayo.evaluation.repository.EvaluationAssignmentRepository;
 import edu.cit.camoro.peertayo.evaluation.repository.EvaluationFormRepository;
-import edu.cit.camoro.peertayo.notification.entity.Notification;
-import edu.cit.camoro.peertayo.notification.repository.NotificationRepository;
+import edu.cit.camoro.peertayo.notification.entity.NotificationType;
+import edu.cit.camoro.peertayo.notification.shared.NotificationService;
 import edu.cit.camoro.peertayo.shared.exception.BusinessRuleException;
 import edu.cit.camoro.peertayo.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class EvaluationFormService {
 
     private final EvaluationFormRepository evaluationFormRepository;
     private final EvaluationAssignmentRepository evaluationAssignmentRepository;
-    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
     private final UserRepository userRepository;
 
     @Transactional
@@ -63,10 +63,12 @@ public class EvaluationFormService {
 
         evaluationAssignmentRepository.saveAll(assignments);
 
-        notificationRepository.saveAll(evaluators.stream()
-                .map(u -> Notification.builder()
-                        .user(u).message("You have a new evaluation assigned.").read(false).build())
-                .toList());
+        // Notify each evaluator — respects their notification preferences
+        notificationService.sendToAll(
+                evaluators,
+                "You have been assigned to evaluate: " + saved.getTitle(),
+                NotificationType.EVALUATION_ASSIGNED
+        );
 
         return CreatedEvaluationResponse.builder()
                 .id(saved.getId()).title(saved.getTitle())
