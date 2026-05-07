@@ -1,6 +1,8 @@
-import { useState, useMemo } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/context/AuthContext';
+import { useNavigationGuard } from '../context/NavigationGuardContext';
+import { listPendingEvaluations } from '../../features/evaluation/submission/evaluationSubmissionService';
 import {
   LogoIcon,
   DashboardIcon,
@@ -17,15 +19,31 @@ import './Sidebar.css';
 export default function Sidebar() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { guardedNavigate } = useNavigationGuard();
   const [showModal, setShowModal] = useState(false);
+
+  const isActive = (path, exact = false) =>
+    exact ? location.pathname === path : location.pathname.startsWith(path);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
 
   const isFacilitator = useMemo(() => {
     return user?.roles?.some(
       (r) => (typeof r === 'string' ? r : r?.name)?.toUpperCase() === 'FACILITATOR'
     );
   }, [user]);
+
+  /* fetch pending count on mount and whenever user changes */
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    listPendingEvaluations()
+      .then((data) => { if (alive) setPendingCount(data?.length ?? 0); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [user?.id]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -48,53 +66,51 @@ export default function Sidebar() {
         <div className="sidebar__section">
           <span className="sidebar__section-title">My Activity</span>
 
-          <NavLink
-            to="/dashboard"
-            end
-            className={({ isActive }) => `sidebar__link${isActive ? ' active' : ''}`}
+          <button
+            onClick={() => guardedNavigate('/dashboard')}
+            className={`sidebar__link${isActive('/dashboard', true) ? ' active' : ''}`}
           >
             <DashboardIcon size={16} />
             Dashboard
-          </NavLink>
+          </button>
 
-          <NavLink
-            to="/pending-evaluations"
-            className={({ isActive }) => `sidebar__link${isActive ? ' active' : ''}`}
+          <button
+            onClick={() => guardedNavigate('/pending-evaluations')}
+            className={`sidebar__link${isActive('/pending-evaluations') ? ' active' : ''}`}
           >
             <PendingIcon size={16} />
             Pending Evaluations
-            {/* orange dot badge if there are any pending */}
-            <span className="sidebar__dot" />
-          </NavLink>
+            {pendingCount > 0 && <span className="sidebar__dot" />}
+          </button>
 
-          <NavLink
-            to="/my-results"
-            className={({ isActive }) => `sidebar__link${isActive ? ' active' : ''}`}
+          <button
+            onClick={() => guardedNavigate('/my-results')}
+            className={`sidebar__link${isActive('/my-results') ? ' active' : ''}`}
           >
             <MyResultsIcon size={16} />
             My Results
-          </NavLink>
+          </button>
 
-          <NavLink
-            to="/completed"
-            className={({ isActive }) => `sidebar__link${isActive ? ' active' : ''}`}
+          <button
+            onClick={() => guardedNavigate('/completed')}
+            className={`sidebar__link${isActive('/completed') ? ' active' : ''}`}
           >
             <CompletedFormsIcon size={16} />
             My Completed Forms
-          </NavLink>
+          </button>
         </div>
 
         {/* ── Manage (facilitator only) ── */}
         <div className="sidebar__section">
           <span className="sidebar__section-title">Manage</span>
           {isFacilitator && (
-            <NavLink
-              to="/forms-created"
-              className={({ isActive }) => `sidebar__link${isActive ? ' active' : ''}`}
+            <button
+              onClick={() => guardedNavigate('/forms-created')}
+              className={`sidebar__link${isActive('/forms-created') ? ' active' : ''}`}
             >
               <FormsIcon size={16} />
               Forms Created
-            </NavLink>
+            </button>
           )}
           {!isFacilitator && (
             <span className="sidebar__link sidebar__link--disabled" style={{ opacity: 0.4, cursor: 'default', pointerEvents: 'none' }}>
@@ -124,10 +140,13 @@ export default function Sidebar() {
       {/* ── Account ── */}
       <div className="sidebar__footer">
         <span className="sidebar__section-title" style={{ paddingLeft: '0.3rem', marginBottom: '0.5rem', display: 'block' }}>Account</span>
-        <NavLink to="/settings" className="sidebar__footer-link">
+        <button
+          onClick={() => guardedNavigate('/settings')}
+          className={`sidebar__footer-link${isActive('/settings') ? ' active' : ''}`}
+        >
           <SettingsIcon size={16} />
           Settings
-        </NavLink>
+        </button>
 
         <button className="sidebar__footer-link" onClick={() => setShowModal(true)}>
           <LogoutIcon size={16} />

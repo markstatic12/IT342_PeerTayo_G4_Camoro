@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './features/auth/context/AuthContext';
+import { NavigationGuardProvider } from './shared/context/NavigationGuardContext';
 import ProtectedRoute from './shared/routes/ProtectedRoute';
 import RoleProtectedRoute from './shared/routes/RoleProtectedRoute';
 import AppLayout from './shared/layouts/AppLayout';
@@ -21,6 +22,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <NavigationGuardProvider>
         <Routes>
           {/* Auth routes — AuthShell stays mounted, only Outlet swaps */}
           <Route element={<AuthShell />}>
@@ -55,6 +57,7 @@ export default function App() {
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        </NavigationGuardProvider>
       </AuthProvider>
     </BrowserRouter>
   );
