@@ -20,8 +20,13 @@ public class ListNotificationController {
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, List<NotificationResponse>>>> getNotifications(
             @AuthenticationPrincipal UserDetails userDetails) {
-        List<NotificationResponse> notifications =
-                listNotificationService.getNotifications(userDetails.getUsername());
-        return ResponseEntity.ok(ApiResponse.ok(Map.of("notifications", notifications)));
+        try {
+            List<NotificationResponse> notifications =
+                    listNotificationService.getNotifications(userDetails.getUsername());
+            return ResponseEntity.ok(ApiResponse.ok(Map.of("notifications", notifications)));
+        } catch (Exception e) {
+            // Return empty list instead of 500 — notification failure is non-critical
+            return ResponseEntity.ok(ApiResponse.ok(Map.of("notifications", List.of())));
+        }
     }
 }
