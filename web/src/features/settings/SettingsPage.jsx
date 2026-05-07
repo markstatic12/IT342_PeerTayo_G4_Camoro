@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../auth/context/AuthContext';
 import { updateProfile, changePassword } from './settingsService';
+import { getNotificationPreferences, updateNotificationPreferences } from '../notification/preferences/notificationPreferencesService';
 import './SettingsPage.css';
 
 /* ── Tiny SVG helpers ─────────────────────────────────────────────────── */
@@ -52,15 +53,36 @@ export default function SettingsPage() {
   const [pwdAlert,   setPwdAlert]   = useState(null);
   const strength = getStrength(newPwd);
 
-  /* ── Notification prefs (UI-only — no backend endpoint yet) ── */
+  /* ── Notification prefs — loaded from and saved to backend ── */
   const [notifPrefs, setNotifPrefs] = useState({
-    assignedApp: true,
-    deadlineApp: true,
-    resultsApp:  false,
-    formCreatedApp: true,
-    submissionApp: true,
-    systemApp: true,
+    evaluationAssigned: true,
+    deadlineReminder: true,
+    resultsPublished: true,
+    formCreated: true,
+    submissionReceived: true,
+    systemAnnouncements: true,
   });
+  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifSaving, setNotifSaving] = useState(false);
+  const [notifAlert, setNotifAlert] = useState(null);
+
+  // Load preferences when the notifications panel is opened
+  useEffect(() => {
+    if (activePanel !== 'notifications') return;
+    let alive = true;
+    (async () => {
+      setNotifLoading(true);
+      try {
+        const data = await getNotificationPreferences();
+        if (alive && data) setNotifPrefs(data);
+      } catch {
+        // silently ignore — defaults remain
+      } finally {
+        if (alive) setNotifLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, [activePanel]);
 
   /* ── Sync user into form on mount / user change ── */
   useEffect(() => {
@@ -373,7 +395,7 @@ export default function SettingsPage() {
           <div className="settings-panel">
             <div className="panel-header">
               <div className="panel-title">Notifications</div>
-              <div className="panel-sub">Control how PeerTayo sends you updates about evaluations and activity.</div>
+              <div className="panel-sub">Control which in-app alerts PeerTayo sends you.</div>
             </div>
 
             <div className="settings-card">
@@ -387,42 +409,72 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {[
-                { key: 'assigned',    label: 'New Evaluation Assigned',   desc: 'When a facilitator assigns you to an evaluation form' },
-                { key: 'deadline',    label: 'Deadline Reminders',         desc: '48-hour and 24-hour reminders before an evaluation closes' },
-                { key: 'results',     label: 'Results Published',          desc: 'When your evaluation results become available to view' },
-                { key: 'formCreated', label: 'Form Created',               desc: 'Confirmation when you successfully create or update an evaluation form', facilitatorOnly: true },
-                { key: 'submission',  label: 'Submission Received',        desc: 'When an evaluator submits a response for your form', facilitatorOnly: true },
-                { key: 'system',      label: 'System Announcements',       desc: 'Important updates about PeerTayo features and maintenance' },
-              ].filter(n => !n.facilitatorOnly || isFacilitator).map((n) => (
-                <div className="notif-row" key={n.key}>
-                  <div>
-                    <div className="notif-label">
-                      {n.label}
-                      {n.facilitatorOnly && (
-                        <span style={{ fontSize: 10, fontWeight: 600, color: '#fb923c', background: 'rgba(249,115,22,0.12)', padding: '1px 6px', borderRadius: 4, marginLeft: 6 }}>
-                          Facilitator
-                        </span>
-                      )}
+              {notifLoading ? (
+                <div style={{ padding: '20px', color: '#64748b', fontSize: 12 }}>Loading preferences…</div>
+              ) : (
+                [
+                  { key: 'evaluationAssigned', label: 'New Evaluation Assigned',   desc: 'When a facilitator assigns you to an evaluation form' },
+                  { key: 'deadlineReminder',   label: 'Deadline Reminders',         desc: '48-hour and 24-hour reminders before an evaluation closes' },
+                  { key: 'resultsPublished',   label: 'Results Published',          desc: 'When your evaluation results become available to view' },
+                  { key: 'formCreated',        label: 'Form Created',               desc: 'Confirmation when you successfully create or update an evaluation form', facilitatorOnly: true },
+                  { key: 'submissionReceived', label: 'Submission Received',        desc: 'When an evaluator submits a response for your form', facilitatorOnly: true },
+                  { key: 'systemAnnouncements', label: 'System Announcements',     desc: 'Important updates about PeerTayo features and maintenance' },
+                ].filter(n => !n.facilitatorOnly || isFacilitator).map((n) => (
+                  <div className="notif-row" key={n.key}>
+                    <div>
+                      <div className="notif-label">
+                        {n.label}
+                        {n.facilitatorOnly && (
+                          <span style={{ fontSize: 10, fontWeight: 600, color: '#fb923c', background: 'rgba(249,115,22,0.12)', padding: '1px 6px', borderRadius: 4, marginLeft: 6 }}>
+                            Facilitator
+                          </span>
+                        )}
+                      </div>
+                      <div className="notif-desc">{n.desc}</div>
                     </div>
-                    <div className="notif-desc">{n.desc}</div>
+                    <div className="notif-toggles">
+                      <label className="toggle">
+                        <input
+                          type="checkbox"
+                          checked={notifPrefs[n.key] ?? true}
+                          onChange={(e) => setNotifPrefs(p => ({ ...p, [n.key]: e.target.checked }))}
+                        />
+                        <span className="toggle-slider" />
+                      </label>
+                    </div>
                   </div>
-                  <div className="notif-toggles">
-                    <label className="toggle">
-                      <input type="checkbox" checked={notifPrefs[`${n.key}App`]}
-                        onChange={(e) => setNotifPrefs(p => ({ ...p, [`${n.key}App`]: e.target.checked }))} />
-                      <span className="toggle-slider" />
-                    </label>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
+            {notifAlert && (
+              <div className={`s-alert s-alert-${notifAlert.type}`}>
+                {notifAlert.type === 'success' ? <SvgCheck /> : <SvgInfo />}
+                {notifAlert.msg}
+              </div>
+            )}
+
             <div className="save-bar">
-              <div className="save-bar-hint"><SvgInfo /> Notification preferences are saved locally.</div>
+              <div className="save-bar-hint"><SvgInfo /> Preferences apply immediately to new notifications.</div>
               <div className="save-bar-actions">
-                <button className="s-btn s-btn-primary" type="button">
-                  <SvgCheck /> Save Preferences
+                <button
+                  className="s-btn s-btn-primary"
+                  type="button"
+                  disabled={notifSaving || notifLoading}
+                  onClick={async () => {
+                    setNotifSaving(true);
+                    setNotifAlert(null);
+                    try {
+                      await updateNotificationPreferences(notifPrefs);
+                      setNotifAlert({ type: 'success', msg: 'Notification preferences saved.' });
+                    } catch {
+                      setNotifAlert({ type: 'error', msg: 'Failed to save preferences.' });
+                    } finally {
+                      setNotifSaving(false);
+                    }
+                  }}
+                >
+                  <SvgCheck /> {notifSaving ? 'Saving…' : 'Save Preferences'}
                 </button>
               </div>
             </div>
