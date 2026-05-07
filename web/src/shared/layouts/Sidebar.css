@@ -67,7 +67,15 @@
   text-decoration: none;
   margin-bottom: 1px;
   font-family: var(--font-family);
-  border: 1px solid transparent; /* Prevent layout shift */
+  border: 1px solid transparent;
+  /* button reset */
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .sidebar__link svg {

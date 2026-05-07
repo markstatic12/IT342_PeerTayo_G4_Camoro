@@ -6,6 +6,8 @@ import edu.cit.camoro.peertayo.notification.entity.Notification;
 import edu.cit.camoro.peertayo.notification.repository.NotificationRepository;
 import edu.cit.camoro.peertayo.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ListNotificationService {
 
+    private static final Logger log = LoggerFactory.getLogger(ListNotificationService.class);
+
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
 
@@ -23,10 +27,15 @@ public class ListNotificationService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        return notificationRepository.findAllByUserOrderByCreatedAtDesc(user)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        try {
+            return notificationRepository.findAllByUserOrderByCreatedAtDesc(user)
+                    .stream()
+                    .map(this::toResponse)
+                    .toList();
+        } catch (Exception e) {
+            log.warn("Could not load notifications for {}: {}", email, e.getMessage());
+            return List.of();
+        }
     }
 
     private NotificationResponse toResponse(Notification notification) {

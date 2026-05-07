@@ -22,7 +22,8 @@ export default function NotificationDropdown({ isOpen, onClose, onCountChange })
           const data = await listNotifications();
           if (mounted) {
             setNotifications(data);
-            onCountChange?.(data.filter((n) => !n.isRead).length);
+            // defer count update to avoid setState-during-render warning
+            setTimeout(() => onCountChange?.(data.filter((n) => !n.isRead).length), 0);
           }
         } catch {
           // silently ignore

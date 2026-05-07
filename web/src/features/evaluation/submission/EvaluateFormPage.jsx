@@ -1,6 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { submitEvaluation } from './evaluationSubmissionService';
+import { useNavigationGuard } from '../../../shared/context/NavigationGuardContext';
+import ExitConfirmModal from '../../../shared/components/ui/ExitConfirmModal';
 import './EvaluateFormPage.css';
 
 /* ─── Criteria definition (mirrors HTML prototype) ────────── */
@@ -69,11 +71,48 @@ export default function EvaluateFormPage() {
   /* State passed from PendingEvaluationsPage via navigate() */
   const { form, evaluatee } = location.state ?? {};
 
-  const [ratings, setRatings]   = useState({});   // { criteriaIndex: 1–5 }
+  const [ratings, setRatings]   = useState({});
   const [comment, setComment]   = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted]   = useState(false);
   const [error, setError]       = useState('');
+  const [exitModal, setExitModal] = useState({ open: false, path: '' });
+
+  const isDirty = (Object.keys(ratings).length > 0 || comment.trim().length > 0) && !submitted;
+
+  const { registerGuard, clearGuard } = useNavigationGuard();
+
+  /* Register/clear the global navigation guard */
+  useEffect(() => {
+    if (isDirty) {
+      registerGuard({
+        title: 'Leave this evaluation?',
+        body: 'You have unsaved ratings. Leaving now will discard your progress and you\'ll need to start over.',
+      });
+    } else {
+      clearGuard();
+    }
+    return () => clearGuard();
+  }, [isDirty, registerGuard, clearGuard]);
+
+  /* Block browser back/forward */
+  useEffect(() => {
+    if (!isDirty) return;
+    const handlePop = () => {
+      window.history.pushState(null, '', window.location.href);
+    };
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', handlePop);
+    return () => window.removeEventListener('popstate', handlePop);
+  }, [isDirty]);
+
+  const guardedNavigate = useCallback((path) => {
+    if (isDirty) {
+      setExitModal({ open: true, path });
+    } else {
+      navigate(path);
+    }
+  }, [isDirty, navigate]);
 
   const ratedCount = Object.keys(ratings).length;
   const total      = CRITERIA.length;
@@ -152,7 +191,7 @@ export default function EvaluateFormPage() {
       {/* ── Top bar ── */}
       <div className="eval-topbar">
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <button className="esh-back" onClick={() => navigate('/pending-evaluations')}>
+          <button className="esh-back" onClick={() => guardedNavigate('/pending-evaluations')}>
             <SvgChevLeft />
             Pending Evaluations
           </button>
@@ -266,7 +305,7 @@ export default function EvaluateFormPage() {
             <div className="ef-actions">
               <button
                 className="ef-btn ef-btn-ghost"
-                onClick={() => navigate('/pending-evaluations')}
+                onClick={() => guardedNavigate('/pending-evaluations')}
               >
                 Cancel
               </button>
@@ -288,6 +327,19 @@ export default function EvaluateFormPage() {
           )}
         </div>
       </div>
+
+      <ExitConfirmModal
+        isOpen={exitModal.open}
+        onCancel={() => setExitModal({ open: false, path: '' })}
+        onConfirm={() => {
+          const path = exitModal.path;
+          setExitModal({ open: false, path: '' });
+          clearGuard();
+          navigate(path);
+        }}
+        title="Leave this evaluation?"
+        body="You have unsaved ratings. Leaving now will discard your progress and you'll need to start over."
+      />
     </div>
   );
 }

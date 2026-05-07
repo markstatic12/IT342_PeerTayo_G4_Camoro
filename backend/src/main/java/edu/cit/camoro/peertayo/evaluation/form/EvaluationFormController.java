@@ -26,6 +26,8 @@ public class EvaluationFormController {
             @Valid @RequestBody CreateEvaluationRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         CreatedEvaluationResponse response = evaluationFormService.create(request, userDetails.getUsername());
+        // Fire notifications in a separate transaction after the evaluation is committed
+        evaluationFormService.sendAssignmentNotificationsById(request.getEvaluatorIds(), response.getTitle());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok(Map.of("evaluation", response)));
     }
