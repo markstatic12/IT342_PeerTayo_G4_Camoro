@@ -4,7 +4,6 @@ import { useAuth } from '../auth/context/AuthContext';
 import { listCreatedEvaluations } from '../evaluation/form/evaluationFormService';
 import { getSubmittedSummary, listPendingEvaluations } from '../evaluation/submission/evaluationSubmissionService';
 import { getMyResults } from '../evaluation/results/evaluationResultsService';
-import { listNotifications } from '../notification/list/notificationService';
 import Skeleton from '../../shared/components/ui/Skeleton';
 import './DashboardPage.css';
 
@@ -234,7 +233,6 @@ export default function DashboardPage() {
   const [createdEvaluations, setCreatedEvaluations] = useState([]);
   const [pendingEvaluations, setPendingEvaluations] = useState([]);
   const [myResults, setMyResults] = useState(null);
-  const [notifications, setNotifications] = useState([]);
   const [submittedSummary, setSubmittedSummary] = useState({ submittedThisMonth: 0, totalSubmitted: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -269,16 +267,14 @@ export default function DashboardPage() {
           listPendingEvaluations(),
           getSubmittedSummary(),
           getMyResults(),
-          listNotifications(),
         ];
-        // Only fetch created evaluations for facilitators
         const isFac = user?.roles?.some(
           (r) => (typeof r === 'string' ? r : r?.name)?.toUpperCase() === 'FACILITATOR'
         );
         if (isFac) promises.unshift(listCreatedEvaluations());
         else promises.unshift(Promise.resolve([]));
 
-        const [created, pending, summary, results, notices] = await Promise.all(promises);
+        const [created, pending, summary, results] = await Promise.all(promises);
         if (mounted) {
           setCreatedEvaluations(created);
           setPendingEvaluations(pending);
@@ -287,7 +283,6 @@ export default function DashboardPage() {
             totalSubmitted: summary?.totalSubmitted ?? 0,
           });
           setMyResults(results ?? null);
-          setNotifications(notices);
         }
       } catch {
         if (mounted) setError('Unable to load dashboard data right now.');
@@ -401,31 +396,63 @@ export default function DashboardPage() {
 
   const stats = allStats.filter((s) => s.showAlways || isFacilitator);
 
-  /* ── Activity items ─────────────────────────────────────────────────── */
-  const dotColors = ['dot-green', 'dot-blue', 'dot-orange', 'dot-purple', 'dot-red'];
+  /* ── Tag map for activity items ────────────────────────────────────── */
   const tagMap = { Done: 'done', New: 'new', Pending: 'pending', Updated: 'update', Assigned: 'update', Score: 'done', Closed: 'late' };
 
-  const activityItems = notifications.length
-    ? notifications.slice(0, 7).map((item, i) => ({
-        color: dotColors[i % 5],
-        title: item.message,
-        message: '',
-        time: item.createdAt ? formatDateTime(item.createdAt) : 'Now',
-        tag: item.isRead ? 'Done' : 'New',
-        route: '/pending-evaluations',
-      }))
-    : pendingEvaluations.length
-    ? pendingEvaluations.slice(0, 7).map((ev, i) => ({
-        color: dotColors[i % 5],
-        title: `Pending: ${ev.title}`,
-        message: ev.evaluateeName ? `Evaluatee: ${ev.evaluateeName}` : '',
-        time: ev.deadline ? formatDateTime(ev.deadline) : 'No deadline',
+  const activeSlide = slides[slideIndex];
+
+  /* ── Recent Activity — built from what the user has DONE ────────────── */
+  const activityItems = useMemo(() => {
+    const items = [];
+
+    // Submitted evaluations
+    const submitted = submittedSummary.totalSubmitted ?? 0;
+    if (submitted > 0) {
+      items.push({
+        color: 'dot-green',
+        title: `Submitted ${submitted} evaluation${submitted !== 1 ? 's' : ''}`,
+        message: `${submittedSummary.submittedThisMonth ?? 0} this month`,
+        tag: 'Done',
+        route: '/completed',
+      });
+    }
+
+    // Pending evaluations (assigned to user — they haven't acted yet)
+    if (pendingEvaluations.length > 0) {
+      items.push({
+        color: 'dot-orange',
+        title: `${pendingEvaluations.length} evaluation${pendingEvaluations.length !== 1 ? 's' : ''} pending`,
+        message: pendingDue > 0 ? `${pendingDue} due within 2 days` : 'No urgent deadlines',
         tag: 'Pending',
         route: '/pending-evaluations',
-      }))
-    : [];
+      });
+    }
 
-  const activeSlide = slides[slideIndex];
+    // Forms created (facilitator only)
+    if (isFacilitator && createdEvaluations.length > 0) {
+      const active = createdEvaluations.filter((e) => e.status !== 'CLOSED').length;
+      items.push({
+        color: 'dot-blue',
+        title: `Created ${createdEvaluations.length} evaluation form${createdEvaluations.length !== 1 ? 's' : ''}`,
+        message: `${active} still active`,
+        tag: 'Done',
+        route: '/forms-created',
+      });
+    }
+
+    // Results available
+    if (myResults && myResults.totalResponses > 0) {
+      items.push({
+        color: 'dot-purple',
+        title: 'Performance results available',
+        message: `${myResults.totalResponses} peer response${myResults.totalResponses !== 1 ? 's' : ''} · avg ${myResults.overallAverage?.toFixed(1) ?? '—'}`,
+        tag: 'Score',
+        route: '/my-results',
+      });
+    }
+
+    return items;
+  }, [submittedSummary, pendingEvaluations, pendingDue, createdEvaluations, isFacilitator, myResults]);
 
   const handlePromote = async () => {
     setPromoting(true);
@@ -615,17 +642,14 @@ export default function DashboardPage() {
             <div className="act-head">
               <div>
                 <div className="act-title">Recent Activity</div>
-                <div className="act-sub">Last 7 days</div>
+                <div className="act-sub">Your actions in the system</div>
               </div>
-              <button className="act-view-all" type="button" onClick={() => navigate('/pending-evaluations')}>
-                View all <IconArrowRight size={11} />
-              </button>
             </div>
 
             <div className="act-list">
               {loading && (
                 <>
-                  {[1, 2, 3, 4].map((i) => (
+                  {[1, 2, 3].map((i) => (
                     <div key={i} className="act-item act-item--skeleton">
                       <div className="act-timeline">
                         <Skeleton variant="circle" width="10px" height="10px" className="skeleton-stagger" />
@@ -634,21 +658,16 @@ export default function DashboardPage() {
                       <div className="act-body">
                         <Skeleton variant="text" width="85%" height="11px" className="skeleton-stagger" />
                         <Skeleton variant="text" width="50%" height="9px" style={{ marginTop: 6 }} className="skeleton-stagger" />
-                        <div className="act-meta" style={{ marginTop: 6 }}>
-                          <Skeleton variant="text" width="60px" height="9px" className="skeleton-stagger" />
-                          <Skeleton variant="rect" width="36px" height="16px" style={{ borderRadius: 4 }} className="skeleton-stagger" />
-                        </div>
                       </div>
                     </div>
                   ))}
                 </>
               )}
-              {!loading && error && <div className="act-empty">{error}</div>}
-              {!loading && !error && activityItems.length === 0 && (
-                <div className="act-empty">No recent activity yet.</div>
+              {!loading && activityItems.length === 0 && (
+                <div className="act-empty">No activity yet. Start by submitting an evaluation.</div>
               )}
               {!loading && activityItems.map((item, i) => (
-                <div key={`${item.title}-${i}`} className="act-item">
+                <div key={i} className="act-item">
                   <div className="act-timeline">
                     <div className={`act-dot ${item.color}`} />
                     <div className="act-line" />
@@ -657,7 +676,6 @@ export default function DashboardPage() {
                     <div className="act-msg">{item.title}</div>
                     {item.message && <div className="act-msg-sub">{item.message}</div>}
                     <div className="act-meta">
-                      <span className="act-time">{item.time}</span>
                       <span className={`act-tag tag-${(tagMap[item.tag] ?? item.tag).toLowerCase()}`}>
                         {item.tag}
                       </span>

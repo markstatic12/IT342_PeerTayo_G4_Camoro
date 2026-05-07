@@ -33,6 +33,7 @@ public class ListNotificationService {
         return NotificationResponse.builder()
                 .id(notification.getId())
                 .message(notification.getMessage())
+                .type(notification.getType())
                 .isRead(notification.isRead())
                 .createdAt(notification.getCreatedAt())
                 .build();

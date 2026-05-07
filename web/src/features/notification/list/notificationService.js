@@ -6,3 +6,9 @@ export async function listNotifications() {
   const response = await api.get(basePath);
   return response.data?.data?.notifications ?? [];
 }
+
+export async function getUnreadCount() {
+  const response = await api.get(basePath);
+  const notifications = response.data?.data?.notifications ?? [];
+  return notifications.filter((n) => !n.isRead).length;
+}
