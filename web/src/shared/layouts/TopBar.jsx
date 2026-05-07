@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/context/AuthContext';
-import { SearchIcon } from '../components/icons/Icons';
 import { getUnreadCount } from '../../features/notification/list/notificationService';
 import NotificationDropdown from '../components/ui/NotificationDropdown';
 import './TopBar.css';
@@ -44,14 +43,15 @@ export default function TopBar() {
   /* ── Poll unread count every 30 s ── */
   useEffect(() => {
     let mounted = true;
-    const fetch = async () => {
+    const fetchCount = async () => {
       try {
         const count = await getUnreadCount();
         if (mounted) setUnreadCount(count);
       } catch { /* silently ignore */ }
     };
-    fetch();
-    const id = setInterval(fetch, 30_000);
+    fetchCount();
+    /* re-check every 15 s so new assignments show up without a page refresh */
+    const id = setInterval(fetchCount, 15_000);
     return () => { mounted = false; clearInterval(id); };
   }, []);
 
@@ -94,18 +94,7 @@ export default function TopBar() {
 
   return (
     <header className="topbar">
-      <div className="topbar__search">
-        <span className="topbar__search-icon">
-          <SearchIcon size={16} />
-        </span>
-        <input
-          className="topbar__search-input"
-          type="text"
-          placeholder="Search evaluations, forms, or users…"
-        />
-      </div>
-
-      <div className="topbar__right">
+      <div className="topbar__right" style={{ marginLeft: 'auto' }}>
         {/* Bell notification button */}
         <div className="topbar__notif-wrap" ref={bellRef}>
           <button
