@@ -39,7 +39,14 @@
   aspect-ratio: 1 / 1;
 }
 
-/* Stagger delays for natural feel */
+/* Stagger delays for natural feel — scoped to .skeleton-group container */
+.skeleton-group .skeleton-stagger:nth-child(1) { animation-delay: 0ms; }
+.skeleton-group .skeleton-stagger:nth-child(2) { animation-delay: 80ms; }
+.skeleton-group .skeleton-stagger:nth-child(3) { animation-delay: 160ms; }
+.skeleton-group .skeleton-stagger:nth-child(4) { animation-delay: 240ms; }
+.skeleton-group .skeleton-stagger:nth-child(5) { animation-delay: 320ms; }
+
+/* Legacy: direct stagger (kept for backward compat but scoped) */
 .skeleton-stagger:nth-child(1) { animation-delay: 0ms; }
 .skeleton-stagger:nth-child(2) { animation-delay: 80ms; }
 .skeleton-stagger:nth-child(3) { animation-delay: 160ms; }
