@@ -49,6 +49,13 @@ function statusLabel(status) {
   }
 }
 
+function getFormInitials(title) {
+  if (!title) return '??';
+  const words = title.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
 function progressPct(progress) {
   if (!progress) return 0;
   const [a, b] = progress.split('/').map(Number);
@@ -397,23 +404,31 @@ export default function FormsCreatedPage() {
           <>
             <div className="fc-stat fc-stat--total">
               <div className="fc-stat__icon"><IconFile /></div>
-              <div className="fc-stat__val">{total}</div>
-              <div className="fc-stat__lbl">Total Forms</div>
+              <div className="fc-stat__body">
+                <div className="fc-stat__val">{total}</div>
+                <div className="fc-stat__lbl">Total Forms</div>
+              </div>
             </div>
             <div className="fc-stat fc-stat--active">
               <div className="fc-stat__icon"><IconCheck /></div>
-              <div className="fc-stat__val">{active}</div>
-              <div className="fc-stat__lbl">Active</div>
+              <div className="fc-stat__body">
+                <div className="fc-stat__val">{active}</div>
+                <div className="fc-stat__lbl">Active</div>
+              </div>
             </div>
             <div className="fc-stat fc-stat--warn">
               <div className="fc-stat__icon"><IconAlert /></div>
-              <div className="fc-stat__val">{attention}</div>
-              <div className="fc-stat__lbl">Needs Attention</div>
+              <div className="fc-stat__body">
+                <div className="fc-stat__val">{attention}</div>
+                <div className="fc-stat__lbl">Needs Attention</div>
+              </div>
             </div>
             <div className="fc-stat fc-stat--closed">
               <div className="fc-stat__icon"><IconLock /></div>
-              <div className="fc-stat__val">{closed}</div>
-              <div className="fc-stat__lbl">Closed</div>
+              <div className="fc-stat__body">
+                <div className="fc-stat__val">{closed}</div>
+                <div className="fc-stat__lbl">Closed</div>
+              </div>
             </div>
           </>
         )}
@@ -436,133 +451,86 @@ export default function FormsCreatedPage() {
         <button className="fc-archives-btn" type="button">Archives</button>
       </div>
 
-      {/* ── Table ───────────────────────────────────────────────────── */}
-      <div className="fc-table-wrap">
-        {loading && (
-          <table className="fc-table">
-            <thead>
-              <tr>
-                <th>Title</th><th>Status</th><th>Progress</th><th>Deadline</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[1,2,3,4,5].map((i) => (
-                <tr key={i} className="fc-row">
-                  <td className="fc-row__title">
-                    <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
-                      <Skeleton variant="text" width="60%" height="12px" className="skeleton-stagger" />
-                      <Skeleton variant="text" width="80%" height="10px" className="skeleton-stagger" />
-                    </div>
-                  </td>
-                  <td><Skeleton variant="rect" width="60px" height="20px" style={{ borderRadius:6 }} className="skeleton-stagger" /></td>
-                  <td className="fc-row__progress">
-                    <Skeleton variant="rect" width="100%" height="6px" style={{ borderRadius:3 }} className="skeleton-stagger" />
-                    <Skeleton variant="text" width="30px" height="10px" style={{ marginTop:4 }} className="skeleton-stagger" />
-                  </td>
-                  <td><Skeleton variant="text" width="80px" height="11px" className="skeleton-stagger" /></td>
-                  <td className="fc-row__actions">
-                    {[1,2,3,4].map((j) => (
-                      <Skeleton key={j} variant="circle" width="26px" height="26px" className="skeleton-stagger" />
-                    ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      {/* ── Card list ───────────────────────────────────────────────── */}
+      <div className="fc-list">
+        {loading && [1,2,3,4,5].map((i) => (
+          <div key={i} className="fc-card fc-card--active" style={{ pointerEvents:'none' }}>
+            <Skeleton variant="rect" width="38px" height="38px" style={{ borderRadius:9, flexShrink:0 }} />
+            <div style={{ flex:1, display:'flex', flexDirection:'column', gap:6 }}>
+              <Skeleton variant="text" width="45%" height="13px" />
+              <Skeleton variant="text" width="65%" height="10px" />
+              <div style={{ display:'flex', gap:10 }}>
+                <Skeleton variant="text" width="80px" height="9px" />
+              </div>
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:4, width:120 }}>
+              <Skeleton variant="rect" width="100%" height="5px" style={{ borderRadius:3 }} />
+              <Skeleton variant="text" width="40px" height="9px" style={{ marginLeft:'auto' }} />
+            </div>
+            <div style={{ display:'flex', gap:4 }}>
+              {[1,2,3,4].map((j) => <Skeleton key={j} variant="circle" width="30px" height="30px" />)}
+            </div>
+          </div>
+        ))}
+
         {!loading && error && <div className="fc-empty fc-empty--error">{error}</div>}
+
         {!loading && !error && filtered.length === 0 && (
           <div className="fc-empty">
             {search ? `No forms match "${search}".` : 'No evaluations found. Create your first one.'}
           </div>
         )}
 
-        {!loading && !error && filtered.length > 0 && (
-          <table className="fc-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Progress</th>
-                <th>Deadline</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((ev) => {
-                const pct = progressPct(ev.submissionProgress);
-                const variant = statusVariant(ev.status);
-                const isFull = pct === 100;
-                const isOverdue = ev.deadline && new Date(ev.deadline) < new Date();
-                return (
-                  <tr key={ev.id} className="fc-row">
-                    <td className="fc-row__title">
-                      <div className="fc-row__title-wrap">
-                        <span className={`fc-row__title-dot fc-row__title-dot--${variant}`} />
-                        <div>
-                          <div className="fc-row__name">{ev.title}</div>
-                          {ev.description && (
-                            <div className="fc-row__desc">{ev.description}</div>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`fc-status fc-status--${variant}`}>
-                        {statusLabel(ev.status)}
-                      </span>
-                    </td>
-                    <td className="fc-row__progress">
-                      <div className="fc-progress-bar">
-                        <div
-                          className={`fc-progress-fill${isFull ? ' fc-progress-fill--full' : ''}`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                      <span className="fc-progress-label">{ev.submissionProgress ?? '0/0'}</span>
-                    </td>
-                    <td className={`fc-row__deadline${isOverdue ? ' fc-row__deadline--overdue' : ''}`}>
-                      {formatDeadline(ev.deadline)}
-                    </td>
-                    <td className="fc-row__actions">
-                      <button
-                        className="fc-icon-btn"
-                        type="button"
-                        title="View results"
-                        onClick={() => navigate(`/forms-created/${ev.id}/results`)}
-                      >
-                        <IconChevronRight />
-                      </button>
-                      <button
-                        className="fc-icon-btn fc-icon-btn--archive"
-                        type="button"
-                        title="Archive"
-                      >
-                        <IconArchive />
-                      </button>
-                      <button
-                        className="fc-icon-btn fc-icon-btn--edit"
-                        type="button"
-                        title="Edit"
-                        onClick={() => setEditTarget(ev)}
-                      >
-                        <IconEdit />
-                      </button>
-                      <button
-                        className="fc-icon-btn fc-icon-btn--danger"
-                        type="button"
-                        title="Delete"
-                        onClick={() => setDeleteTarget(ev)}
-                      >
-                        <IconTrash />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+        {!loading && !error && filtered.map((ev) => {
+          const pct = progressPct(ev.submissionProgress);
+          const variant = statusVariant(ev.status);
+          const isFull = pct === 100;
+          const isOverdue = ev.deadline && new Date(ev.deadline) < new Date();
+          return (
+            <div key={ev.id} className={`fc-card fc-card--${variant}`}>
+              <div className="fc-card__initials">{getFormInitials(ev.title)}</div>
+              <div className="fc-card__body">
+                <div className="fc-card__top">
+                  <span className="fc-card__title">{ev.title}</span>
+                  <span className={`fc-status fc-status--${variant}`}>{statusLabel(ev.status)}</span>
+                </div>
+                {ev.description && <div className="fc-card__desc">{ev.description}</div>}
+                <div className="fc-card__meta">
+                  <span className={`fc-card__meta-item${isOverdue ? ' fc-card__meta-item--overdue' : ''}`}>
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {isOverdue ? 'Overdue · ' : ''}{formatDeadline(ev.deadline)}
+                  </span>
+                </div>
+              </div>
+              <div className="fc-card__progress">
+                <div className="fc-card__progress-bar">
+                  <div
+                    className={`fc-card__progress-fill${isFull ? ' fc-card__progress-fill--full' : ''}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <span className="fc-card__progress-label">{ev.submissionProgress ?? '0/0'}</span>
+              </div>
+              <div className="fc-card__actions">
+                <button className="fc-icon-btn" type="button" title="View results"
+                  onClick={() => navigate(`/forms-created/${ev.id}/results`)}>
+                  <IconChevronRight />
+                </button>
+                <button className="fc-icon-btn fc-icon-btn--archive" type="button" title="Archive">
+                  <IconArchive />
+                </button>
+                <button className="fc-icon-btn fc-icon-btn--edit" type="button" title="Edit"
+                  onClick={() => setEditTarget(ev)}>
+                  <IconEdit />
+                </button>
+                <button className="fc-icon-btn fc-icon-btn--danger" type="button" title="Delete"
+                  onClick={() => setDeleteTarget(ev)}>
+                  <IconTrash />
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* ── Modals ──────────────────────────────────────────────────── */}

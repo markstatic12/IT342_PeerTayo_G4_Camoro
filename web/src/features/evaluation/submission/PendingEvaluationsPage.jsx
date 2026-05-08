@@ -396,19 +396,19 @@ export default function PendingEvaluationsPage() {
         <div className="page-col">
           <div className="page-header">
             <div>
-              <Skeleton variant="title" width="200px" height="20px" className="skeleton-stagger" />
-              <Skeleton variant="text" width="280px" height="11px" style={{ marginTop:6 }} className="skeleton-stagger" />
+              <Skeleton variant="title" width="200px" height="20px" />
+              <Skeleton variant="text" width="280px" height="11px" style={{ marginTop:6 }} />
             </div>
-            <Skeleton variant="rect" width="200px" height="36px" style={{ borderRadius:8 }} className="skeleton-stagger" />
+            <Skeleton variant="rect" width="200px" height="36px" style={{ borderRadius:8 }} />
           </div>
           <div className="summary-strip">
             {[1,2,3].map((i) => (
               <div key={i} className="sum-card">
-                <Skeleton variant="circle" width="36px" height="36px" className="skeleton-stagger" />
+                <Skeleton variant="circle" width="36px" height="36px" />
                 <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
-                  <Skeleton variant="title" width="40px" height="22px" className="skeleton-stagger" />
-                  <Skeleton variant="text" width="100px" height="10px" className="skeleton-stagger" />
-                  <Skeleton variant="text" width="80px" height="9px" className="skeleton-stagger" />
+                  <Skeleton variant="title" width="40px" height="22px" />
+                  <Skeleton variant="text" width="100px" height="10px" />
+                  <Skeleton variant="text" width="80px" height="9px" />
                 </div>
               </div>
             ))}
@@ -417,20 +417,20 @@ export default function PendingEvaluationsPage() {
             <div className="list-col">
               <div className="filter-row">
                 <div style={{ display:'flex', gap:6 }}>
-                  {[1,2,3].map((i) => <Skeleton key={i} variant="rect" width="60px" height="28px" style={{ borderRadius:6 }} className="skeleton-stagger" />)}
+                  {[1,2,3].map((i) => <Skeleton key={i} variant="rect" width="60px" height="28px" style={{ borderRadius:6 }} />)}
                 </div>
               </div>
               <div className="eval-scroll">
                 {[1,2,3].map((i) => (
                   <div key={i} className="eval-card ec-blue" style={{ pointerEvents:'none' }}>
                     <div className="ec-top">
-                      <Skeleton variant="text" width="70%" height="13px" className="skeleton-stagger" />
-                      <Skeleton variant="rect" width="55px" height="20px" style={{ borderRadius:10 }} className="skeleton-stagger" />
+                      <Skeleton variant="text" width="70%" height="13px" />
+                      <Skeleton variant="rect" width="55px" height="20px" style={{ borderRadius:10 }} />
                     </div>
-                    <Skeleton variant="text" width="50%" height="10px" style={{ marginTop:6 }} className="skeleton-stagger" />
+                    <Skeleton variant="text" width="50%" height="10px" style={{ marginTop:6 }} />
                     <div className="ec-progress-row" style={{ marginTop:8 }}>
-                      <Skeleton variant="rect" width="100%" height="5px" style={{ borderRadius:3 }} className="skeleton-stagger" />
-                      <Skeleton variant="text" width="24px" height="10px" className="skeleton-stagger" />
+                      <Skeleton variant="rect" width="100%" height="5px" style={{ borderRadius:3 }} />
+                      <Skeleton variant="text" width="24px" height="10px" />
                     </div>
                   </div>
                 ))}
@@ -438,8 +438,8 @@ export default function PendingEvaluationsPage() {
             </div>
             <div className="detail-panel">
               <div className="detail-empty">
-                <Skeleton variant="circle" width="40px" height="40px" style={{ margin:'0 auto 12px' }} className="skeleton-stagger" />
-                <Skeleton variant="text" width="60%" height="11px" style={{ margin:'0 auto' }} className="skeleton-stagger" />
+                <Skeleton variant="circle" width="40px" height="40px" style={{ margin:'0 auto 12px' }} />
+                <Skeleton variant="text" width="60%" height="11px" style={{ margin:'0 auto' }} />
               </div>
             </div>
           </div>
