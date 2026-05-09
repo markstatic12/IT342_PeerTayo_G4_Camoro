@@ -375,3 +375,108 @@
 /* ── Permissions list ───────────────────────────────────────────────── */
 .perm-check { color: #22c55e; }
 .perm-cross { color: #4a5568; }
+
+/* ── Change Password Modal ──────────────────────────────────────────── */
+.pwd-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(5px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: pwd-fade-in 0.15s ease both;
+}
+
+@keyframes pwd-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.pwd-modal {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  animation: pwd-slide-up 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pwd-slide-up {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.pwd-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.pwd-modal-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.3px;
+}
+
+.pwd-modal-sub {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 3px;
+}
+
+.pwd-modal-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.pwd-modal-close:hover { color: #f8fafc; background: rgba(255, 255, 255, 0.08); }
+.pwd-modal-close svg { width: 14px; height: 14px; }
+
+.pwd-modal-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pwd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pwd-label-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.pwd-modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 24px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}

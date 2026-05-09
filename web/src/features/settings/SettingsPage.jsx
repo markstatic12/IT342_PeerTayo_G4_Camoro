@@ -6,15 +6,16 @@ import Skeleton from '../../shared/components/ui/Skeleton';
 import './SettingsPage.css';
 
 /* ── Tiny SVG helpers ─────────────────────────────────────────────────── */
-const SvgUser    = () => <svg viewBox="0 0 24 24" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>;
-const SvgLock    = () => <svg viewBox="0 0 24 24" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
-const SvgBell    = () => <svg viewBox="0 0 24 24" strokeWidth="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>;
-const SvgRoles   = () => <svg viewBox="0 0 24 24" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
-const SvgPerson  = () => <svg viewBox="0 0 24 24" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-const SvgShield  = () => <svg viewBox="0 0 24 24" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
-const SvgCheck   = () => <svg viewBox="0 0 24 24" strokeWidth="2"><polyline points="9 11 12 14 22 4"/></svg>;
-const SvgInfo    = () => <svg viewBox="0 0 24 24" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
-const SvgLogout  = () => <svg viewBox="0 0 24 24" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
+const SvgUser    = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>;
+const SvgLock    = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+const SvgBell    = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>;
+const SvgRoles   = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+const SvgPerson  = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+const SvgShield  = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+const SvgCheck   = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><polyline points="9 11 12 14 22 4"/></svg>;
+const SvgInfo    = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
+const SvgLogout  = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
+const SvgX       = () => <svg viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
 
 /* ── Password strength helper ─────────────────────────────────────────── */
 function getStrength(pwd) {
@@ -44,12 +45,18 @@ export default function SettingsPage() {
   const [profileAlert,  setProfileAlert]  = useState(null); // { type, msg }
 
   /* ── Password state ── */
+  const [pwdModalOpen, setPwdModalOpen] = useState(false);
   const [currentPwd, setCurrentPwd] = useState('');
   const [newPwd,     setNewPwd]     = useState('');
   const [confirmPwd, setConfirmPwd] = useState('');
   const [pwdSaving,  setPwdSaving]  = useState(false);
   const [pwdAlert,   setPwdAlert]   = useState(null);
   const strength = getStrength(newPwd);
+
+  const closePwdModal = () => {
+    setPwdModalOpen(false);
+    setCurrentPwd(''); setNewPwd(''); setConfirmPwd(''); setPwdAlert(null);
+  };
 
   /* ── Notification prefs — loaded from and saved to backend ── */
   const [notifPrefs, setNotifPrefs] = useState({
@@ -152,6 +159,7 @@ export default function SettingsPage() {
       setNewPwd('');
       setConfirmPwd('');
       setPwdAlert({ type: 'success', msg: 'Password updated successfully.' });
+      setTimeout(() => closePwdModal(), 1500);
     } catch (err) {
       const msg = err.response?.data?.error?.message || 'Failed to update password.';
       setPwdAlert({ type: 'error', msg });
@@ -326,7 +334,7 @@ export default function SettingsPage() {
           <div className="settings-panel">
             <div className="panel-header">
               <div className="panel-title">Password &amp; Security</div>
-              <div className="panel-sub">Update your login password. Must be at least 6 characters.</div>
+              <div className="panel-sub">Manage your login credentials and account security.</div>
             </div>
 
             <div className="settings-card">
@@ -335,7 +343,7 @@ export default function SettingsPage() {
                   <div className="card-head-icon chi-orange"><SvgLock /></div>
                   <div>
                     <div className="card-head-title">Change Password</div>
-                    <div className="card-head-sub">Use a strong, unique password of at least 6 characters</div>
+                    <div className="card-head-sub">Update your login password to keep your account secure</div>
                   </div>
                 </div>
               </div>
@@ -350,64 +358,48 @@ export default function SettingsPage() {
                   </div>
                 </div>
               ) : (
-                <>
-                  <div className="field-row">
-                    <div className="field-info"><div className="field-label">Current Password</div></div>
-                    <div className="field-control">
-                      <input className="field-input" type="password" placeholder="Enter current password"
-                        value={currentPwd} onChange={(e) => setCurrentPwd(e.target.value)} />
-                    </div>
+                <div className="field-row" style={{ justifyContent: 'space-between' }}>
+                  <div className="field-info">
+                    <div className="field-label">Password</div>
+                    <div className="field-desc">Last changed: unknown · Use a strong, unique password</div>
                   </div>
-                  <div className="field-row top">
-                    <div className="field-info">
-                      <div className="field-label">New Password</div>
-                      <div className="field-desc">Must be at least 6 characters</div>
-                    </div>
-                    <div className="field-control">
-                      <input className="field-input" type="password" placeholder="Enter new password"
-                        value={newPwd} onChange={(e) => setNewPwd(e.target.value)} />
-                      <div className="pwd-strength">
-                        <div className={`pwd-bar${strength.level >= 1 ? ' s1' : ''}`} />
-                        <div className={`pwd-bar${strength.level >= 2 ? ' s2' : ''}`} />
-                        <div className={`pwd-bar${strength.level >= 3 ? ' s3' : ''}`} />
-                      </div>
-                      <div className="pwd-label">{strength.label}</div>
-                    </div>
+                  <div className="field-control">
+                    <button
+                      className="s-btn s-btn-primary"
+                      type="button"
+                      onClick={() => setPwdModalOpen(true)}
+                    >
+                      <SvgLock /> Change Password
+                    </button>
                   </div>
-                  <div className="field-row">
-                    <div className="field-info"><div className="field-label">Confirm New Password</div></div>
-                    <div className="field-control">
-                      <input className="field-input" type="password" placeholder="Repeat new password"
-                        value={confirmPwd} onChange={(e) => setConfirmPwd(e.target.value)} />
-                    </div>
-                  </div>
-                </>
+                </div>
               )}
             </div>
 
-            {pwdAlert && (
-              <div className={`s-alert s-alert-${pwdAlert.type}`}>
-                {pwdAlert.type === 'success' ? <SvgCheck /> : <SvgInfo />}
-                {pwdAlert.msg}
-              </div>
-            )}
-
-            {user?.provider !== 'GOOGLE' && (
-              <div className="save-bar">
-                <div className="save-bar-hint">
-                  <SvgShield /> Security changes take effect immediately on all devices.
-                </div>
-                <div className="save-bar-actions">
-                  <button className="s-btn s-btn-ghost" type="button"
-                    onClick={() => { setCurrentPwd(''); setNewPwd(''); setConfirmPwd(''); setPwdAlert(null); }}>
-                    Cancel
-                  </button>
-                  <button className="s-btn s-btn-primary" type="button" onClick={handlePasswordSave} disabled={pwdSaving}>
-                    <SvgCheck /> {pwdSaving ? 'Updating…' : 'Update Password'}
-                  </button>
+            <div className="settings-card">
+              <div className="card-head">
+                <div className="card-head-left">
+                  <div className="card-head-icon chi-warn"><SvgShield /></div>
+                  <div>
+                    <div className="card-head-title">Security Tips</div>
+                    <div className="card-head-sub">Keep your account safe</div>
+                  </div>
                 </div>
               </div>
-            )}
+              {[
+                'Use at least 8 characters with uppercase, numbers, and symbols.',
+                'Never share your password with anyone.',
+                'Use a unique password not used on other sites.',
+              ].map((tip, i) => (
+                <div className="field-row" key={i} style={{ borderBottom: i < 2 ? undefined : 'none' }}>
+                  <div className="field-info">
+                    <div className="field-desc" style={{ color: '#94a3b8' }}>
+                      <span style={{ color: '#3b82f6', marginRight: 8 }}>✓</span>{tip}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -602,6 +594,84 @@ export default function SettingsPage() {
         )}
 
       </div>
+
+      {/* ══ CHANGE PASSWORD MODAL ══ */}
+      {pwdModalOpen && (
+        <div className="pwd-modal-overlay" onClick={(e) => e.target === e.currentTarget && closePwdModal()}>
+          <div className="pwd-modal">
+            <div className="pwd-modal-head">
+              <div>
+                <div className="pwd-modal-title">Change Password</div>
+                <div className="pwd-modal-sub">Use a strong, unique password of at least 6 characters</div>
+              </div>
+              <button className="pwd-modal-close" type="button" onClick={closePwdModal}><SvgX /></button>
+            </div>
+
+            <div className="pwd-modal-body">
+              {pwdAlert && (
+                <div className={`s-alert s-alert-${pwdAlert.type}`} style={{ marginBottom: 16 }}>
+                  {pwdAlert.type === 'success' ? <SvgCheck /> : <SvgInfo />}
+                  {pwdAlert.msg}
+                </div>
+              )}
+
+              <div className="pwd-field">
+                <label className="pwd-label-text">Current Password</label>
+                <input
+                  className="field-input"
+                  type="password"
+                  placeholder="Enter your current password"
+                  value={currentPwd}
+                  onChange={(e) => setCurrentPwd(e.target.value)}
+                  autoFocus
+                />
+              </div>
+
+              <div className="pwd-field">
+                <label className="pwd-label-text">New Password</label>
+                <input
+                  className="field-input"
+                  type="password"
+                  placeholder="Enter new password"
+                  value={newPwd}
+                  onChange={(e) => setNewPwd(e.target.value)}
+                />
+                <div className="pwd-strength">
+                  <div className={`pwd-bar${strength.level >= 1 ? ' s1' : ''}`} />
+                  <div className={`pwd-bar${strength.level >= 2 ? ' s2' : ''}`} />
+                  <div className={`pwd-bar${strength.level >= 3 ? ' s3' : ''}`} />
+                </div>
+                <div className="pwd-label">{strength.label}</div>
+              </div>
+
+              <div className="pwd-field">
+                <label className="pwd-label-text">Confirm New Password</label>
+                <input
+                  className="field-input"
+                  type="password"
+                  placeholder="Repeat new password"
+                  value={confirmPwd}
+                  onChange={(e) => setConfirmPwd(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="pwd-modal-foot">
+              <div className="save-bar-hint" style={{ fontSize: 11 }}>
+                <SvgShield /> Changes take effect immediately on all devices.
+              </div>
+              <div className="save-bar-actions">
+                <button className="s-btn s-btn-ghost" type="button" onClick={closePwdModal} disabled={pwdSaving}>
+                  Cancel
+                </button>
+                <button className="s-btn s-btn-primary" type="button" onClick={handlePasswordSave} disabled={pwdSaving}>
+                  <SvgCheck /> {pwdSaving ? 'Updating…' : 'Update Password'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
