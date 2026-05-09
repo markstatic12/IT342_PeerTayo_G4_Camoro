@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PeerTayo — Forms Created</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0c0f18;--surface:#111827;--surface2:#161d2e;--surface3:#1c2438;
+  --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.13);
+  --blue:#3b82f6;--blue-bright:#5b9dff;--blue-deep:#2563eb;
+  --blue-dim:rgba(59,130,246,0.12);--blue-glow:rgba(59,130,246,0.25);--blue-light:#60a5fa;
+  --orange:#f97316;--orange-dim:rgba(249,115,22,0.12);--orange-lt:#fb923c;
+  --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
+  --warn:#eab308;--warn-dim:rgba(234,179,8,0.12);
+  --red:#ef4444;--red-dim:rgba(239,68,68,0.12);
+  --purple:#a78bfa;--purple-dim:rgba(167,139,250,0.12);
+  --teal:#06b6d4;--teal-dim:rgba(6,182,212,0.12);
+  --text:#f1f5f9;--text2:#cbd5e1;--muted:#94a3b8;--dim:#4a5568;
+  --sidebar-w:224px;--nav-h:62px;
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+  font-size:14px;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-size:14px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:4px;}
+
+/* ── NAV ── */
+.topnav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:rgba(11,14,24,0.95);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px 0 0;z-index:300;backdrop-filter:blur(20px);}
+.nav-logo{width:var(--sidebar-w);height:100%;display:flex;align-items:center;gap:10px;padding-left:24px;flex-shrink:0;border-right:1px solid var(--border);}
+.nav-icon{width:30px;height:30px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;box-shadow:0 0 16px var(--blue-glow);}
+.nav-wordmark{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.4px;}
+.nav-wordmark span{color:var(--blue);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-notif{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border-color .15s;}
+.nav-notif:hover{border-color:var(--border-hi);}
+.nav-notif svg{width:15px;height:15px;stroke:var(--muted);fill:none;}
+.notif-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--orange);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);}
+.nav-user{display:flex;align-items:center;gap:8px;padding:5px 11px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:border-color .15s;}
+.nav-user:hover{border-color:var(--border-hi);}
+.nav-avatar{width:26px;height:26px;border-radius:6px;background:var(--blue);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.nav-uname{font-size:13px;font-weight:700;color:var(--text);line-height:1;}
+.nav-urole{font-size:10px;font-weight:600;color:var(--blue);margin-top:1px;}
+
+/* ── SHELL & SIDEBAR ── */
+.shell{display:flex;height:100vh;padding-top:var(--nav-h);overflow:hidden;position:relative;z-index:1;}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100%;overflow-y:auto;padding:20px 0;}
+.sb-section{padding:0 14px;}
+.sb-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.4px;color:var(--dim);padding:12px 8px 5px;display:block;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;transition:all .15s;margin-bottom:1px;cursor:pointer;}
+.sb-item:hover{background:var(--surface2);color:var(--text);}
+.sb-item.on{background:var(--blue-dim);color:var(--blue-light);font-weight:700;border:1px solid rgba(59,130,246,0.18);}
+.sb-item svg{width:14px;height:14px;stroke:currentColor;fill:none;flex-shrink:0;}
+.sb-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);margin-left:auto;}
+.sb-hr{border:none;border-top:1px solid var(--border);margin:10px 14px;}
+.sb-spacer{flex:1;}
+.fac-banner{margin:0 12px 14px;padding:10px 12px;border-radius:8px;background:linear-gradient(135deg,rgba(249,115,22,.07),rgba(59,130,246,.07));border:1px solid rgba(249,115,22,.15);display:flex;align-items:center;gap:8px;}
+.fac-icon{width:26px;height:26px;border-radius:6px;background:var(--orange-dim);color:var(--orange-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.fac-icon svg{width:12px;height:12px;stroke:currentColor;fill:none;}
+.fac-txt{font-size:11px;color:var(--text2);font-weight:600;line-height:1.4;}
+.fac-txt span{color:var(--orange-lt);}
+
+/* ── SCREENS ── */
+.screen{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.screen.active{display:flex;}
+
+/* ── SHARED ── */
+.page-col{flex:1;min-width:0;padding:24px 26px;display:flex;flex-direction:column;gap:14px;overflow:hidden;}
+.page-title{font-family:'Syne',sans-serif;font-size:23px;font-weight:800;color:var(--text);letter-spacing:-.5px;}
+.page-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.page-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.ph-right{display:flex;align-items:center;gap:8px;}
+
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--blue-light);cursor:pointer;background:none;border:none;font-family:'Plus Jakarta Sans',sans-serif;transition:opacity .15s;flex-shrink:0;padding:0;}
+.back-btn:hover{opacity:.7;}
+.back-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;}
+
+.search-box{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;width:210px;transition:border-color .15s;}
+.search-box:focus-within{border-color:rgba(59,130,246,0.35);}
+.search-box svg{width:13px;height:13px;stroke:var(--dim);fill:none;flex-shrink:0;}
+.search-box input{background:none;border:none;outline:none;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;width:100%;}
+.search-box input::placeholder{color:var(--dim);}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;}
+.btn svg{width:13px;height:13px;stroke:currentColor;fill:none;}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 4px 14px var(--blue-glow);}
+.btn-primary:hover{opacity:.88;}
+.btn-ghost{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border-hi);}
+.btn-sm{padding:6px 13px;font-size:12px;}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(239,68,68,0.25);}
+.btn-danger:hover{background:var(--red-dim);}
+.btn-archive{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:1px solid rgba(249,115,22,0.3);background:var(--orange-dim);color:var(--orange-lt);transition:all .15s;}
+.btn-archive:hover{background:rgba(249,115,22,0.2);border-color:rgba(249,115,22,0.5);}
+.btn-archive svg{width:12px;height:12px;stroke:currentColor;fill:none;}
+
+/* ── SUMMARY STRIP ── */
+.sum-strip{display:flex;gap:10px;flex-shrink:0;}
+.sum-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;transition:border-color .15s;}
+.sum-card:hover{border-color:var(--border-hi);}
+.sum-card::after{content:'';position:absolute;top:0;left:12px;right:12px;height:2px;border-radius:0 0 2px 2px;}
+.sc-blue::after{background:var(--blue);}
+.sc-green::after{background:var(--green);}
+.sc-orange::after{background:var(--orange);}
+.sc-warn::after{background:var(--warn);}
+.sum-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sum-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;}
+.si-b{background:var(--blue-dim);color:var(--blue-light);}
+.si-g{background:var(--green-dim);color:var(--green);}
+.si-o{background:var(--orange-dim);color:var(--orange-lt);}
+.si-w{background:var(--warn-dim);color:var(--warn);}
+.sum-num{font-size:24px;font-weight:900;font-family:'DM Mono',monospace;line-height:1;}
+.sum-lbl{font-size:11px;font-weight:600;color:var(--muted);margin-top:1px;}
+
+/* ── FILTER ROW ── */
+.filter-row{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.filter-tabs{display:flex;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:4px;}
+.ftab{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;border:1px solid transparent;white-space:nowrap;}
+.ftab:hover{color:var(--text);}
+.ftab.active{background:var(--blue-dim);color:var(--blue-light);border-color:rgba(59,130,246,0.2);}
+.ftab.t-warn.active{background:var(--warn-dim);color:var(--warn);border-color:rgba(234,179,8,0.2);}
+.ftab.t-dim.active{background:rgba(255,255,255,0.05);color:var(--muted);border-color:var(--border-hi);}
+
+/* ── FORM ROW CARDS ── */
+.forms-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:0;}
+
+.form-row{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px 18px;display:flex;align-items:center;gap:16px;transition:all .15s;cursor:pointer;position:relative;overflow:visible;}
+.form-row:hover{border-color:var(--border-hi);background:var(--surface2);}
+.form-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:12px 0 0 12px;}
+.fr-active::before{background:var(--green);}
+.fr-warn::before{background:var(--warn);}
+.fr-closed::before{background:var(--dim);}
+
+.fr-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.fr-icon svg{width:17px;height:17px;stroke:currentColor;fill:none;}
+.fi-g{background:var(--green-dim);color:var(--green);}
+.fi-w{background:var(--warn-dim);color:var(--warn);}
+.fi-d{background:rgba(255,255,255,0.04);color:var(--dim);}
+
+.fr-info{flex:1;min-width:0;}
+.fr-title{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
+.fr-meta{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.fr-sep{width:3px;height:3px;border-radius:50%;background:var(--dim);}
+
+/* Circular completion ring */
+.fr-ring-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:64px;}
+.fr-ring{position:relative;flex-shrink:0;}
+.fr-ring svg{display:block;transform:rotate(-90deg);}
+.fr-ring-bg{fill:none;stroke:rgba(255,255,255,0.06);stroke-width:4;}
+.fr-ring-fill{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .4s;}
+.fr-ring-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:'DM Mono',monospace;}
+.fr-ring-lbl{font-size:9.5px;color:var(--muted);font-weight:600;white-space:nowrap;}
+
+.fr-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+
+.status-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:4px 9px;border-radius:20px;white-space:nowrap;}
+.sp-active{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,0.2);}
+.sp-warn{background:var(--warn-dim);color:var(--warn);border:1px solid rgba(234,179,8,0.2);}
+.sp-closed{background:rgba(255,255,255,0.04);color:var(--dim);border:1px solid var(--border);}
+
+/* View Details button — blue bg on hover */
+.btn-view{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--surface3);color:var(--muted);transition:all .15s;white-space:nowrap;}
+.btn-view svg{width:12px;height:12px;stroke:currentColor;fill:none;}
+.form-row:hover .btn-view{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 3px 10px var(--blue-glow);}
+
+/* Three-dot menu */
+.fr-dots{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--dim);transition:all .15s;flex-shrink:0;position:relative;}
+.fr-dots:hover{background:var(--surface3);color:var(--muted);}
+.fr-dots svg{width:14px;height:14px;stroke:currentColor;fill:none;}
+.fr-menu{position:absolute;top:30px;right:0;background:var(--surface2);border:1px solid var(--border-hi);border-radius:9px;padding:4px;min-width:155px;z-index:200;box-shadow:0 8px 28px rgba(0,0,0,.55);display:none;}
+.fr-menu.open{display:block;}
+.fr-menu-item{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:background .12s;}
+.fr-menu-item svg{width:13px;height:13px;stroke:currentColor;fill:none;flex-shrink:0;}
+.fr-menu-item:hover{background:var(--surface3);}
+.mi-edit{color:var(--text2);}
+.mi-archive{color:var(--teal);}
+.mi-delete{color:var(--red);}
+
+/* ── SCREEN 2: DETAIL VIEW ── */
+.detail-col{flex:1;min-width:0;padding:24px 26px;display:flex;flex-direction:column;gap:16px;overflow:hidden;}
+
+/* Plain header — no gradient */
+.detail-head-plain{flex-shrink:0;}
+.dh-title{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:var(--text);letter-spacing:-.4px;}
+.dh-sub{font-size:12px;color:var(--muted);margin-top:5px;display:flex;align-items:center;gap:8px;}
+.dh-sub-sep{width:3px;height:3px;border-radius:50%;background:var(--dim);}
+
+.section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;flex-shrink:0;}
+
+/* ── EVALUATEE TABLE — clean list rows ── */
+.evaluatee-grid{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;min-height:0;align-content:start;}
+
+.ev-row-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;}
+.ev-row-card:hover{border-color:rgba(59,130,246,0.35);background:var(--surface2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,0.25);}
+.ev-row-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:12px 0 0 12px;}
+.ev-done::before{background:var(--green);}
+.ev-partial::before{background:var(--warn);}
+
+/* Avatar */
+.eva-circle{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;font-family:'DM Mono',monospace;flex-shrink:0;}
+.eva-s{background:var(--green-dim);color:var(--green);border:2px solid rgba(34,197,94,0.3);}
+.eva-p{background:var(--warn-dim);color:var(--warn);border:2px solid rgba(234,179,8,0.3);}
+
+/* Name + sub */
+.ev-row-info{flex:0 0 160px;min-width:0;}
+.ev-row-name{font-size:13.5px;font-weight:700;color:var(--text);}
+.ev-row-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* Score boxes — one per evaluator response, color-coded 1-5 */
+.ev-score-boxes{flex:1;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.ev-score-box{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:'DM Mono',monospace;flex-shrink:0;}
+.esb-1{background:rgba(239,68,68,0.18);color:#ef4444;border:1px solid rgba(239,68,68,0.25);}
+.esb-2{background:rgba(249,115,22,0.18);color:#f97316;border:1px solid rgba(249,115,22,0.25);}
+.esb-3{background:rgba(234,179,8,0.18);color:#eab308;border:1px solid rgba(234,179,8,0.25);}
+.esb-4{background:rgba(34,197,94,0.18);color:#22c55e;border:1px solid rgba(34,197,94,0.25);}
+.esb-5{background:rgba(59,130,246,0.18);color:#60a5fa;border:1px solid rgba(59,130,246,0.25);}
+.esb-pending{background:rgba(255,255,255,0.04);color:var(--dim);border:1px dashed rgba(255,255,255,0.1);}
+
+/* Avg as percentage */
+.ev-avg-block{flex-shrink:0;text-align:center;min-width:68px;}
+.ev-avg-pct{font-size:20px;font-weight:900;font-family:'DM Mono',monospace;line-height:1;}
+.ev-avg-lbl{font-size:9.5px;color:var(--muted);margin-top:2px;font-weight:600;}
+
+/* View button */
+.ev-view-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:7px;background:var(--blue-dim);color:var(--blue-light);border:1px solid rgba(59,130,246,0.22);font-size:12px;font-weight:700;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.ev-row-card:hover .ev-view-btn{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 3px 10px var(--blue-glow);}
+.ev-view-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;}
+
+/* ── SCREEN 3: EVALUATOR RESULT ── */
+.result-col{flex:1;min-width:0;padding:24px 26px;display:flex;flex-direction:column;gap:16px;overflow:hidden;}
+.result-header{flex-shrink:0;}
+.result-form-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.3px;}
+.result-meta{font-size:12px;color:var(--muted);margin-top:5px;display:flex;align-items:center;gap:7px;}
+.rm-sep{width:3px;height:3px;border-radius:50%;background:var(--dim);}
+
+.result-layout{flex:1;display:flex;gap:16px;min-height:0;overflow:hidden;}
+
+/* Left evaluator list — clean, spacious */
+.result-left{width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;overflow-y:auto;}
+.result-left-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;padding:2px 0 4px;flex-shrink:0;}
+
+.evaluator-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 14px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:all .15s;}
+.evaluator-item:hover{border-color:var(--border-hi);background:var(--surface2);}
+.evaluator-item.selected{border-color:rgba(59,130,246,0.4);background:var(--surface2);box-shadow:0 0 0 1px rgba(59,130,246,0.15);}
+.evaluator-item.ev-pending{opacity:.45;cursor:default;pointer-events:none;}
+.ei-avatar{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;font-family:'DM Mono',monospace;}
+.ei-info{flex:1;min-width:0;}
+.ei-name{font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ei-tag{font-size:10px;color:var(--muted);margin-top:3px;}
+.ei-score{font-size:15px;font-weight:900;font-family:'DM Mono',monospace;flex-shrink:0;}
+
+/* Right result panel */
+.result-right{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:13px;display:flex;flex-direction:column;overflow:hidden;}
+.rr-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.rr-empty-icon{width:54px;height:54px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;}
+.rr-empty-icon svg{width:24px;height:24px;stroke:var(--dim);fill:none;}
+.rr-empty-txt{font-size:13px;color:var(--dim);font-weight:500;}
+.rr-content{display:none;flex-direction:column;flex:1;overflow:hidden;}
+
+/* Result panel header */
+.rr-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.rr-head-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;font-family:'DM Mono',monospace;}
+.rr-head-info{flex:1;}
+.rr-evaluator-name{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px;}
+.rr-meta{font-size:11px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px;}
+.rr-sep{width:3px;height:3px;border-radius:50%;background:var(--dim);}
+.rr-score-hero{text-align:center;padding:9px 18px;background:var(--blue-dim);border:1px solid rgba(59,130,246,0.22);border-radius:11px;flex-shrink:0;}
+.rr-score-num{font-size:28px;font-weight:900;color:var(--blue-light);font-family:'DM Mono',monospace;line-height:1;}
+.rr-score-denom{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* Criteria grid — dot-progress professional look */
+.rr-crit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rr-crit-row{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px;transition:border-color .15s;}
+.rr-crit-row:hover{border-color:var(--border-hi);}
+.rr-crit-num{width:22px;height:22px;border-radius:6px;background:var(--blue-dim);color:var(--blue-light);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;flex-shrink:0;}
+.rr-crit-name{font-size:11.5px;color:var(--text2);flex:1;font-weight:500;}
+
+/* 5-dot progress indicator */
+.rr-dot-track{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.rr-dot{width:10px;height:10px;border-radius:50%;transition:all .2s;flex-shrink:0;}
+.rr-dot-empty{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);}
+
+/* Score label next to dots */
+.rr-dot-val{font-size:12px;font-weight:900;font-family:'DM Mono',monospace;flex-shrink:0;min-width:18px;text-align:right;margin-left:3px;}
+
+.rr-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:16px;}
+.rr-section-title{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin-bottom:8px;}
+
+.rr-comment{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:10px;padding:14px 16px;}
+.rr-comment-text{font-size:12.5px;color:var(--text2);line-height:1.7;font-style:italic;}
+.rr-comment-none{font-size:12px;color:var(--dim);font-style:italic;}
+
+/* ── EDIT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{background:var(--surface);border:1px solid var(--border-hi);border-radius:16px;width:100%;max-width:640px;max-height:calc(100vh - 80px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 28px 70px rgba(0,0,0,.65);transform:translateY(14px);transition:transform .2s;}
+.modal-overlay.open .modal-box{transform:translateY(0);}
+
+.modal-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-title{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.3px;}
+.modal-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.modal-close{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:17px;line-height:1;transition:all .15s;}
+.modal-close:hover{border-color:var(--red);color:var(--red);}
+
+.modal-body{flex:1;overflow-y:auto;padding:22px 24px;}
+.form-section-title{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin-bottom:12px;display:block;}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:12.5px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:4px;}
+.req{color:var(--red);font-size:10px;}
+.form-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--text);outline:none;width:100%;transition:border-color .15s,box-shadow .15s;}
+.form-input::placeholder{color:var(--dim);}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-dim);}
+textarea.form-input{resize:none;height:78px;line-height:1.55;}
+
+.rule-note{display:flex;align-items:flex-start;gap:9px;background:var(--blue-dim);border:1px solid rgba(59,130,246,0.18);border-radius:9px;padding:11px 14px;margin-bottom:18px;}
+.rule-note svg{width:14px;height:14px;stroke:var(--blue-light);fill:none;flex-shrink:0;margin-top:1px;}
+.rule-note p{font-size:12px;color:var(--blue-light);line-height:1.55;}
+.rule-note strong{font-weight:700;color:var(--text);}
+
+.people-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.people-box{display:flex;flex-direction:column;gap:8px;}
+.people-label{font-size:12.5px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:4px;}
+.search-input-wrap{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0 12px;transition:border-color .15s;}
+.search-input-wrap:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-dim);}
+.search-input-wrap svg{width:13px;height:13px;stroke:var(--dim);fill:none;flex-shrink:0;}
+.search-input-wrap input{flex:1;background:transparent;border:none;outline:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--text);padding:9px 0;}
+.search-input-wrap input::placeholder{color:var(--dim);}
+.chips-area{min-height:72px;border:1px dashed rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;background:var(--surface2);}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface3);border:1px solid var(--border-hi);color:var(--text2);font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;}
+.chip.chip-blue{background:var(--blue-dim);border-color:rgba(59,130,246,0.2);color:var(--blue-light);}
+.chip.chip-green{background:var(--green-dim);border-color:rgba(34,197,94,0.2);color:var(--green);}
+.chip-remove{width:13px;height:13px;stroke:currentColor;fill:none;cursor:pointer;opacity:.6;}
+.chip-remove:hover{opacity:1;}
+
+.modal-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-shrink:0;background:var(--surface);}
+
+/* DELETE MODAL */
+.del-modal-box{background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;width:100%;max-width:400px;padding:24px;box-shadow:0 24px 64px rgba(0,0,0,.65);transform:translateY(12px);transition:transform .2s;}
+.modal-overlay.open .del-modal-box{transform:translateY(0);}
+.del-icon{width:44px;height:44px;border-radius:12px;background:var(--red-dim);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.del-icon svg{width:20px;height:20px;stroke:var(--red);fill:none;}
+.del-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.del-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+.del-actions{display:flex;gap:8px;justify-content:flex-end;}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="nav-logo">
+    <div class="nav-icon">🎯</div>
+    <div class="nav-wordmark">Peer<span>Tayo</span></div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-notif">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-badge">3</span>
+    </div>
+    <div class="nav-user">
+      <div class="nav-avatar">MA</div>
+      <div><div class="nav-uname">Mark Anton</div><div class="nav-urole">Facilitator · Respondent</div></div>
+    </div>
+  </div>
+</nav>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sb-section">
+      <span class="sb-label">My Activity</span>
+      <a class="sb-item" href="#" onclick="return false"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a class="sb-item" href="#" onclick="return false"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending Evaluations</a>
+      <a class="sb-item" href="#" onclick="return false"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>My Results</a>
+      <a class="sb-item" href="#" onclick="return false"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>My Completed Forms</a>
+    </div>
+    <hr class="sb-hr"/>
+    <div class="sb-section">
+      <span class="sb-label">Manage</span>
+      <a class="sb-item on" href="#" onclick="return false"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>Forms Created <span class="sb-dot"></span></a>
+    </div>
+    <div class="sb-spacer"></div>
+    <hr class="sb-hr"/>
+    <div class="fac-banner">
+      <div class="fac-icon"><svg viewBox="0 0 24 24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <div class="fac-txt">You're a <span>Facilitator</span>.<br/>Create &amp; manage evals.</div>
+    </div>
+    <div class="sb-section">
+      <span class="sb-label">Account</span>
+      <a class="sb-item" href="#" onclick="return false"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Settings</a>
+      <a class="sb-item" href="#" onclick="return false"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</a>
+    </div>
+  </aside>
+
+  <!-- ══ SCREEN 1: FORMS LIST ══ -->
+  <div class="screen active" id="screen-list">
+    <div class="page-col">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Forms Created</div>
+          <div class="page-sub">Manage your evaluation forms as a Facilitator</div>
+        </div>
+        <div class="ph-right">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search forms..." oninput="filterForms(this.value)">
+          </div>
+          <button class="btn btn-primary" onclick="alert('Navigate to Create Evaluation')">
+            <svg viewBox="0 0 24 24" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Form
+          </button>
+        </div>
+      </div>
+
+      <div class="sum-strip">
+        <div class="sum-card sc-blue"><div class="sum-icon si-b"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="sum-num" style="color:var(--blue-light);">3</div><div class="sum-lbl">Total Forms</div></div></div>
+        <div class="sum-card sc-green"><div class="sum-icon si-g"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div><div class="sum-num" style="color:var(--green);">2</div><div class="sum-lbl">Active</div></div></div>
+        <div class="sum-card sc-orange"><div class="sum-icon si-o"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="sum-num" style="color:var(--orange-lt);">1</div><div class="sum-lbl">Needs Attention</div></div></div>
+        <div class="sum-card sc-warn"><div class="sum-icon si-w"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg></div><div><div class="sum-num" style="color:var(--warn);">0</div><div class="sum-lbl">Closed</div></div></div>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-tabs">
+          <div class="ftab active" onclick="setFilter('all',this)">All</div>
+          <div class="ftab" onclick="setFilter('active',this)">Active</div>
+          <div class="ftab t-warn" onclick="setFilter('attention',this)">Needs Attention</div>
+          <div class="ftab t-dim" onclick="setFilter('closed',this)">Closed</div>
+        </div>
+        <button class="btn-archive">
+          <svg viewBox="0 0 24 24" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+          Archives
+        </button>
+      </div>
+
+      <div class="forms-scroll" id="formsList"></div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 2: DETAIL VIEW ══ -->
+  <div class="screen" id="screen-detail">
+    <div class="detail-col">
+      <button class="back-btn" onclick="goScreen('screen-list')">
+        <svg viewBox="0 0 24 24" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Forms Created
+      </button>
+      <!-- Plain title, no gradient banner -->
+      <div class="detail-head-plain">
+        <div class="dh-title" id="dh-title"></div>
+        <div class="dh-sub">
+          <span id="dh-deadline"></span>
+          <span class="dh-sub-sep"></span>
+          <span id="dh-created"></span>
+          <span class="dh-sub-sep"></span>
+          <span id="dh-status-txt"></span>
+        </div>
+      </div>
+      <div class="section-label">Evaluatees <span id="ev-count" style="color:var(--dim);font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;margin-left:4px;"></span></div>
+      <div class="evaluatee-grid" id="evaluateeGrid"></div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 3: EVALUATOR RESULT ══ -->
+  <div class="screen" id="screen-result">
+    <div class="result-col">
+      <button class="back-btn" onclick="goScreen('screen-detail')">
+        <svg viewBox="0 0 24 24" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Form Details
+      </button>
+      <div class="result-header">
+        <div class="result-form-title" id="res-form-title"></div>
+        <div class="result-meta">
+          <span id="res-evaluatee-name"></span>
+          <span class="rm-sep"></span>
+          <span id="res-response-count"></span>
+        </div>
+      </div>
+      <div class="result-layout">
+        <div class="result-left">
+          <div class="result-left-label">Evaluators</div>
+          <div id="evaluatorList" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+        <div class="result-right">
+          <div class="rr-empty" id="rr-empty">
+            <div class="rr-empty-icon"><svg viewBox="0 0 24 24" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <div class="rr-empty-txt">Select an evaluator to view their submission</div>
+          </div>
+          <div class="rr-content" id="rr-content">
+            <div class="rr-head">
+              <div class="rr-head-avatar" id="rr-head-avatar"></div>
+              <div class="rr-head-info">
+                <div class="rr-evaluator-name" id="rr-evaluator-name"></div>
+                <div class="rr-meta" id="rr-meta"></div>
+              </div>
+              <div class="rr-score-hero">
+                <div class="rr-score-num" id="rr-score"></div>
+                <div class="rr-score-denom">out of 5.0</div>
+              </div>
+            </div>
+            <div class="rr-body">
+              <div>
+                <div class="rr-section-title">Criteria Scores</div>
+                <div class="rr-crit-grid" id="rr-crit-grid"></div>
+              </div>
+              <div>
+                <div class="rr-section-title">Peer Comment</div>
+                <div class="rr-comment" id="rr-comment"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /shell -->
+
+<!-- ══ EDIT MODAL ══ -->
+<div class="modal-overlay" id="editModal" onclick="closeEditOutside(event)">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Edit Evaluation</div>
+        <div class="modal-sub" id="edit-modal-sub">Update form details and participants</div>
+      </div>
+      <div class="modal-close" onclick="closeEdit()">×</div>
+    </div>
+    <div class="modal-body">
+      <span class="form-section-title">Evaluation Details</span>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Evaluation Title <span class="req">*</span></label>
+          <input class="form-input" id="edit-title" type="text" placeholder="e.g. Q1 2026 Team Performance Review"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Deadline <span class="req">*</span></label>
+          <input class="form-input" id="edit-deadline" type="datetime-local"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:18px;">
+        <label class="form-label">Description <span class="req">*</span></label>
+        <textarea class="form-input" id="edit-desc" placeholder="Briefly describe the purpose or context of this evaluation…"></textarea>
+      </div>
+      <div class="rule-note">
+        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p><strong>Assignment rules:</strong> A user cannot be both evaluator and evaluatee in the same evaluation. As the form creator, you are excluded from the evaluator list but may add yourself as an evaluatee.</p>
+      </div>
+      <span class="form-section-title">Assign Participants</span>
+      <div class="people-grid">
+        <div class="people-box">
+          <div class="people-label">Evaluators <span class="req">*</span></div>
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search by name or email…"/>
+          </div>
+          <div class="chips-area">
+            <div class="chip chip-blue">Jose Reyes <svg class="chip-remove" viewBox="0 0 24 24" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+            <div class="chip chip-blue">Maria Garcia <svg class="chip-remove" viewBox="0 0 24 24" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+            <div class="chip chip-blue">Ben Torres <svg class="chip-remove" viewBox="0 0 24 24" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+          </div>
+        </div>
+        <div class="people-box">
+          <div class="people-label">Evaluatees <span class="req">*</span></div>
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search by name or email…"/>
+          </div>
+          <div class="chips-area">
+            <div class="chip chip-green">Ruther Ramirez <svg class="chip-remove" viewBox="0 0 24 24" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+            <div class="chip chip-green">Sofia Lim <svg class="chip-remove" viewBox="0 0 24 24" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeEdit()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">
+        <svg viewBox="0 0 24 24" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>
+        Update Evaluation
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DELETE MODAL ══ -->
+<div class="modal-overlay" id="deleteModal" onclick="closeDeleteOutside(event)">
+  <div class="del-modal-box">
+    <div class="del-icon"><svg viewBox="0 0 24 24" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></div>
+    <div class="del-title">Delete this evaluation form?</div>
+    <div class="del-desc">This form will be permanently deleted. Submitted responses will be retained in evaluatees' results and will not be lost.</div>
+    <div class="del-actions">
+      <button class="btn btn-ghost" onclick="closeDelete()">Cancel</button>
+      <button class="btn btn-primary" style="background:var(--red);box-shadow:none;" onclick="confirmDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const criteriaNames=['Quality of Work','Reliability','Collaboration','Communication','Initiative','Problem Solving','Professionalism','Time Management','Adaptability','Contribution'];
+const criteriaColors=['#3b82f6','#a78bfa','#22c55e','#06b6d4','#f97316','#3b82f6','#eab308','#a78bfa','#ef4444','#22c55e'];
+
+const forms=[
+  {id:1,title:'Q1 2026 Team Performance Review',deadline:'Apr 6, 2026',created:'Mar 25, 2026',status:'attention',
+   evaluatees:[
+    {name:'Ruther Ramirez',initials:'RR',submitted:5,total:5,avg:4.6,evaluators:[
+      {name:'Jose Reyes',initials:'JR',color:'#3b82f6',submitted:true,avg:4.7,scores:[5,4,5,4,5,4,5,4,4,5],comment:'Excellent team player with great initiative.'},
+      {name:'Maria Garcia',initials:'MG',color:'#22c55e',submitted:true,avg:4.5,scores:[4,5,5,4,4,5,4,4,5,4],comment:'Very reliable and professional.'},
+      {name:'Ben Torres',initials:'BT',color:'#a78bfa',submitted:true,avg:4.8,scores:[5,5,5,5,5,4,5,4,5,5],comment:null},
+      {name:'Sofia Lim',initials:'SL',color:'#f97316',submitted:true,avg:4.4,scores:[4,4,5,4,4,4,4,5,4,5],comment:'Good work ethic, could improve time management.'},
+      {name:'Diego Reyes',initials:'DR',color:'#06b6d4',submitted:true,avg:4.6,scores:[5,4,4,5,5,4,5,5,4,4],comment:null},
+    ]},
+    {name:'Maria Garcia',initials:'MG',submitted:4,total:5,avg:4.3,evaluators:[
+      {name:'Jose Reyes',initials:'JR',color:'#3b82f6',submitted:true,avg:4.2,scores:[4,4,4,4,4,4,4,4,5,5],comment:'Consistent contributor.'},
+      {name:'Ruther Ramirez',initials:'RR',color:'#22c55e',submitted:true,avg:4.5,scores:[5,4,5,4,5,4,4,5,4,4],comment:null},
+      {name:'Ben Torres',initials:'BT',color:'#a78bfa',submitted:true,avg:4.1,scores:[4,4,4,4,4,4,4,4,4,5],comment:'Good teamwork.'},
+      {name:'Sofia Lim',initials:'SL',color:'#f97316',submitted:true,avg:4.4,scores:[4,4,5,5,4,4,4,5,4,4],comment:null},
+      {name:'Diego Reyes',initials:'DR',color:'#06b6d4',submitted:false,avg:null,scores:null,comment:null},
+    ]},
+    {name:'Ben Torres',initials:'BT',submitted:5,total:5,avg:4.8,evaluators:[
+      {name:'Jose Reyes',initials:'JR',color:'#3b82f6',submitted:true,avg:4.9,scores:[5,5,5,5,5,5,5,4,5,5],comment:'Outstanding performance all around.'},
+      {name:'Ruther Ramirez',initials:'RR',color:'#22c55e',submitted:true,avg:4.7,scores:[5,5,5,5,4,5,5,4,5,4],comment:null},
+      {name:'Maria Garcia',initials:'MG',color:'#a78bfa',submitted:true,avg:4.8,scores:[5,5,5,5,5,4,5,5,5,4],comment:'One of the best teammates I have had.'},
+      {name:'Sofia Lim',initials:'SL',color:'#f97316',submitted:true,avg:4.6,scores:[5,4,5,5,4,5,5,4,5,4],comment:null},
+      {name:'Diego Reyes',initials:'DR',color:'#06b6d4',submitted:true,avg:5.0,scores:[5,5,5,5,5,5,5,5,5,5],comment:'Perfect scores — truly exceptional.'},
+    ]},
+    {name:'Sofia Lim',initials:'SL',submitted:3,total:5,avg:4.1,evaluators:[
+      {name:'Jose Reyes',initials:'JR',color:'#3b82f6',submitted:true,avg:4.0,scores:[4,4,4,4,4,4,4,4,4,4],comment:'Solid contributor.'},
+      {name:'Ruther Ramirez',initials:'RR',color:'#22c55e',submitted:true,avg:4.2,scores:[4,4,5,4,4,4,4,4,4,5],comment:null},
+      {name:'Ben Torres',initials:'BT',color:'#a78bfa',submitted:false,avg:null,scores:null,comment:null},
+      {name:'Maria Garcia',initials:'MG',color:'#f97316',submitted:true,avg:4.1,scores:[4,4,4,4,5,4,4,4,4,4],comment:'Good attitude throughout.'},
+      {name:'Diego Reyes',initials:'DR',color:'#06b6d4',submitted:false,avg:null,scores:null,comment:null},
+    ]},
+    {name:'Diego Reyes',initials:'DR',submitted:5,total:5,avg:4.4,evaluators:[
+      {name:'Jose Reyes',initials:'JR',color:'#3b82f6',submitted:true,avg:4.3,scores:[4,4,5,4,4,4,5,4,4,4],comment:'Dependable team member.'},
+      {name:'Ruther Ramirez',initials:'RR',color:'#22c55e',submitted:true,avg:4.5,scores:[5,4,5,4,5,4,5,4,4,4],comment:null},
+      {name:'Ben Torres',initials:'BT',color:'#a78bfa',submitted:true,avg:4.4,scores:[4,5,4,4,5,4,4,5,4,5],comment:'Strong performer.'},
+      {name:'Maria Garcia',initials:'MG',color:'#f97316',submitted:true,avg:4.2,scores:[4,4,4,4,4,5,4,4,4,5],comment:null},
+      {name:'Sofia Lim',initials:'SL',color:'#06b6d4',submitted:true,avg:4.6,scores:[5,5,5,4,5,4,5,4,5,4],comment:'Great collaboration skills.'},
+    ]},
+  ]},
+  {id:2,title:'SIA G4 Sprint 3 Peer Evaluation',deadline:'Apr 14, 2026',created:'Apr 1, 2026',status:'active',
+   evaluatees:[
+    {name:'Cris Tan',initials:'CT',submitted:3,total:5,avg:4.2,evaluators:[
+      {name:'Jose Reyes',initials:'JR',color:'#3b82f6',submitted:true,avg:4.3,scores:[4,4,4,4,4,5,4,4,5,4],comment:'Good sprint performance.'},
+      {name:'Ruther Ramirez',initials:'RR',color:'#22c55e',submitted:true,avg:4.0,scores:[4,4,4,4,4,4,4,4,4,4],comment:null},
+      {name:'Maria Garcia',initials:'MG',color:'#a78bfa',submitted:true,avg:4.3,scores:[4,4,4,5,4,4,4,4,5,4],comment:'Consistent across all criteria.'},
+      {name:'Sofia Lim',initials:'SL',color:'#f97316',submitted:false,avg:null,scores:null,comment:null},
+      {name:'Ben Torres',initials:'BT',color:'#06b6d4',submitted:false,avg:null,scores:null,comment:null},
+    ]},
+    {name:'Ana Cruz',initials:'AC',submitted:2,total:5,avg:3.9,evaluators:[
+      {name:'Jose Reyes',initials:'JR',color:'#3b82f6',submitted:true,avg:3.8,scores:[4,3,4,4,4,4,3,4,4,4],comment:'Needs more communication effort.'},
+      {name:'Ruther Ramirez',initials:'RR',color:'#22c55e',submitted:true,avg:4.0,scores:[4,4,4,4,4,4,4,4,4,4],comment:null},
+      {name:'Maria Garcia',initials:'MG',color:'#a78bfa',submitted:false,avg:null,scores:null,comment:null},
+      {name:'Sofia Lim',initials:'SL',color:'#f97316',submitted:false,avg:null,scores:null,comment:null},
+      {name:'Ben Torres',initials:'BT',color:'#06b6d4',submitted:false,avg:null,scores:null,comment:null},
+    ]},
+  ]},
+  {id:3,title:'SIA G4 Sprint 2 Peer Evaluation',deadline:'Mar 1, 2026',created:'Feb 10, 2026',status:'active',
+   evaluatees:[
+    {name:'Ruther Ramirez',initials:'RR',submitted:5,total:5,avg:4.3,evaluators:[
+      {name:'Jose Reyes',initials:'JR',color:'#3b82f6',submitted:true,avg:4.4,scores:[4,4,5,4,5,4,4,4,5,4],comment:'Strong sprint 2 output.'},
+      {name:'Cris Tan',initials:'CT',color:'#22c55e',submitted:true,avg:4.2,scores:[4,4,4,4,4,4,4,5,5,4],comment:null},
+      {name:'Ana Cruz',initials:'AC',color:'#a78bfa',submitted:true,avg:4.3,scores:[4,4,5,4,4,4,5,4,4,5],comment:'Reliable as always.'},
+      {name:'Sofia Lim',initials:'SL',color:'#f97316',submitted:true,avg:4.5,scores:[5,4,5,4,5,4,5,4,4,4],comment:null},
+      {name:'Ben Torres',initials:'BT',color:'#06b6d4',submitted:true,avg:4.1,scores:[4,4,4,4,4,4,4,4,5,5],comment:'Good work.'},
+    ]},
+  ]},
+];
+
+let displayedForms=[...forms];
+
+/* ── Close menus ── */
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.fr-dots')) document.querySelectorAll('.fr-menu.open').forEach(m=>m.classList.remove('open'));
+});
+function toggleFrMenu(e,menuId){
+  e.stopPropagation();
+  const menu=document.getElementById(menuId);
+  const wasOpen=menu.classList.contains('open');
+  document.querySelectorAll('.fr-menu.open').forEach(m=>m.classList.remove('open'));
+  if(!wasOpen) menu.classList.add('open');
+}
+function frMenuAction(e,action,formId){
+  e.stopPropagation();
+  document.querySelectorAll('.fr-menu.open').forEach(m=>m.classList.remove('open'));
+  const f=forms.find(x=>x.id===formId);
+  if(action==='edit') openEdit(f);
+  else if(action==='archive') alert('"'+f.title+'" archived.');
+  else if(action==='delete') openDeleteModal();
+}
+
+/* ── SCREENS ── */
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ── RING HELPER ── */
+function makeRing(pct,color,size=48,stroke=4){
+  const r=((size-stroke)/2);
+  const circ=2*Math.PI*r;
+  const offset=circ-(pct/100)*circ;
+  return `<div class="fr-ring" style="width:${size}px;height:${size}px;">
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;">
+      <circle class="fr-ring-bg" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${stroke}"/>
+      <circle class="fr-ring-fill" cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${stroke}" stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"/>
+    </svg>
+    <div class="fr-ring-pct" style="color:${color};font-size:${size<44?'9':'11'}px;">${pct}%</div>
+  </div>`;
+}
+
+/* ── SCREEN 1 ── */
+function statusPill(s){
+  if(s==='active')    return '<span class="status-pill sp-active">● Active</span>';
+  if(s==='attention') return '<span class="status-pill sp-warn">⚠ Attention</span>';
+  return '<span class="status-pill sp-closed">Closed</span>';
+}
+function frClass(s){return s==='active'?'fr-active':s==='attention'?'fr-warn':'fr-closed';}
+function fiClass(s){return s==='active'?'fi-g':s==='attention'?'fi-w':'fi-d';}
+function ringColor(s){return s==='active'?'#3b82f6':s==='attention'?'#eab308':'#6b7280';}
+
+function renderForms(){
+  const c=document.getElementById('formsList');
+  c.innerHTML='';
+  displayedForms.forEach(f=>{
+    const totalSub=f.evaluatees.reduce((a,e)=>a+e.submitted,0);
+    const totalPoss=f.evaluatees.reduce((a,e)=>a+e.total,0);
+    const pct=totalPoss>0?Math.round(totalSub/totalPoss*100):0;
+    const avgAll=(f.evaluatees.reduce((a,e)=>a+e.avg,0)/f.evaluatees.length).toFixed(1);
+    const menuId='frmenu-'+f.id;
+    const div=document.createElement('div');
+    div.className='form-row '+frClass(f.status);
+    div.innerHTML=`
+      <div class="fr-icon ${fiClass(f.status)}">
+        <svg viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div class="fr-info">
+        <div class="fr-title">${f.title}</div>
+        <div class="fr-meta">
+          <span>Due ${f.deadline}</span><span class="fr-sep"></span>
+          <span>${f.evaluatees.length} evaluatee${f.evaluatees.length!==1?'s':''}</span><span class="fr-sep"></span>
+          <span>Avg ${avgAll}</span>
+        </div>
+      </div>
+      <div class="fr-ring-wrap">
+        ${makeRing(pct,ringColor(f.status))}
+        <div class="fr-ring-lbl">completion</div>
+      </div>
+      <div class="fr-right">
+        ${statusPill(f.status)}
+        <button class="btn-view" onclick="event.stopPropagation();openDetail(${f.id})">
+          View Details <svg viewBox="0 0 24 24" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="fr-dots" onclick="toggleFrMenu(event,'${menuId}')" title="Options">
+          <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg>
+          <div class="fr-menu" id="${menuId}">
+            <div class="fr-menu-item mi-edit" onclick="frMenuAction(event,'edit',${f.id})">
+              <svg viewBox="0 0 24 24" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Edit Form
+            </div>
+            <div class="fr-menu-item mi-archive" onclick="frMenuAction(event,'archive',${f.id})">
+              <svg viewBox="0 0 24 24" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+              Archive
+            </div>
+            <div class="fr-menu-item mi-delete" onclick="frMenuAction(event,'delete',${f.id})">
+              <svg viewBox="0 0 24 24" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H5L4 6"/><path d="M10 11v6M14 11v6"/></svg>
+              Delete
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    div.addEventListener('click',()=>openDetail(f.id));
+    c.appendChild(div);
+  });
+}
+
+function setFilter(type,el){
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(type==='all') displayedForms=[...forms];
+  else if(type==='active') displayedForms=forms.filter(f=>f.status==='active');
+  else if(type==='attention') displayedForms=forms.filter(f=>f.status==='attention');
+  else displayedForms=forms.filter(f=>f.status==='closed');
+  renderForms();
+}
+
+function filterForms(q){
+  const lq=q.toLowerCase();
+  displayedForms=forms.filter(f=>f.title.toLowerCase().includes(lq));
+  renderForms();
+}
+
+/* ── SCREEN 2 ── */
+function openDetail(id){
+  const f=forms.find(x=>x.id===id);
+  document.getElementById('dh-title').textContent=f.title;
+  document.getElementById('dh-deadline').textContent='Due '+f.deadline;
+  document.getElementById('dh-created').textContent='Created '+f.created;
+  const smap={active:'● Active',attention:'⚠ Needs Attention',closed:'Closed'};
+  document.getElementById('dh-status-txt').textContent=smap[f.status]||f.status;
+  document.getElementById('ev-count').textContent=f.evaluatees.length+' evaluatees';
+
+  const grid=document.getElementById('evaluateeGrid');
+  grid.innerHTML='';
+  f.evaluatees.forEach((ev,idx)=>{
+    const done=ev.submitted===ev.total;
+    const avgPct=Math.round((ev.avg/5)*100);
+    const avgColor=ev.avg>=4.5?'var(--green)':ev.avg>=4.0?'var(--blue-light)':'var(--warn)';
+
+    /* score boxes — one per evaluator slot, color-coded by avg score or dashed if pending */
+    const scoreBoxes=ev.evaluators.map(e=>{
+      if(!e.submitted) return `<div class="ev-score-box esb-pending" title="Pending">—</div>`;
+      const avgRounded=Math.round(e.avg);
+      const cls=`esb-${Math.min(5,Math.max(1,avgRounded))}`;
+      return `<div class="ev-score-box ${cls}" title="${e.name}: ${e.avg.toFixed(1)}">${e.avg.toFixed(1)}</div>`;
+    }).join('');
+
+    const div=document.createElement('div');
+    div.className='ev-row-card '+(done?'ev-done':'ev-partial');
+    div.innerHTML=`
+      <div class="eva-circle ${done?'eva-s':'eva-p'}">${ev.initials}</div>
+      <div class="ev-row-info">
+        <div class="ev-row-name">${ev.name}</div>
+        <div class="ev-row-sub">
+          <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;${done?'color:#22c55e;':'color:#eab308;'}">
+            ${done?'●':'◑'} ${ev.submitted}/${ev.total} responses
+          </span>
+        </div>
+      </div>
+      <div class="ev-score-boxes">${scoreBoxes}</div>
+      <div class="ev-avg-block">
+        <div class="ev-avg-pct" style="color:${avgColor};">${avgPct}%</div>
+        <div class="ev-avg-lbl">avg score</div>
+      </div>
+      <div class="ev-view-btn">
+        <svg viewBox="0 0 24 24" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        View Results
+      </div>
+    `;
+    div.onclick=()=>openResult(id,idx);
+    grid.appendChild(div);
+  });
+  goScreen('screen-detail');
+}
+
+/* ── SCREEN 3 ── */
+function openResult(formId,evaluateeIdx){
+  const f=forms.find(x=>x.id===formId);
+  const ev=f.evaluatees[evaluateeIdx];
+  document.getElementById('res-form-title').textContent=f.title;
+  document.getElementById('res-evaluatee-name').textContent='Evaluatee: '+ev.name;
+  const submitted=ev.evaluators.filter(e=>e.submitted).length;
+  document.getElementById('res-response-count').textContent=submitted+' of '+ev.evaluators.length+' evaluators submitted';
+
+  const list=document.getElementById('evaluatorList');
+  list.innerHTML='';
+  ev.evaluators.forEach((e,i)=>{
+    const div=document.createElement('div');
+    div.className='evaluator-item'+(e.submitted?'':' ev-pending');
+    div.id='ei-'+i;
+    const scoreColor=e.submitted?(e.avg>=4.5?'var(--green)':e.avg>=4.0?'var(--blue-light)':'var(--warn)'):'var(--dim)';
+    const tag=e.submitted
+      ?`<span style="font-size:10.5px;font-weight:700;color:var(--green);">● Submitted</span>`
+      :`<span style="font-size:10.5px;font-weight:700;color:var(--dim);">○ Pending</span>`;
+    div.innerHTML=`
+      <div class="ei-avatar" style="background:${e.color}22;color:${e.color};">${e.initials}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="ei-name">${e.name}</div>
+        <div class="ei-tag">${tag}</div>
+      </div>
+      <div class="ei-score" style="color:${scoreColor};">${e.submitted?e.avg.toFixed(1):'—'}</div>
+    `;
+    if(e.submitted) div.addEventListener('click',()=>selectEvaluator(ev,e,i));
+    list.appendChild(div);
+  });
+
+  document.getElementById('rr-empty').style.display='flex';
+  document.getElementById('rr-content').style.display='none';
+  goScreen('screen-result');
+}
+
+function selectEvaluator(evaluatee,evaluator,idx){
+  document.querySelectorAll('.evaluator-item').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('ei-'+idx).classList.add('selected');
+  document.getElementById('rr-empty').style.display='none';
+  document.getElementById('rr-content').style.display='flex';
+
+  // Head avatar
+  const avatarEl=document.getElementById('rr-head-avatar');
+  avatarEl.style.background=evaluator.color+'22';
+  avatarEl.style.color=evaluator.color;
+  avatarEl.textContent=evaluator.initials;
+
+  document.getElementById('rr-evaluator-name').textContent=evaluator.name;
+  document.getElementById('rr-meta').innerHTML=`
+    <span>Submitted evaluation</span>
+    <span class="rr-sep"></span>
+    <span>Evaluating ${evaluatee.name}</span>
+  `;
+  document.getElementById('rr-score').textContent=evaluator.avg.toFixed(1);
+
+  const grid=document.getElementById('rr-crit-grid');
+  grid.innerHTML='';
+  /* Each dot position always has its own fixed color from the system palette */
+  const dotPositionColors={
+    1:'#ef4444',  /* pos 1 — red    (--red)   */
+    2:'#f97316',  /* pos 2 — orange (--orange)*/
+    3:'#eab308',  /* pos 3 — yellow (--warn)  */
+    4:'#22c55e',  /* pos 4 — green  (--green) */
+    5:'#3b82f6',  /* pos 5 — blue   (--blue)  */
+  };
+  /* Score label color still reflects how high the score is */
+  const scoreColorMap={1:'#ef4444',2:'#f97316',3:'#eab308',4:'#22c55e',5:'#3b82f6'};
+  evaluator.scores.forEach((s,i)=>{
+    const score=Math.min(5,Math.max(1,s));
+    const scoreColor=scoreColorMap[score];
+    /* dots: filled up to score using each position's own color, empty after */
+    const dots=[1,2,3,4,5].map(d=>{
+      if(d<=score){
+        const c=dotPositionColors[d];
+        return `<div class="rr-dot" style="background:${c};box-shadow:0 0 5px ${c}55;"></div>`;
+      }
+      return `<div class="rr-dot rr-dot-empty"></div>`;
+    }).join('');
+    const row=document.createElement('div');
+    row.className='rr-crit-row';
+    row.style.borderLeftColor=scoreColor;
+    row.style.borderLeftWidth='2px';
+    row.innerHTML=`
+      <div class="rr-crit-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="rr-crit-name">${criteriaNames[i]}</div>
+      <div class="rr-dot-track">${dots}</div>
+      <div class="rr-dot-val" style="color:${scoreColor};">${s}</div>
+    `;
+    grid.appendChild(row);
+  });
+
+  const comment=document.getElementById('rr-comment');
+  comment.innerHTML=evaluator.comment
+    ?`<div class="rr-comment-text">"${evaluator.comment}"</div>`
+    :`<div class="rr-comment-none">No comment was provided.</div>`;
+}
+
+/* ── EDIT MODAL ── */
+function openEdit(f){
+  document.getElementById('edit-modal-sub').textContent='Editing: '+f.title;
+  document.getElementById('edit-title').value=f.title;
+  document.getElementById('edit-desc').value='Q1 2026 performance evaluation for the full team.';
+  document.getElementById('editModal').classList.add('open');
+}
+function closeEdit(){document.getElementById('editModal').classList.remove('open');}
+function closeEditOutside(e){if(e.target===document.getElementById('editModal'))closeEdit();}
+function saveEdit(){closeEdit();alert('Evaluation updated successfully.');}
+
+/* ── DELETE MODAL ── */
+function openDeleteModal(){document.getElementById('deleteModal').classList.add('open');}
+function closeDelete(){document.getElementById('deleteModal').classList.remove('open');}
+function closeDeleteOutside(e){if(e.target===document.getElementById('deleteModal'))closeDelete();}
+function confirmDelete(){closeDelete();alert('Form deleted.');}
+
+renderForms();
+</script>
+</body>
+</html>

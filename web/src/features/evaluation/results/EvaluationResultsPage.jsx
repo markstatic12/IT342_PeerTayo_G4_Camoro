@@ -8,7 +8,7 @@ import './EvaluationResultsPage.css';
 /* ── Helpers ──────────────────────────────────────────────────────────── */
 function initials(name) {
   if (!name) return '??';
-  return name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  return name.split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 }
 
 function avatarColor(name) {
@@ -28,63 +28,46 @@ function progressPct(submitted, total) {
   return Math.round((submitted / total) * 100);
 }
 
-function isOverdueEvaluation(meta) {
+function isOverdue(meta) {
   if (!meta?.deadline) return false;
   if (meta.status?.toUpperCase() !== 'ACTIVE') return false;
   return new Date(meta.deadline) < new Date();
 }
 
-function statusVariant(status) {
-  if (!status) return 'active';
-  switch (status.toUpperCase()) {
-    case 'ACTIVE':   return 'active';
-    case 'CLOSED':   return 'closed';
-    default:         return 'attention';
-  }
-}
-
 function normalizedStatus(meta) {
-  const status = meta?.status?.toUpperCase() ?? 'ACTIVE';
-  if (status === 'CLOSED' || status === 'ARCHIVED') return 'CLOSED';
-  if (status === 'ACTIVE' && isOverdueEvaluation(meta)) return 'NEEDS_ATTENTION';
-  if (status === 'ACTIVE') return 'ACTIVE';
-  return 'NEEDS_ATTENTION';
+  const s = meta?.status?.toUpperCase() ?? 'ACTIVE';
+  if (s === 'CLOSED' || s === 'ARCHIVED') return 'closed';
+  if (s === 'ACTIVE' && isOverdue(meta)) return 'attention';
+  return 'active';
 }
 
 function statusLabel(meta) {
-  const status = normalizedStatus(meta);
-  if (status === 'ACTIVE') return 'Active';
-  if (status === 'CLOSED') return 'Closed';
-  return 'Needs Attention';
+  const s = normalizedStatus(meta);
+  if (s === 'closed') return 'Closed';
+  if (s === 'attention') return 'Needs Attention';
+  return 'Active';
 }
 
 /* ── Icons ────────────────────────────────────────────────────────────── */
-function IconBack() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="15 18 9 12 15 6"/>
-    </svg>
-  );
-}
-function IconEye() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-      <circle cx="12" cy="12" r="3"/>
-    </svg>
-  );
-}
-function IconAlert() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-      <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-    </svg>
-  );
-}
+const IcoBack = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="15 18 9 12 15 6"/>
+  </svg>
+);
+const IcoEye = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+const IcoAlert = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+  </svg>
+);
 
 /* ══════════════════════════════════════════════════════════════════════
-   EvaluationResultsPage
+   EvaluationResultsPage — Screen 2: evaluatee list with score boxes
    ══════════════════════════════════════════════════════════════════════ */
 export default function EvaluationResultsPage() {
   const { id } = useParams();
@@ -117,70 +100,62 @@ export default function EvaluationResultsPage() {
   }, [id]);
 
   const evaluatees = results?.evaluatees ?? [];
+  const statusKey = normalizedStatus(meta);
 
   return (
-    <div className="er-page">
-      {/* Breadcrumb */}
+    <div className="er-page animate-page">
+
+      {/* Back */}
       <button className="er-back" type="button" onClick={() => navigate('/forms-created')}>
-        <IconBack /> Forms Created
+        <IcoBack /> Forms Created
       </button>
 
+      {/* Loading */}
       {loading && (
         <>
           <div className="er-header">
-            <Skeleton variant="title" width="50%" height="22px" className="skeleton-stagger" />
+            <Skeleton variant="title" width="50%" height="22px" />
             <div style={{ display:'flex', gap:8, marginTop:8 }}>
-              <Skeleton variant="text" width="80px" height="10px" className="skeleton-stagger" />
-              <Skeleton variant="text" width="80px" height="10px" className="skeleton-stagger" />
-              <Skeleton variant="text" width="60px" height="10px" className="skeleton-stagger" />
+              <Skeleton variant="text" width="80px" height="10px" />
+              <Skeleton variant="text" width="80px" height="10px" />
             </div>
           </div>
-          <div className="er-table-wrap">
-            <table className="er-table">
-              <thead><tr><th>Evaluatee</th><th>Avg Score</th><th>Progress</th><th>Actions</th></tr></thead>
-              <tbody>
-                {[1,2,3].map((i) => (
-                  <tr key={i} className="er-row">
-                    <td className="er-row__name-cell">
-                      <div className="er-row__name-wrap">
-                        <Skeleton variant="circle" width="32px" height="32px" className="skeleton-stagger" />
-                        <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
-                          <Skeleton variant="text" width="100px" height="12px" className="skeleton-stagger" />
-                          <Skeleton variant="text" width="70px" height="10px" className="skeleton-stagger" />
-                        </div>
-                      </div>
-                    </td>
-                    <td><Skeleton variant="rect" width="44px" height="22px" style={{ borderRadius:6 }} className="skeleton-stagger" /></td>
-                    <td className="er-row__progress">
-                      <Skeleton variant="rect" width="100%" height="6px" style={{ borderRadius:3 }} className="skeleton-stagger" />
-                      <Skeleton variant="text" width="30px" height="10px" style={{ marginTop:4 }} className="skeleton-stagger" />
-                    </td>
-                    <td><Skeleton variant="rect" width="90px" height="28px" style={{ borderRadius:7 }} className="skeleton-stagger" /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="er-list">
+            {[1,2,3].map((i) => (
+              <div key={i} className="er-ev-card">
+                <Skeleton variant="circle" width="42px" height="42px" />
+                <div style={{ flex:1, display:'flex', flexDirection:'column', gap:6 }}>
+                  <Skeleton variant="text" width="40%" height="13px" />
+                  <Skeleton variant="text" width="25%" height="10px" />
+                </div>
+                <div style={{ display:'flex', gap:5 }}>
+                  {[1,2,3,4,5].map((j) => <Skeleton key={j} variant="rect" width="28px" height="28px" style={{ borderRadius:6 }} />)}
+                </div>
+                <Skeleton variant="rect" width="90px" height="32px" style={{ borderRadius:8 }} />
+              </div>
+            ))}
           </div>
         </>
       )}
+
       {!loading && error && <div className="er-state er-state--error">{error}</div>}
 
       {!loading && !error && (
         <>
-          {/* Eval header */}
+          {/* Header */}
           <div className="er-header">
             <h1 className="er-title">{meta?.title ?? `Evaluation #${id}`}</h1>
             <div className="er-meta">
               {meta?.deadline && <span>Due {formatDate(meta.deadline)}</span>}
-              {meta?.deadline && <span className="er-meta__dot">·</span>}
+              {meta?.deadline && <span className="er-meta-dot">·</span>}
               {meta?.createdAt && <span>Created {formatDate(meta.createdAt)}</span>}
-              {meta?.createdAt && <span className="er-meta__dot">·</span>}
+              {meta?.createdAt && <span className="er-meta-dot">·</span>}
               {meta?.submissionProgress && <span>{meta.submissionProgress} submitted</span>}
               {meta?.status && (
                 <>
-                  <span className="er-meta__dot">·</span>
-                  <span className={`er-badge er-badge--${statusVariant(normalizedStatus(meta))}`}>
-                    {normalizedStatus(meta) !== 'ACTIVE' && <IconAlert />}
+                  <span className="er-meta-dot">·</span>
+                  <span className={`er-badge er-badge--${statusKey}`}>
+                    {statusKey !== 'active' && <IcoAlert />}
                     {statusLabel(meta)}
                   </span>
                 </>
@@ -196,89 +171,83 @@ export default function EvaluationResultsPage() {
             </span>
           </div>
 
-          {/* Table */}
-          <div className="er-table-wrap">
+          {/* Evaluatee card list */}
+          <div className="er-list">
             {evaluatees.length === 0 ? (
               <div className="er-state">No evaluatees assigned to this evaluation yet.</div>
             ) : (
-              <table className="er-table">
-                <thead>
-                  <tr>
-                    <th>Evaluatee</th>
-                    <th>Avg Score</th>
-                    <th>Progress</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {evaluatees.map((ev) => {
-                    // Defensive mapping for backend shapes
-                    const name = ev.evaluateeName || ev.name || ev.displayName || ev.userName || 'Unknown';
-                    const userIdKey = ev.userId ?? ev.id ?? ev.evaluateeId ?? name;
-                    const color = avatarColor(name);
-                    const submitted = Number(ev.submittedResponses ?? ev.responsesReceived ?? ev.submissionsReceived ?? ev.submitted ?? 0);
-                    const total = Number(ev.totalResponses ?? ev.expectedResponses ?? ev.assignedEvaluators ?? 0);
-                    const pct = progressPct(submitted, total);
-                    const isFull = pct === 100;
-                    const avg = Number(ev.overallAverage ?? ev.average ?? 0);
+              evaluatees.map((ev) => {
+                const name = ev.evaluateeName ?? ev.name ?? ev.displayName ?? 'Unknown';
+                const userIdKey = ev.userId ?? ev.id ?? ev.evaluateeId ?? name;
+                const color = avatarColor(name);
+                const submitted = Number(ev.submittedResponses ?? ev.responsesReceived ?? 0);
+                const total = Number(ev.totalResponses ?? ev.expectedResponses ?? 0);
+                const pct = progressPct(submitted, total);
+                const isFull = pct === 100;
+                const avg = Number(ev.overallAverage ?? ev.average ?? 0);
 
-                    return (
-                      <tr key={userIdKey} className="er-row">
-                        {/* Evaluatee name + avatar */}
-                        <td className="er-row__name-cell">
-                          <div className="er-row__name-wrap">
-                            <div
-                              className="er-avatar"
-                              style={{ background: `${color}22`, color, border: `1.5px solid ${color}55` }}
-                            >
-                              {initials(name)}
+                // Score boxes from individual evaluator ratings
+                const scoreBoxes = (ev.submissions ?? ev.responses ?? ev.evaluators ?? [])
+                  .filter((s) => s.submittedAt || s.submitted)
+                  .map((s) => Number(s.overallAverage ?? s.average ?? 0));
+
+                return (
+                  <div
+                    key={userIdKey}
+                    className={`er-ev-card${isFull ? ' er-ev-card--done' : ''}`}
+                    onClick={() => navigate(`/forms-created/${id}/evaluatee/${userIdKey}`)}
+                  >
+                    {/* Avatar */}
+                    <div
+                      className="er-ev-avatar"
+                      style={{ background: `${color}22`, color, border: `1.5px solid ${color}44` }}
+                    >
+                      {initials(name)}
+                    </div>
+
+                    {/* Name + sub */}
+                    <div className="er-ev-info">
+                      <div className="er-ev-name">{name}</div>
+                      <div className="er-ev-sub">{submitted} of {total} evaluators submitted</div>
+                    </div>
+
+                    {/* Score boxes — one per submitted evaluator */}
+                    <div className="er-score-boxes">
+                      {scoreBoxes.length > 0 ? (
+                        scoreBoxes.map((s, i) => {
+                          const rounded = Math.max(1, Math.min(5, Math.round(s)));
+                          return (
+                            <div key={i} className={`er-score-box er-score-box--${rounded}`}>
+                              {s > 0 ? s.toFixed(1) : '—'}
                             </div>
-                            <div>
-                              <div className="er-row__name">{name}</div>
-                              <div className="er-row__sub">
-                                {ev.criteriaAverages?.length ?? 0} criteria rated
-                              </div>
-                            </div>
-                          </div>
-                        </td>
+                          );
+                        })
+                      ) : (
+                        Array.from({ length: total || 1 }, (_, i) => (
+                          <div key={i} className="er-score-box er-score-box--pending">—</div>
+                        ))
+                      )}
+                    </div>
 
-                        {/* Avg score */}
-                        <td className="er-row__avg">
-                          {avg > 0 ? (
-                            <span className={`er-score${avg >= 4.0 ? ' er-score--high' : avg >= 3.0 ? ' er-score--mid' : ' er-score--low'}`}>
-                              {avg.toFixed(2)}
-                            </span>
-                          ) : (
-                            <span className="er-score er-score--none">—</span>
-                          )}
-                        </td>
+                    {/* Avg + progress */}
+                    <div className="er-ev-avg">
+                      <div className="er-ev-avg-val" style={{ color: avg >= 4 ? '#22c55e' : avg >= 3 ? '#eab308' : avg > 0 ? '#f87171' : '#4a5568' }}>
+                        {avg > 0 ? Math.round((avg / 5) * 100) + '%' : '—'}
+                      </div>
+                      <div className="er-ev-avg-lbl">avg score</div>
+                    </div>
 
-                        {/* Progress */}
-                        <td className="er-row__progress">
-                          <div className="er-progress-bar">
-                            <div
-                              className={`er-progress-fill${isFull ? ' er-progress-fill--full' : ''}`}
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                          <span className="er-progress-label">{submitted}/{total}</span>
-                        </td>
-
-                        {/* Actions */}
-                        <td className="er-row__actions">
-                          <button
-                            className="er-view-btn"
-                            type="button"
-                            onClick={() => navigate(`/forms-created/${id}/evaluatee/${userIdKey}`)}
-                          >
-                            <IconEye /> View Results
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    {/* View button */}
+                    <button
+                      className="er-view-btn"
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); navigate(`/forms-created/${id}/evaluatee/${userIdKey}`); }}
+                    >
+                      <IcoEye /> View Results
+                    </button>
+                  </div>
+                );
+              })
             )}
           </div>
         </>
