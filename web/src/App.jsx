@@ -47,6 +47,7 @@ export default function App() {
               <Route element={<RoleProtectedRoute role="FACILITATOR" />}>
                 <Route path="/forms-created"             element={<FormsCreatedPage />} />
                 <Route path="/forms-created/new"         element={<CreateEvaluationPage />} />
+                <Route path="/forms-created/:id/edit"    element={<CreateEvaluationPage />} />
                 <Route path="/forms-created/:id/results" element={<EvaluationResultsPage />} />
                 <Route path="/forms-created/:id/evaluatee/:userId" element={<EvaluateeResultsPage />} />
               </Route>
