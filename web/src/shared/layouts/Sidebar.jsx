@@ -138,17 +138,19 @@ export default function Sidebar() {
       )}
 
       {/* ── Account ── */}
-      <div className="sidebar__footer">
-        <span className="sidebar__section-title" style={{ paddingLeft: '0.3rem', marginBottom: '0.5rem', display: 'block' }}>Account</span>
+      <div className="sidebar__section" style={{ marginTop: 'auto', paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+        <span className="sidebar__section-title">Account</span>
+
         <button
+          type="button"
           onClick={() => guardedNavigate('/settings')}
-          className={`sidebar__footer-link${isActive('/settings') ? ' active' : ''}`}
+          className={`sidebar__link${isActive('/settings') ? ' active' : ''}`}
         >
           <SettingsIcon size={16} />
           Settings
         </button>
 
-        <button className="sidebar__footer-link" onClick={() => setShowModal(true)}>
+        <button type="button" className="sidebar__link" onClick={() => setShowModal(true)}>
           <LogoutIcon size={16} />
           Logout
         </button>
