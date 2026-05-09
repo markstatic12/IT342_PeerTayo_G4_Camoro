@@ -28,15 +28,10 @@ function progressPct(submitted, total) {
   return Math.round((submitted / total) * 100);
 }
 
-function statusLabel(status) {
-  if (!status) return 'Active';
-  switch (status.toUpperCase()) {
-    case 'ACTIVE':   return 'Active';
-    case 'CLOSED':   return 'Closed';
-    case 'EXPIRED':  return 'Expired';
-    case 'ARCHIVED': return 'Archived';
-    default:         return 'Needs Attention';
-  }
+function isOverdueEvaluation(meta) {
+  if (!meta?.deadline) return false;
+  if (meta.status?.toUpperCase() !== 'ACTIVE') return false;
+  return new Date(meta.deadline) < new Date();
 }
 
 function statusVariant(status) {
@@ -44,10 +39,23 @@ function statusVariant(status) {
   switch (status.toUpperCase()) {
     case 'ACTIVE':   return 'active';
     case 'CLOSED':   return 'closed';
-    case 'EXPIRED':  return 'expired';
-    case 'ARCHIVED': return 'archived';
     default:         return 'attention';
   }
+}
+
+function normalizedStatus(meta) {
+  const status = meta?.status?.toUpperCase() ?? 'ACTIVE';
+  if (status === 'CLOSED' || status === 'ARCHIVED') return 'CLOSED';
+  if (status === 'ACTIVE' && isOverdueEvaluation(meta)) return 'NEEDS_ATTENTION';
+  if (status === 'ACTIVE') return 'ACTIVE';
+  return 'NEEDS_ATTENTION';
+}
+
+function statusLabel(meta) {
+  const status = normalizedStatus(meta);
+  if (status === 'ACTIVE') return 'Active';
+  if (status === 'CLOSED') return 'Closed';
+  return 'Needs Attention';
 }
 
 /* ── Icons ────────────────────────────────────────────────────────────── */
@@ -171,9 +179,9 @@ export default function EvaluationResultsPage() {
               {meta?.status && (
                 <>
                   <span className="er-meta__dot">·</span>
-                  <span className={`er-badge er-badge--${statusVariant(meta.status)}`}>
-                    {meta.status?.toUpperCase() !== 'ACTIVE' && <IconAlert />}
-                    {statusLabel(meta.status)}
+                  <span className={`er-badge er-badge--${statusVariant(normalizedStatus(meta))}`}>
+                    {normalizedStatus(meta) !== 'ACTIVE' && <IconAlert />}
+                    {statusLabel(meta)}
                   </span>
                 </>
               )}
@@ -204,15 +212,18 @@ export default function EvaluationResultsPage() {
                 </thead>
                 <tbody>
                   {evaluatees.map((ev) => {
-                    const color = avatarColor(ev.evaluateeName);
-                    const submitted = ev.submittedResponses ?? 0;
-                    const total = ev.totalResponses ?? 0;
+                    // Defensive mapping for backend shapes
+                    const name = ev.evaluateeName || ev.name || ev.displayName || ev.userName || 'Unknown';
+                    const userIdKey = ev.userId ?? ev.id ?? ev.evaluateeId ?? name;
+                    const color = avatarColor(name);
+                    const submitted = Number(ev.submittedResponses ?? ev.responsesReceived ?? ev.submissionsReceived ?? ev.submitted ?? 0);
+                    const total = Number(ev.totalResponses ?? ev.expectedResponses ?? ev.assignedEvaluators ?? 0);
                     const pct = progressPct(submitted, total);
                     const isFull = pct === 100;
-                    const avg = Number(ev.overallAverage ?? 0);
+                    const avg = Number(ev.overallAverage ?? ev.average ?? 0);
 
                     return (
-                      <tr key={ev.userId} className="er-row">
+                      <tr key={userIdKey} className="er-row">
                         {/* Evaluatee name + avatar */}
                         <td className="er-row__name-cell">
                           <div className="er-row__name-wrap">
@@ -220,10 +231,10 @@ export default function EvaluationResultsPage() {
                               className="er-avatar"
                               style={{ background: `${color}22`, color, border: `1.5px solid ${color}55` }}
                             >
-                              {initials(ev.evaluateeName)}
+                              {initials(name)}
                             </div>
                             <div>
-                              <div className="er-row__name">{ev.evaluateeName}</div>
+                              <div className="er-row__name">{name}</div>
                               <div className="er-row__sub">
                                 {ev.criteriaAverages?.length ?? 0} criteria rated
                               </div>
@@ -258,7 +269,7 @@ export default function EvaluationResultsPage() {
                           <button
                             className="er-view-btn"
                             type="button"
-                            onClick={() => navigate(`/forms-created/${id}/evaluatee/${ev.userId}`)}
+                            onClick={() => navigate(`/forms-created/${id}/evaluatee/${userIdKey}`)}
                           >
                             <IconEye /> View Results
                           </button>
