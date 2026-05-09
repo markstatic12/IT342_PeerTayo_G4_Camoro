@@ -28,23 +28,30 @@ function statusVariant(status) {
   switch (status.toUpperCase()) {
     case 'ACTIVE':    return 'active';
     case 'CLOSED':    return 'closed';
-    case 'DRAFT':     return 'draft';
-    case 'PENDING':   return 'pending';
-    case 'EXPIRED':   return 'expired';
-    case 'ARCHIVED':  return 'archived';
     default:          return 'attention';
   }
 }
 
-function statusLabel(status) {
+function isOverdueEvaluation(evaluation) {
+  if (!evaluation?.deadline) return false;
+  if (evaluation.status?.toUpperCase() !== 'ACTIVE') return false;
+  return new Date(evaluation.deadline) < new Date();
+}
+
+function normalizedStatus(evaluation) {
+  const status = evaluation?.status?.toUpperCase() ?? 'ACTIVE';
+  if (status === 'CLOSED' || status === 'ARCHIVED') return 'CLOSED';
+  if (status === 'ACTIVE' && isOverdueEvaluation(evaluation)) return 'NEEDS_ATTENTION';
+  if (status === 'ACTIVE') return 'ACTIVE';
+  return 'NEEDS_ATTENTION';
+}
+
+function statusLabel(status, evaluation) {
+  if (isOverdueEvaluation(evaluation)) return 'Needs Attention';
   if (!status) return 'Active';
   switch (status.toUpperCase()) {
     case 'ACTIVE':    return 'Active';
     case 'CLOSED':    return 'Closed';
-    case 'DRAFT':     return 'Draft';
-    case 'PENDING':   return 'Pending';
-    case 'EXPIRED':   return 'Expired';
-    case 'ARCHIVED':  return 'Archived';
     default:          return 'Needs Attention';
   }
 }
@@ -336,17 +343,18 @@ export default function FormsCreatedPage() {
 
   /* ── Derived stats ──────────────────────────────────────────────────── */
   const total      = evaluations.length;
-  const active     = evaluations.filter((e) => e.status?.toUpperCase() === 'ACTIVE').length;
-  const attention  = evaluations.filter((e) => e.status?.toUpperCase() !== 'ACTIVE' && e.status?.toUpperCase() !== 'CLOSED').length;
-  const closed     = evaluations.filter((e) => e.status?.toUpperCase() === 'CLOSED').length;
+  const active     = evaluations.filter((e) => normalizedStatus(e) === 'ACTIVE').length;
+  const attention  = evaluations.filter((e) => normalizedStatus(e) === 'NEEDS_ATTENTION').length;
+  const closed     = evaluations.filter((e) => normalizedStatus(e) === 'CLOSED').length;
 
   /* ── Filtered list ──────────────────────────────────────────────────── */
   const filtered = evaluations.filter((e) => {
+    const status = normalizedStatus(e);
     const matchesTab =
       activeTab === 'All' ||
-      (activeTab === 'Active' && e.status?.toUpperCase() === 'ACTIVE') ||
-      (activeTab === 'Closed' && e.status?.toUpperCase() === 'CLOSED') ||
-      (activeTab === 'Needs Attention' && e.status?.toUpperCase() !== 'ACTIVE' && e.status?.toUpperCase() !== 'CLOSED');
+      (activeTab === 'Active' && status === 'ACTIVE') ||
+      (activeTab === 'Closed' && status === 'CLOSED') ||
+      (activeTab === 'Needs Attention' && status === 'NEEDS_ATTENTION');
     const matchesSearch = !search.trim() || e.title?.toLowerCase().includes(search.toLowerCase());
     return matchesTab && matchesSearch;
   });
@@ -483,16 +491,17 @@ export default function FormsCreatedPage() {
 
         {!loading && !error && filtered.map((ev) => {
           const pct = progressPct(ev.submissionProgress);
-          const variant = statusVariant(ev.status);
+          const statusKey = normalizedStatus(ev);
+          const variant = statusVariant(statusKey);
           const isFull = pct === 100;
-          const isOverdue = ev.deadline && new Date(ev.deadline) < new Date();
+          const isOverdue = isOverdueEvaluation(ev);
           return (
             <div key={ev.id} className={`fc-card fc-card--${variant}`}>
               <div className="fc-card__initials">{getFormInitials(ev.title)}</div>
               <div className="fc-card__body">
                 <div className="fc-card__top">
                   <span className="fc-card__title">{ev.title}</span>
-                  <span className={`fc-status fc-status--${variant}`}>{statusLabel(ev.status)}</span>
+                  <span className={`fc-status fc-status--${variant}`}>{statusLabel(ev.status, ev)}</span>
                 </div>
                 {ev.description && <div className="fc-card__desc">{ev.description}</div>}
                 <div className="fc-card__meta">

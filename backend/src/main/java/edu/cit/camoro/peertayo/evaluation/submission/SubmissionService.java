@@ -170,6 +170,13 @@ public class SubmissionService {
         }
 
         EvaluationForm evaluation = assignment.getEvaluation();
+        
+        // Prevent submissions on closed evaluations
+        if ("CLOSED".equals(evaluation.getStatus())) {
+            throw new BusinessRuleException("EVAL-004", "This evaluation is closed and no longer accepts submissions");
+        }
+        
+        // Prevent submissions after the deadline
         if (evaluation.getDeadline().isBefore(LocalDateTime.now())) {
             throw new BusinessRuleException("EVAL-001", "Cannot submit evaluation after the deadline");
         }

@@ -12,6 +12,7 @@ import DashboardPage from './features/dashboard/DashboardPage';
 import FormsCreatedPage from './features/evaluation/form/FormsCreatedPage';
 import CreateEvaluationPage from './features/evaluation/form/CreateEvaluationPage';
 import EvaluationResultsPage from './features/evaluation/results/EvaluationResultsPage';
+import EvaluateeResultsPage from './features/evaluation/results/EvaluateeResultsPage';
 import MyResultsPage from './features/evaluation/results/MyResultsPage';
 import MyCompletedFormsPage from './features/evaluation/submission/MyCompletedFormsPage';
 import PendingEvaluationsPage from './features/evaluation/submission/PendingEvaluationsPage';
@@ -47,6 +48,7 @@ export default function App() {
                 <Route path="/forms-created"             element={<FormsCreatedPage />} />
                 <Route path="/forms-created/new"         element={<CreateEvaluationPage />} />
                 <Route path="/forms-created/:id/results" element={<EvaluationResultsPage />} />
+                <Route path="/forms-created/:id/evaluatee/:userId" element={<EvaluateeResultsPage />} />
               </Route>
             </Route>
 
