@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getEvaluationResults } from './evaluationResultsService';
-import { listCreatedEvaluations } from '../form/evaluationFormService';
+import { getEvaluateeSubmissions } from './evaluationResultsService';
+import { listCreatedEvaluations as listFormsCreated } from '../form/evaluationFormService';
 import Skeleton from '../../../shared/components/ui/Skeleton';
 import './EvaluateeResultsPage.css';
 
@@ -30,13 +30,6 @@ const CRITERIA_COLORS = [
   '#ef4444','#22c55e',
 ];
 
-const CRITERIA_FALLBACK = [
-  'Quality of Work','Reliability & Dependability','Collaboration & Teamwork',
-  'Communication Skills','Initiative & Proactiveness','Problem Solving',
-  'Professionalism & Conduct','Time Management','Adaptability & Learning',
-  'Overall Contribution',
-];
-
 /* ── Icons ────────────────────────────────────────────────────────────── */
 const IcoBack = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -48,13 +41,8 @@ const IcoChart = () => (
     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
   </svg>
 );
-const IcoEye = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-  </svg>
-);
 
-/* ── Dot track (5 dots, filled by score) ─────────────────────────────── */
+/* ── 5-dot track ─────────────────────────────────────────────────────── */
 function DotTrack({ score, color }) {
   const filled = Math.round(Math.max(0, Math.min(5, Number(score) || 0)));
   return (
@@ -74,7 +62,7 @@ function DotTrack({ score, color }) {
 export default function EvaluateeResultsPage() {
   const { id, userId } = useParams();
   const navigate = useNavigate();
-  const [allResults, setAllResults] = useState(null);
+  const [data, setData] = useState(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -86,13 +74,16 @@ export default function EvaluateeResultsPage() {
       setLoading(true);
       setError('');
       try {
-        const [res, list] = await Promise.all([
-          getEvaluationResults(id),
-          listCreatedEvaluations(),
+        const [subs, forms] = await Promise.all([
+          getEvaluateeSubmissions(id, userId),
+          listFormsCreated(),
         ]);
         if (!alive) return;
-        setAllResults(res);
-        setMeta(list.find((e) => String(e.id) === String(id)) ?? null);
+        setData(subs);
+        setMeta(forms.find((e) => String(e.id) === String(id)) ?? null);
+        // auto-select first submitted evaluator
+        const first = subs?.evaluators?.find((e) => e.submitted) ?? subs?.evaluators?.[0] ?? null;
+        setSelectedEv(first);
       } catch {
         if (alive) setError('Unable to load results right now.');
       } finally {
@@ -100,33 +91,13 @@ export default function EvaluateeResultsPage() {
       }
     })();
     return () => { alive = false; };
-  }, [id]);
+  }, [id, userId]);
 
-  const evaluatee = allResults?.evaluatees?.find(
-    (ev) => String(ev.userId ?? ev.evaluateeId ?? ev.id) === String(userId)
-  ) ?? null;
+  const evaluators = data?.evaluators ?? [];
+  const evaluateeName = data?.evaluateeName ?? 'Unknown';
+  const submittedCount = data?.submittedCount ?? 0;
+  const totalCount = data?.totalCount ?? 0;
 
-  const evaluators = evaluatee?.submissions
-    ?? evaluatee?.responses
-    ?? evaluatee?.evaluatorResponses
-    ?? evaluatee?.evaluators
-    ?? [];
-
-  // auto-select first submitted evaluator
-  useEffect(() => {
-    if (evaluators.length > 0) {
-      const first = evaluators.find((e) => e.submittedAt || e.submitted) ?? evaluators[0];
-      setSelectedEv(first ?? null);
-    } else {
-      setSelectedEv(null);
-    }
-  }, [allResults, userId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const evaluateeName = evaluatee?.evaluateeName ?? evaluatee?.name ?? 'Unknown';
-  const submittedCount = evaluatee?.submittedResponses ?? 0;
-  const totalCount = evaluatee?.totalResponses ?? 0;
-
-  /* ── Render ── */
   return (
     <div className="erp-page animate-page">
 
@@ -141,7 +112,7 @@ export default function EvaluateeResultsPage() {
           <div className="erp-header">
             <Skeleton variant="title" width="55%" height="22px" />
             <div style={{ display:'flex', gap:8, marginTop:8 }}>
-              <Skeleton variant="text" width="100px" height="10px" />
+              <Skeleton variant="text" width="120px" height="10px" />
               <Skeleton variant="text" width="80px" height="10px" />
             </div>
           </div>
@@ -169,19 +140,16 @@ export default function EvaluateeResultsPage() {
       )}
 
       {!loading && error && <div className="erp-state erp-state--error">{error}</div>}
-      {!loading && !error && !evaluatee && (
-        <div className="erp-state">Evaluatee not found for this evaluation.</div>
-      )}
 
-      {!loading && !error && evaluatee && (
+      {!loading && !error && data && (
         <>
           {/* Header */}
           <div className="erp-header">
             <h1 className="erp-title">{meta?.title ?? `Evaluation #${id}`}</h1>
             <div className="erp-meta">
-              <span>{evaluateeName}</span>
+              <span>Evaluatee: {evaluateeName}</span>
               <span className="erp-meta-sep">·</span>
-              <span>{submittedCount} response{submittedCount !== 1 ? 's' : ''}</span>
+              <span>{submittedCount} of {totalCount} evaluations submitted</span>
             </div>
           </div>
 
@@ -192,45 +160,32 @@ export default function EvaluateeResultsPage() {
             <div className="erp-left">
               <div className="erp-left-label">Evaluators</div>
               {evaluators.length === 0 ? (
-                <div className="erp-state" style={{ padding:'24px 0' }}>No evaluators assigned.</div>
+                <div className="erp-state" style={{ padding:'24px 0', fontSize:12 }}>No evaluators assigned.</div>
               ) : (
                 evaluators.map((ev) => {
-                  const name = ev.evaluatorName ?? ev.name ?? ev.displayName ?? 'Unknown';
-                  const key = ev.evaluatorId ?? ev.userId ?? ev.id ?? name;
-                  const submitted = Boolean(ev.submittedAt || ev.submitted);
-                  const avg = Number(ev.overallAverage ?? ev.average ?? 0);
-                  const color = avatarColor(name);
-                  const isSelected = selectedEv && (
-                    selectedEv === ev ||
-                    (selectedEv.evaluatorId ?? selectedEv.userId) === (ev.evaluatorId ?? ev.userId)
-                  );
-
+                  const color = avatarColor(ev.evaluatorName);
+                  const isSelected = selectedEv?.evaluatorId === ev.evaluatorId;
                   return (
                     <div
-                      key={key}
-                      className={`erp-ev-card${submitted ? ' erp-ev-submitted' : ' erp-ev-pending'}${isSelected ? ' erp-ev-selected' : ''}`}
-                      onClick={() => submitted && setSelectedEv(ev)}
+                      key={ev.evaluatorId}
+                      className={`erp-ev-card${ev.submitted ? ' erp-ev-submitted' : ' erp-ev-pending'}${isSelected ? ' erp-ev-selected' : ''}`}
+                      onClick={() => ev.submitted && setSelectedEv(ev)}
                     >
-                      {/* Avatar */}
                       <div
                         className="erp-ev-avatar"
                         style={{ background: `${color}22`, color, border: `1.5px solid ${color}44` }}
                       >
-                        {initials(name)}
+                        {initials(ev.evaluatorName)}
                       </div>
-
-                      {/* Info */}
                       <div className="erp-ev-info">
-                        <div className="erp-ev-name">{name}</div>
-                        <div className={`erp-ev-tag${submitted ? ' erp-ev-tag--done' : ''}`}>
-                          {submitted ? '✓ Submitted' : 'Pending'}
+                        <div className="erp-ev-name">{ev.evaluatorName}</div>
+                        <div className={`erp-ev-tag${ev.submitted ? ' erp-ev-tag--done' : ''}`}>
+                          {ev.submitted ? '✓ Submitted' : 'Pending'}
                         </div>
                       </div>
-
-                      {/* Score */}
-                      {submitted && avg > 0 && (
+                      {ev.submitted && ev.overallAverage > 0 && (
                         <div className="erp-ev-score" style={{ color }}>
-                          {avg.toFixed(1)}
+                          {ev.overallAverage.toFixed(1)}
                         </div>
                       )}
                     </div>
@@ -239,62 +194,77 @@ export default function EvaluateeResultsPage() {
               )}
             </div>
 
-            {/* ── RIGHT: result panel ── */}
+            {/* ── RIGHT: detail panel ── */}
             <div className="erp-right">
-              {!selectedEv ? (
-                /* Empty state — no evaluator selected */
+              {!selectedEv || !selectedEv.submitted ? (
                 <div className="erp-right-empty">
                   <div className="erp-right-empty-icon"><IcoChart /></div>
                   <div className="erp-right-empty-txt">Select an evaluator to view their submission</div>
                 </div>
               ) : (
-                /* Selected evaluator detail */
                 <div className="erp-detail">
 
-                  {/* Summary boxes */}
-                  <div className="erp-summary-row">
-                    <div className="erp-summary-box">
-                      <div className="erp-summary-label">Overall Score</div>
-                      <div className="erp-summary-val erp-summary-val--blue">
-                        {toFixed(selectedEv.overallAverage ?? selectedEv.average, 2)}
-                      </div>
-                      <div className="erp-summary-sub">out of 5.0</div>
+                  {/* Evaluator header */}
+                  <div className="erp-detail-head">
+                    <div
+                      className="erp-detail-avatar"
+                      style={{
+                        background: `${avatarColor(selectedEv.evaluatorName)}22`,
+                        color: avatarColor(selectedEv.evaluatorName),
+                        border: `1.5px solid ${avatarColor(selectedEv.evaluatorName)}44`,
+                      }}
+                    >
+                      {initials(selectedEv.evaluatorName)}
                     </div>
-                    <div className="erp-summary-box">
-                      <div className="erp-summary-label">Evaluation Progress</div>
-                      <div className="erp-summary-val erp-summary-val--blue">
-                        {submittedCount}
+                    <div className="erp-detail-info">
+                      <div className="erp-detail-name">{selectedEv.evaluatorName}</div>
+                      <div className="erp-detail-sub">
+                        Submitted evaluation
+                        {selectedEv.submittedAt && (
+                          <> · Evaluating {evaluateeName}</>
+                        )}
                       </div>
-                      <div className="erp-summary-sub">of {totalCount} submitted</div>
+                    </div>
+                    <div className="erp-detail-score-hero">
+                      <div className="erp-detail-score-num">
+                        {toFixed(selectedEv.overallAverage, 1)}
+                      </div>
+                      <div className="erp-detail-score-denom">out of 5.0</div>
                     </div>
                   </div>
 
-                  {/* Criteria breakdown */}
-                  <div className="erp-crit-section">
-                    <div className="erp-crit-label">Criteria Breakdown</div>
-                    <div className="erp-crit-list">
-                      {(selectedEv.criteriaRatings ?? selectedEv.ratings ?? evaluatee.criteriaAverages ?? []).map((r, i) => {
-                        const score = Number(r.score ?? r.average ?? r ?? 0);
-                        const label = r.criteriaName ?? CRITERIA_FALLBACK[(r.criteriaId ?? i + 1) - 1] ?? `Criteria ${i + 1}`;
-                        const color = CRITERIA_COLORS[i % CRITERIA_COLORS.length];
-                        return (
-                          <div className="erp-crit-row" key={i}>
-                            <div className="erp-crit-name">{label}</div>
-                            <DotTrack score={score} color={color} />
-                            <div className="erp-crit-score" style={{ color }}>
-                              {score > 0 ? score.toFixed(1) : '—'}
+                  {/* Criteria scores — 2-column grid */}
+                  {selectedEv.criteriaRatings?.length > 0 && (
+                    <div className="erp-crit-section">
+                      <div className="erp-crit-label">Criteria Scores</div>
+                      <div className="erp-crit-grid">
+                        {selectedEv.criteriaRatings.map((r, i) => {
+                          const color = CRITERIA_COLORS[i % CRITERIA_COLORS.length];
+                          return (
+                            <div className="erp-crit-row" key={r.criteriaId ?? i}>
+                              <div className="erp-crit-num"
+                                style={{ background: `${color}22`, color }}>
+                                {String(r.criteriaId ?? i + 1).padStart(2, '0')}
+                              </div>
+                              <div className="erp-crit-name">{r.criteriaName}</div>
+                              <DotTrack score={r.score} color={color} />
+                              <div className="erp-crit-score" style={{ color }}>
+                                {r.score ?? '—'}
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Comment */}
+                  {/* Peer comment */}
                   {selectedEv.comment && (
-                    <div className="erp-comment">
-                      <div className="erp-comment-label">Peer Comment</div>
-                      <div className="erp-comment-text">"{selectedEv.comment}"</div>
+                    <div className="erp-comment-section">
+                      <div className="erp-crit-label">Peer Comment</div>
+                      <div className="erp-comment">
+                        <div className="erp-comment-text">"{selectedEv.comment}"</div>
+                      </div>
                     </div>
                   )}
 
