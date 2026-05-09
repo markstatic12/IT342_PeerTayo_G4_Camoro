@@ -228,18 +228,31 @@
   font-size: 12px;
   font-weight: 700;
   color: #64748b;
-  background: none;
-  border: none;
-  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
   cursor: pointer;
-  transition: color 150ms, background 150ms;
+  transition: color 150ms, background 150ms, border-color 150ms, box-shadow 150ms, transform 150ms;
   white-space: nowrap;
 }
-.fc-tab:hover { color: #94a3b8; }
+.fc-tab:hover {
+  color: #dbeafe;
+  background: rgba(59,130,246,0.08);
+  border-color: rgba(59,130,246,0.18);
+}
 .fc-tab.active {
-  background: #1e293b;
-  color: #f8fafc;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  color: #60a5fa;
+  background: rgba(59,130,246,0.16);
+  border-color: rgba(59,130,246,0.45);
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.22) inset, 0 4px 12px rgba(59,130,246,0.12);
+}
+.fc-tab.active:hover {
+  color: #93c5fd;
+  background: rgba(59,130,246,0.2);
+  border-color: rgba(59,130,246,0.55);
+}
+.fc-tab:active {
+  transform: translateY(1px);
 }
 
 .fc-archives-btn {
@@ -255,6 +268,42 @@
   transition: color 150ms, border-color 150ms;
 }
 .fc-archives-btn:hover { color: #94a3b8; border-color: rgba(255,255,255,0.14); }
+
+/* Active state — highlighted orange */
+.fc-archives-btn.active {
+  color: #f97316; /* orange */
+  border-color: rgba(249,115,22,0.6);
+  background: rgba(249,115,22,0.06);
+  box-shadow: 0 0 0 4px rgba(249,115,22,0.06) inset, 0 6px 18px rgba(249,115,22,0.06);
+}
+
+.fc-archives-btn.active:hover {
+  color: #ff8a3c;
+  border-color: rgba(249,115,22,0.8);
+}
+
+.fc-archives-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  color: #94a3b8;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.fc-archives-btn.active .fc-archives-count {
+  color: #fed7aa;
+  background: rgba(249,115,22,0.14);
+  border-color: rgba(249,115,22,0.35);
+}
 
 /* ══════════════════════════════════════════════════════════════════════
    CARD LIST — replaces plain table
@@ -514,6 +563,22 @@
   border-color: #ef4444;
   color: #fff;
   transform: translateY(-1px);
+}
+
+/* Disabled state for small icon buttons */
+.fc-icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.04);
+  color: #475569;
+  transform: none;
+}
+.fc-icon-btn:disabled:hover {
+  /* prevent hover lift and color change when disabled */
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.04);
+  color: #475569;
 }
 
 /* ══════════════════════════════════════════════════════════════════════

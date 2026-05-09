@@ -26,6 +26,54 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.nd-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nd-tab-row {
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.nd-tabs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+  padding: 6px 10px;
+  border-radius: 8px;
+  flex: 1;
+  text-align: center;
+  box-sizing: border-box;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94a3b8;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms, color 150ms, border-color 150ms;
+}
+
+.nd-tab:hover { background: rgba(255,255,255,0.02); color: #f1f5f9; }
+
+.nd-tab.active { background: rgba(59,130,246,0.12); color: #60a5fa; border-color: rgba(59,130,246,0.18); }
+
+.nd-header-actions { display: flex; gap: 8px; align-items: center; }
+
+.nd-clear-read {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #94a3b8;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.nd-clear-read:hover { background: rgba(255,255,255,0.02); color: #f1f5f9; }
+
 .nd-title {
   font-size: 14px;
   font-weight: 700;
@@ -62,26 +110,40 @@
   border-radius: 2px;
 }
 
-.nd-item {
+.nd-tabs {
   display: flex;
-  gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  transition: background 0.2s;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+}
+
+.nd-tab {
+  background: rgba(255,255,255,0.01); /* very subtle dark pill */
+  border: 1px solid transparent;
+  color: #94a3b8;
+  padding: 6px 10px;
+  border-radius: 8px;
+  flex: 1;
+  text-align: center;
+  box-sizing: border-box;
+  font-weight: 700;
   cursor: pointer;
-  position: relative;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background 160ms, color 160ms, border-color 160ms, transform 120ms;
 }
 
-.nd-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+.nd-tab:hover { background: rgba(255,255,255,0.02); color: #e6f4ff; }
+
+/* Active: clear blue filled pill with high contrast text */
+.nd-tab.active {
+  background: linear-gradient(180deg, rgba(59,130,246,0.20), rgba(59,130,246,0.14));
+  color: #e6f4ff;
+  border-color: rgba(59,130,246,0.28);
+  box-shadow: 0 6px 18px rgba(59,130,246,0.06);
 }
 
-.nd-item--unread {
-  background: rgba(59, 130, 246, 0.03);
-}
-
-.nd-item--loading {
-  cursor: default;
+.nd-tab:focus { outline: none; box-shadow: none; }
 }
 
 .nd-item--loading:hover {
@@ -156,6 +218,61 @@
   background: rgba(255, 255, 255, 0.06);
   color: #f1f5f9;
 }
+
+/* sliding underline indicator */
+.nd-tabs { position: relative; }
+.nd-tab-indicator {
+  position: absolute;
+  bottom: 4px; /* closer to the label */
+  height: 2px;  /* thinner */
+  background: linear-gradient(90deg,#7fc3ff,#4f9cf7);
+  border-radius: 2px;
+  transition: left 260ms cubic-bezier(0.22,1,0.36,1), width 260ms cubic-bezier(0.22,1,0.36,1);
+  will-change: left, width;
+  pointer-events: none;
+}
+
+/* User preference: hide sliding underline entirely */
+.nd-tab-indicator { display: none !important; }
+
+/* New-notification highlight animation */
+.nd-item.nd-item--new {
+  animation: nd-new-entrance 520ms cubic-bezier(0.22,1,0.36,1);
+}
+
+@keyframes nd-new-entrance {
+  0% { transform: translateX(8px); opacity: 0; box-shadow: 0 0 0 rgba(59,130,246,0); }
+  60% { transform: translateX(0); opacity: 1; box-shadow: 0 8px 24px rgba(59,130,246,0.06); }
+  100% { transform: translateX(0); opacity: 1; box-shadow: none; }
+}
+
+/* Undo strip */
+.nd-undo {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 64px;
+  background: rgba(17,24,39,0.96);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 8px 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+
+.nd-undo button {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #94a3b8;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.nd-undo button:hover { background: rgba(255,255,255,0.02); color: #f1f5f9; }
 
 /* ── Unread count badge in header ───────────────────────────────────── */
 .nd-count {

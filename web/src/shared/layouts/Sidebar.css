@@ -102,12 +102,47 @@
 
 /* Orange dot badge on Pending Evaluations */
 .sidebar__dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #f97316;
   margin-left: auto;
   flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 0 0 rgba(249,115,22,0.0);
+}
+
+/* pulsing ring to indicate live pending items */
+.sidebar__dot::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 0 0 rgba(249,115,22,0.35);
+  animation: sidebar-dot-pulse 1.8s ease-out infinite;
+}
+
+@keyframes sidebar-dot-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 0 0 rgba(249,115,22,0.35);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(2.6);
+    box-shadow: 0 0 0 8px rgba(249,115,22,0.08);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.6);
+    box-shadow: 0 0 0 8px rgba(249,115,22,0);
+    opacity: 0;
+  }
 }
 
 

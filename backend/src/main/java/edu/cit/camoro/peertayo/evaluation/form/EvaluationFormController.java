@@ -49,6 +49,15 @@ public class EvaluationFormController {
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('FACILITATOR')")
+    public ResponseEntity<ApiResponse<Map<String, CreatedEvaluationListItemResponse>>> getOne(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        CreatedEvaluationListItemResponse data = evaluationFormService.getById(id, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("evaluation", data)));
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('FACILITATOR')")
     public ResponseEntity<ApiResponse<Map<String, CreatedEvaluationListItemResponse>>> update(
