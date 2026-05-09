@@ -125,6 +125,44 @@ public class EvaluationFormService {
     }
 
     @Transactional(readOnly = true)
+    public EvaluationParticipantsResponse getParticipants(Long id, String email) {
+        User creator = getUser(email);
+        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
+                .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+
+        List<EvaluationAssignment> assignments = evaluationAssignmentRepository.findAllByEvaluation(ev);
+
+        // Distinct evaluators
+        List<EvaluationParticipantsResponse.Participant> evaluators = assignments.stream()
+                .map(EvaluationAssignment::getEvaluator)
+                .distinct()
+                .map(u -> EvaluationParticipantsResponse.Participant.builder()
+                        .id(u.getId())
+                        .firstName(u.getFirstName())
+                        .lastName(u.getLastName())
+                        .email(u.getEmail())
+                        .build())
+                .toList();
+
+        // Distinct evaluatees
+        List<EvaluationParticipantsResponse.Participant> evaluatees = assignments.stream()
+                .map(EvaluationAssignment::getEvaluatee)
+                .distinct()
+                .map(u -> EvaluationParticipantsResponse.Participant.builder()
+                        .id(u.getId())
+                        .firstName(u.getFirstName())
+                        .lastName(u.getLastName())
+                        .email(u.getEmail())
+                        .build())
+                .toList();
+
+        return EvaluationParticipantsResponse.builder()
+                .evaluators(evaluators)
+                .evaluatees(evaluatees)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     public List<CreatedEvaluationListItemResponse> getCreated(String email) {
         User creator = getUser(email);
         return evaluationFormRepository.findAllByCreatedByOrderByCreatedAtDesc(creator)

@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   listCreatedEvaluations,
-  updateEvaluation,
+  archiveEvaluation,
   deleteEvaluation,
 } from './evaluationFormService';
 import Skeleton from '../../../shared/components/ui/Skeleton';
+import ExitConfirmModal from '../../../shared/components/ui/ExitConfirmModal';
 import './FormsCreatedPage.css';
 
 /* ── Helpers ──────────────────────────────────────────────────────────── */
@@ -164,105 +165,38 @@ function IconArchive() {
   );
 }
 
-/* ── Edit Modal ───────────────────────────────────────────────────────── */
-function EditModal({ evaluation, onClose, onSaved }) {
-  const [form, setForm] = useState({
-    title: evaluation.title ?? '',
-    description: evaluation.description ?? '',
-    deadline: toDatetimeLocal(evaluation.deadline),
-    status: evaluation.status ?? 'ACTIVE',
-  });
-  const [evaluatorSearch, setEvaluatorSearch] = useState('');
-  const [evaluateeSearch, setEvaluateeSearch] = useState('');
-  const [saving, setSaving] = useState(false);
+/* ── Archive Confirm Modal ────────────────────────────────────────────── */
+function ArchiveModal({ evaluation, onClose, onArchived }) {
+  const [archiving, setArchiving] = useState(false);
   const [error, setError] = useState('');
 
-  const update = (field) => (e) => setForm((p) => ({ ...p, [field]: e.target.value }));
-
-  const handleSave = async () => {
-    if (!form.title.trim() || !form.description.trim() || !form.deadline) {
-      setError('Title, description, and deadline are required.');
-      return;
-    }
-    setSaving(true);
+  const handleArchive = async () => {
+    setArchiving(true);
     setError('');
     try {
-      const updated = await updateEvaluation(evaluation.id, {
-        title: form.title,
-        description: form.description,
-        deadline: form.deadline.replace('T', 'T').slice(0, 16) + ':00',
-        status: form.status,
-      });
-      onSaved(updated ?? { ...evaluation, ...form });
+      await archiveEvaluation(evaluation);
+      onArchived(evaluation.id);
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Failed to update evaluation.');
-    } finally {
-      setSaving(false);
+      setError(err.response?.data?.error?.message || 'Failed to archive evaluation.');
+      setArchiving(false);
     }
   };
 
   return (
     <div className="fc-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="fc-modal">
-        <div className="fc-modal__head">
-          <div>
-            <div className="fc-modal__title">Edit Evaluation</div>
-            <div className="fc-modal__sub">Update form details and participants</div>
-          </div>
-          <button className="fc-modal__close" type="button" onClick={onClose}><IconX /></button>
+      <div className="fc-modal fc-modal--sm">
+        <div className="fc-delete-icon" style={{ background:'rgba(59,130,246,0.1)', border:'1px solid rgba(59,130,246,0.2)', color:'#60a5fa' }}>
+          <IconArchive />
         </div>
-
-        <div className="fc-modal__body">
-          {error && <div className="fc-modal__error">{error}</div>}
-
-          <div className="fc-modal__section-label">Evaluation Details</div>
-
-          <div className="fc-form-row">
-            <div className="fc-form-group">
-              <label className="fc-label">Evaluation Title <span className="fc-req">*</span></label>
-              <input className="fc-input" type="text" value={form.title} onChange={update('title')} />
-            </div>
-            <div className="fc-form-group">
-              <label className="fc-label">Deadline <span className="fc-req">*</span></label>
-              <input className="fc-input" type="datetime-local" value={form.deadline} onChange={update('deadline')} />
-            </div>
-          </div>
-
-          <div className="fc-form-group" style={{ marginBottom: 14 }}>
-            <label className="fc-label">Description <span className="fc-req">*</span></label>
-            <textarea className="fc-input fc-textarea" value={form.description} onChange={update('description')} />
-          </div>
-
-          <div className="fc-rule-note">
-            <IconInfo />
-            <p><strong>Assignment rules:</strong> A user cannot be both evaluator and evaluatee in the same evaluation.</p>
-          </div>
-
-          <div className="fc-modal__section-label">Assign Participants</div>
-          <div className="fc-people-grid">
-            <div className="fc-people-box">
-              <div className="fc-label">Evaluators <span className="fc-req">*</span></div>
-              <div className="fc-search-wrap">
-                <IconSearch />
-                <input type="text" placeholder="Search by name or email…"
-                  value={evaluatorSearch} onChange={(e) => setEvaluatorSearch(e.target.value)} />
-              </div>
-            </div>
-            <div className="fc-people-box">
-              <div className="fc-label">Evaluatees <span className="fc-req">*</span></div>
-              <div className="fc-search-wrap">
-                <IconSearch />
-                <input type="text" placeholder="Search by name or email…"
-                  value={evaluateeSearch} onChange={(e) => setEvaluateeSearch(e.target.value)} />
-              </div>
-            </div>
-          </div>
+        <div className="fc-delete-title">Archive this evaluation?</div>
+        <div className="fc-delete-body">
+          The form will be marked as Archived and hidden from the active list. Submitted responses are preserved.
         </div>
-
-        <div className="fc-modal__foot">
+        {error && <div className="fc-modal__error">{error}</div>}
+        <div className="fc-modal__foot fc-modal__foot--center">
           <button className="fc-btn fc-btn-ghost" type="button" onClick={onClose}>Cancel</button>
-          <button className="fc-btn fc-btn-primary" type="button" onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving…' : 'Update Evaluation'}
+          <button className="fc-btn fc-btn-primary" type="button" onClick={handleArchive} disabled={archiving}>
+            {archiving ? 'Archiving…' : 'Yes, Archive'}
           </button>
         </div>
       </div>
@@ -321,7 +255,7 @@ export default function FormsCreatedPage() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('All');
-  const [editTarget, setEditTarget] = useState(null);
+  const [archiveTarget, setArchiveTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   useEffect(() => {
@@ -360,9 +294,11 @@ export default function FormsCreatedPage() {
   });
 
   /* ── Handlers ───────────────────────────────────────────────────────── */
-  const handleSaved = (updated) => {
-    setEvaluations((prev) => prev.map((e) => (e.id === updated.id ? { ...e, ...updated } : e)));
-    setEditTarget(null);
+  const handleArchived = (id) => {
+    setEvaluations((prev) => prev.map((e) =>
+      e.id === id ? { ...e, status: 'ARCHIVED' } : e
+    ));
+    setArchiveTarget(null);
   };
 
   const handleDeleted = (id) => {
@@ -532,11 +468,12 @@ export default function FormsCreatedPage() {
                   onClick={() => navigate(`/forms-created/${ev.id}/results`)}>
                   <IconChevronRight />
                 </button>
-                <button className="fc-icon-btn fc-icon-btn--archive" type="button" title="Archive">
+                <button className="fc-icon-btn fc-icon-btn--archive" type="button" title="Archive"
+                  onClick={() => setArchiveTarget(ev)}>
                   <IconArchive />
                 </button>
                 <button className="fc-icon-btn fc-icon-btn--edit" type="button" title="Edit"
-                  onClick={() => setEditTarget(ev)}>
+                  onClick={() => navigate(`/forms-created/${ev.id}/edit`, { state: { evaluation: ev } })}>
                   <IconEdit />
                 </button>
                 <button className="fc-icon-btn fc-icon-btn--danger" type="button" title="Delete"
@@ -550,11 +487,11 @@ export default function FormsCreatedPage() {
       </div>
 
       {/* ── Modals ──────────────────────────────────────────────────── */}
-      {editTarget && (
-        <EditModal
-          evaluation={editTarget}
-          onClose={() => setEditTarget(null)}
-          onSaved={handleSaved}
+      {archiveTarget && (
+        <ArchiveModal
+          evaluation={archiveTarget}
+          onClose={() => setArchiveTarget(null)}
+          onArchived={handleArchived}
         />
       )}
       {deleteTarget && (

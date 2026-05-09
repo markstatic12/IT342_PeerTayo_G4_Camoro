@@ -7,6 +7,11 @@ export async function getEvaluationResults(id) {
   return response.data?.data;
 }
 
+export async function getEvaluateeSubmissions(evaluationId, evaluateeId) {
+  const response = await api.get(`${basePath}/${evaluationId}/results/${evaluateeId}/submissions`);
+  return response.data?.data;
+}
+
 export async function getMyResults() {
   const response = await api.get(`${basePath}/my-results`);
   return response.data?.data?.results;
