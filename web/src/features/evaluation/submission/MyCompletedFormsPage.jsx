@@ -125,6 +125,7 @@ export default function MyCompletedFormsPage() {
   const forms = useMemo(() => completed?.forms ?? [], [completed]);
 
   const filteredForms = useMemo(() => {
+    const now = Date.now();
     const q = search.trim().toLowerCase();
     let list = forms.filter((f) => {
       if (showArchived) {
@@ -136,7 +137,7 @@ export default function MyCompletedFormsPage() {
       if (filter === 'week') {
         const d = f.submittedAt ? new Date(f.submittedAt) : null;
         if (!d) return false;
-        const diff = (Date.now() - d.getTime()) / (1000 * 60 * 60 * 24);
+        const diff = (now - d.getTime()) / (1000 * 60 * 60 * 24);
         return diff <= 7;
       }
       return true;
