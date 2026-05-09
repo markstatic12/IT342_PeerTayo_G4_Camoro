@@ -253,7 +253,7 @@
   font-size: 11px;
   font-weight: 600;
   color: #94a3b8;
-  font-family: var(--font-family);
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .sc-delta {
@@ -313,7 +313,7 @@
 
 .ac-title {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #f8fafc;
 }
@@ -490,7 +490,7 @@
 
 .act-title {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #f8fafc;
 }
@@ -681,17 +681,19 @@
 }
 
 .db-upgrade-title {
-  font-size: 1.2rem;
+  font-size: 18px;
   font-weight: 700;
   color: #f1f5f9;
   margin-bottom: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .db-upgrade-body {
-  font-size: 0.875rem;
+  font-size: 13px;
   color: #8b99b5;
   line-height: 1.6;
   margin-bottom: 20px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .db-upgrade-body strong {
@@ -699,9 +701,10 @@
 }
 
 .db-upgrade-error {
-  font-size: 0.8rem;
+  font-size: 12px;
   color: #ef4444;
   margin-bottom: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .db-upgrade-actions {
@@ -713,11 +716,12 @@
 .db-upgrade-btn {
   padding: 9px 20px;
   border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
   border: none;
   transition: opacity 0.15s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .db-upgrade-btn:disabled {

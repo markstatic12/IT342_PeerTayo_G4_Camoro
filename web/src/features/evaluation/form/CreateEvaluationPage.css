@@ -33,7 +33,7 @@
 
 .ce-title {
   font-family: 'Syne', sans-serif;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 800;
   color: #f8fafc;
   letter-spacing: -0.4px;
@@ -87,7 +87,7 @@
   border-bottom: 2px solid transparent;
   cursor: pointer;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #64748b;
   transition: color 0.15s, background 0.15s, border-color 0.15s;
@@ -216,7 +216,7 @@
 
 /* ── Section headings inside panels ────────────────────────────────── */
 .ce-section-head { margin-bottom: 0; }
-.ce-section-title { font-size: 13px; font-weight: 800; color: #f8fafc; }
+.ce-section-title { font-size: 15px; font-weight: 800; color: #f8fafc; }
 .ce-section-sub   { font-size: 11px; color: #64748b; margin-top: 2px; }
 
 /* ── Fields ─────────────────────────────────────────────────────────── */
@@ -227,7 +227,7 @@
 }
 
 .ce-label {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   color: #94a3b8;
   display: flex;
@@ -717,7 +717,7 @@
   padding: 9px 20px;
   border-radius: 8px;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   border: none;

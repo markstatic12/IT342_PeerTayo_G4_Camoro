@@ -106,7 +106,7 @@
   outline: none;
   font-size: 12px;
   color: var(--pe-text);
-  font-family: var(--font-family);
+  font-family: 'Plus Jakarta Sans', sans-serif;
   width: 100%;
 }
 .search-box input::placeholder {
@@ -180,7 +180,7 @@
   font-size: 11px;
   font-weight: 600;
   color: #94a3b8;
-  font-family: var(--font-family);
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 .sum-delta {
   display: inline-flex;
@@ -191,7 +191,7 @@
   padding: 2px 7px;
   border-radius: 4px;
   width: fit-content;
-  font-family: var(--font-family);
+  font-family: 'Plus Jakarta Sans', sans-serif;
   margin-top: 2px;
 }
 /* Pill variants — mirror dashboard .d-warn, .d-up */
@@ -673,8 +673,8 @@
   gap: 6px;
   padding: 7px 14px;
   border-radius: 7px;
-  font-family: var(--font-family);
-  font-size: 11.5px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   border: none;

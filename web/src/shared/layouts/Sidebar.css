@@ -54,7 +54,7 @@
   letter-spacing: 1.4px;
   padding: 12px 8px 5px;
   display: block;
-  font-family: var(--font-family);
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .sidebar__link {
@@ -69,7 +69,7 @@
   transition: all 150ms ease;
   text-decoration: none;
   margin-bottom: 1px;
-  font-family: var(--font-family);
+  font-family: 'Plus Jakarta Sans', sans-serif;
   border: 1px solid transparent;
   /* button reset */
   background: none;
@@ -176,7 +176,7 @@
   width: 100%;
   text-align: left;
   text-decoration: none;
-  font-family: var(--font-family);
+  font-family: 'Plus Jakarta Sans', sans-serif;
   margin-bottom: 1px;
 }
 
@@ -217,7 +217,7 @@
   font-size: 10px;
   font-weight: 600;
   color: #cbd5e1;
-  font-family: var(--font-family);
+  font-family: 'Plus Jakarta Sans', sans-serif;
   line-height: 1.4;
 }
 
@@ -229,7 +229,7 @@
   font-size: 9.5px;
   color: #64748b;
   margin-top: 1px;
-  font-family: var(--font-family);
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 /* ── Logout modal overlay ───────────────────────────────────────────── */
