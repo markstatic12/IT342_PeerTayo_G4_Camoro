@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/context/AuthContext';
-import { createEvaluation } from './evaluationFormService';
+import { createEvaluation, updateEvaluation, getEvaluationParticipants } from './evaluationFormService';
 import { searchUsers } from '../../user/search/userService';
 import { useNavigationGuard } from '../../../shared/context/NavigationGuardContext';
 import ExitConfirmModal from '../../../shared/components/ui/ExitConfirmModal';
@@ -384,11 +384,27 @@ function ParticipantBox({ label, color, selectedIds, options, search, onSearch, 
 /* ══════════════════════════════════════════════════════════════════════ */
 export default function CreateEvaluationPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { id: editId } = useParams();
   const { user: currentUser } = useAuth();
   const { registerGuard, clearGuard } = useNavigationGuard();
 
+  // Edit mode: evaluation passed via route state
+  const editEvaluation = location.state?.evaluation ?? null;
+  const isEditMode = !!editId && !!editEvaluation;
+
   const [tab, setTab] = useState(1);
-  const [form, setForm] = useState({ title: '', deadline: '', description: '' });
+  const [form, setForm] = useState({
+    title: editEvaluation?.title ?? '',
+    deadline: editEvaluation?.deadline
+      ? (() => {
+          const d = new Date(editEvaluation.deadline);
+          const pad = (n) => String(n).padStart(2, '0');
+          return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        })()
+      : '',
+    description: editEvaluation?.description ?? '',
+  });
   const [errors, setErrors] = useState({});
   const [exitModal, setExitModal] = useState({ open: false, path: '' });
 
@@ -464,6 +480,29 @@ export default function CreateEvaluationPage() {
     return () => { alive = false; };
   }, [currentUser?.id]);
 
+  /* in edit mode — pre-populate evaluator/evaluatee chips from backend */
+  useEffect(() => {
+    if (!isEditMode) return;
+    let alive = true;
+    (async () => {
+      try {
+        const participants = await getEvaluationParticipants(editId);
+        if (!alive) return;
+        const evrs = participants?.evaluators ?? [];
+        const eves = participants?.evaluatees ?? [];
+        // merge into usersById so chips can resolve names
+        setUsersById((prev) => {
+          const merged = { ...prev };
+          [...evrs, ...eves].forEach((u) => { merged[u.id] = u; });
+          return merged;
+        });
+        setEvaluatorIds(evrs.map((u) => u.id));
+        setEvaluateeIds(eves.map((u) => u.id));
+      } catch { /* ignore — chips stay empty */ }
+    })();
+    return () => { alive = false; };
+  }, [isEditMode, editId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const updateField = (field) => (e) => {
     setForm((p) => ({ ...p, [field]: e.target.value }));
     setErrors((p) => ({ ...p, [field]: '' }));
@@ -487,20 +526,29 @@ export default function CreateEvaluationPage() {
     setSaving(true);
     setApiError('');
     try {
-      await createEvaluation({
-        title: form.title,
-        description: form.description,
-        deadline: form.deadline,
-        evaluatorIds,
-        evaluateeIds,
-      });
+      if (isEditMode) {
+        await updateEvaluation(editId, {
+          title: form.title,
+          description: form.description,
+          deadline: form.deadline,
+          evaluatorIds,
+          evaluateeIds,
+        });
+      } else {
+        await createEvaluation({
+          title: form.title,
+          description: form.description,
+          deadline: form.deadline,
+          evaluatorIds,
+          evaluateeIds,
+        });
+      }
       clearGuard();
       setSubmitted(true);
-      // Navigate after 2s so the user sees the success screen
       setTimeout(() => navigate('/forms-created'), 2000);
     } catch (err) {
       const msg = err.response?.data?.error?.message
-        || (err.response?.status === 500 ? 'Server error — please restart the backend and try again.' : 'Failed to create evaluation.');
+        || (err.response?.status === 500 ? 'Server error — please restart the backend and try again.' : isEditMode ? 'Failed to update evaluation.' : 'Failed to create evaluation.');
       setApiError(msg);
     } finally {
       setSaving(false);
@@ -522,8 +570,8 @@ export default function CreateEvaluationPage() {
               <polyline points="22 4 12 14.01 9 11.01"/>
             </svg>
           </div>
-          <div className="ce-success-title">Evaluation Created!</div>
-          <div className="ce-success-sub">Your evaluation form has been saved and participants have been notified.</div>
+          <div className="ce-success-title">{isEditMode ? 'Evaluation Updated!' : 'Evaluation Created!'}</div>
+          <div className="ce-success-sub">{isEditMode ? 'Your changes have been saved successfully.' : 'Your evaluation form has been saved and participants have been notified.'}</div>
         </div>
       </div>
     );
@@ -534,10 +582,10 @@ export default function CreateEvaluationPage() {
 
       <div className="ce-header">
         <div className="ce-breadcrumb">
-          Dashboard / Forms Created / <span>Create Evaluation</span>
+          Dashboard / Forms Created / <span>{isEditMode ? 'Edit Evaluation' : 'Create Evaluation'}</span>
         </div>
-        <div className="ce-title">Create Evaluation Form</div>
-        <div className="ce-sub">Fill in the details and assign participants to launch a peer evaluation.</div>
+        <div className="ce-title">{isEditMode ? 'Edit Evaluation Form' : 'Create Evaluation Form'}</div>
+        <div className="ce-sub">{isEditMode ? 'Update the details and participants for this evaluation.' : 'Fill in the details and assign participants to launch a peer evaluation.'}</div>
       </div>
 
       <div className="ce-shell">
@@ -708,7 +756,7 @@ export default function CreateEvaluationPage() {
           </button>
         ) : (
           <button className="ce-btn ce-btn-primary" type="button" onClick={handleSubmit} disabled={saving}>
-            {saving ? 'Creating…' : 'Create Evaluation'}
+            {saving ? (isEditMode ? 'Saving…' : 'Creating…') : (isEditMode ? 'Save Changes' : 'Create Evaluation')}
           </button>
         )}
       </div>
