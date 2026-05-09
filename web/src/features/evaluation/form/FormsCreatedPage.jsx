@@ -394,10 +394,13 @@ export default function FormsCreatedPage() {
       <div className="fc-stats">
         {loading ? (
           [1,2,3,4].map((i) => (
-            <div key={i} className="fc-stat">
-              <Skeleton variant="circle" width="28px" height="28px" className="skeleton-stagger" />
-              <Skeleton variant="title" width="40px" height="24px" style={{ marginTop: 6 }} className="skeleton-stagger" />
-              <Skeleton variant="text" width="70%" height="10px" style={{ marginTop: 4 }} className="skeleton-stagger" />
+            <div key={i} className="fc-stat" style={{ pointerEvents:'none' }}>
+              <Skeleton variant="rect" width="34px" height="34px" style={{ borderRadius:8, flexShrink:0 }} />
+              <div style={{ display:'flex', flexDirection:'column', gap:4, flex:1 }}>
+                <Skeleton variant="title" width="36px" height="22px" />
+                <Skeleton variant="text" width="80px" height="10px" />
+                <Skeleton variant="text" width="60px" height="9px" />
+              </div>
             </div>
           ))
         ) : (
@@ -407,6 +410,7 @@ export default function FormsCreatedPage() {
               <div className="fc-stat__body">
                 <div className="fc-stat__val">{total}</div>
                 <div className="fc-stat__lbl">Total Forms</div>
+                <div className="fc-stat__delta">All forms</div>
               </div>
             </div>
             <div className="fc-stat fc-stat--active">
@@ -414,6 +418,7 @@ export default function FormsCreatedPage() {
               <div className="fc-stat__body">
                 <div className="fc-stat__val">{active}</div>
                 <div className="fc-stat__lbl">Active</div>
+                <div className="fc-stat__delta">Currently open</div>
               </div>
             </div>
             <div className="fc-stat fc-stat--warn">
@@ -421,6 +426,7 @@ export default function FormsCreatedPage() {
               <div className="fc-stat__body">
                 <div className="fc-stat__val">{attention}</div>
                 <div className="fc-stat__lbl">Needs Attention</div>
+                <div className="fc-stat__delta">Review required</div>
               </div>
             </div>
             <div className="fc-stat fc-stat--closed">
@@ -428,6 +434,7 @@ export default function FormsCreatedPage() {
               <div className="fc-stat__body">
                 <div className="fc-stat__val">{closed}</div>
                 <div className="fc-stat__lbl">Closed</div>
+                <div className="fc-stat__delta">No longer active</div>
               </div>
             </div>
           </>

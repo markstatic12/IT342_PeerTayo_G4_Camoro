@@ -69,7 +69,7 @@
 }
 .my-results-page .sum-card {
   flex: 1; background: var(--surface); border: 1px solid var(--border);
-  border-radius: 11px; padding: 13px 15px;
+  border-radius: 11px; padding: 17px 15px;
   display: flex; align-items: center; gap: 11px;
   position: relative; overflow: hidden;
   transition: border-color 0.15s;

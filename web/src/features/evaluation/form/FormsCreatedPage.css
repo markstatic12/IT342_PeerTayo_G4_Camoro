@@ -128,7 +128,7 @@
   background: #111827;
   border: 1px solid rgba(255,255,255,0.07);
   border-radius: 11px;
-  padding: 13px 15px;          /* matches sum-card on other pages */
+  padding: 17px 15px;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -151,7 +151,7 @@
 .fc-stat--warn::after    { background: #f97316; }
 .fc-stat--closed::after  { background: #eab308; }
 
-/* icon badge */
+/* icon badge — matches sum-icon exactly */
 .fc-stat__icon {
   width: 34px;
   height: 34px;
@@ -160,6 +160,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+.fc-stat__icon svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
 }
 .fc-stat--total  .fc-stat__icon { background: rgba(59,130,246,0.14);  color: #3b82f6; }
 .fc-stat--active .fc-stat__icon { background: rgba(34,197,94,0.12);   color: #22c55e; }
@@ -178,7 +184,6 @@
   font-size: 24px;
   font-weight: 900;
   line-height: 1;
-  letter-spacing: -1px;
 }
 .fc-stat--total  .fc-stat__val { color: #3b82f6; }
 .fc-stat--active .fc-stat__val { color: #22c55e; }
@@ -189,6 +194,13 @@
   font-size: 11px;
   font-weight: 600;
   color: #94a3b8;
+}
+
+.fc-stat__delta {
+  font-size: 10px;
+  font-weight: 700;
+  color: #4a5568;
+  margin-top: 1px;
 }
 
 /* ── Tabs bar ───────────────────────────────────────────────────────── */

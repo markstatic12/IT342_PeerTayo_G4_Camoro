@@ -34,7 +34,7 @@
 .completed-forms-page .search-box input::placeholder{color:var(--dim);}
 
 .completed-forms-page .summary-strip{display:flex;gap:10px;flex-shrink:0;}
-.completed-forms-page .sum-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px;position:relative;overflow:hidden;transition:border-color .15s;}
+.completed-forms-page .sum-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:17px 15px;display:flex;align-items:center;gap:11px;position:relative;overflow:hidden;transition:border-color .15s;}
 .completed-forms-page .sum-card:hover{border-color:var(--border-hi);}
 .completed-forms-page .sum-card::after{content:'';position:absolute;top:0;left:12px;right:12px;height:2px;border-radius:0 0 2px 2px;}
 .completed-forms-page .sum-card.s-green::after{background:var(--green);} 
