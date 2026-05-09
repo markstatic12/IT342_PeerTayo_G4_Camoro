@@ -16,9 +16,6 @@ export default function NotificationDropdown({ isOpen, onClose, onCountChange })
   const prevIdsRef = useRef(new Set());
   const [newIds, setNewIds] = useState([]);
   const dropdownRef = useRef(null);
-  const tabsContainerRef = useRef(null);
-  const tabsRef = useRef({});
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const navigate = useNavigate();
 
   /* ── Fetch when opened ── */
@@ -59,20 +56,7 @@ export default function NotificationDropdown({ isOpen, onClose, onCountChange })
     return undefined;
   }, [notifications]);
 
-  // Position the sliding underline indicator under the active tab
-  useEffect(() => {
-    const setPos = () => {
-      const container = tabsContainerRef.current;
-      const activeEl = tabsRef.current[activeTab];
-      if (!container || !activeEl) return;
-      const cRect = container.getBoundingClientRect();
-      const aRect = activeEl.getBoundingClientRect();
-      setIndicatorStyle({ left: aRect.left - cRect.left, width: aRect.width });
-    };
-    const id = requestAnimationFrame(setPos);
-    window.addEventListener('resize', setPos);
-    return () => { cancelAnimationFrame(id); window.removeEventListener('resize', setPos); };
-  }, [activeTab, notifications]);
+  // Position the sliding underline indicator under the active tab — removed, using background tabs
 
   /* ── Close on outside click ── */
   useEffect(() => {
@@ -166,9 +150,8 @@ export default function NotificationDropdown({ isOpen, onClose, onCountChange })
       </div>
 
       <div className="nd-tab-row">
-        <div className="nd-tabs" ref={tabsContainerRef}>
+        <div className="nd-tabs">
           <button
-            ref={(el) => (tabsRef.current['unread'] = el)}
             type="button"
             className={`nd-tab${activeTab === 'unread' ? ' active' : ''}`}
             onClick={() => setActiveTab('unread')}
@@ -176,17 +159,12 @@ export default function NotificationDropdown({ isOpen, onClose, onCountChange })
             Unread
           </button>
           <button
-            ref={(el) => (tabsRef.current['read'] = el)}
             type="button"
             className={`nd-tab${activeTab === 'read' ? ' active' : ''}`}
             onClick={() => setActiveTab('read')}
           >
             Read
           </button>
-          <div
-            className="nd-tab-indicator"
-            style={{ left: indicatorStyle.left, width: indicatorStyle.width }}
-          />
         </div>
       </div>
 
