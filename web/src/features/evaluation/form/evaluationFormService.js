@@ -17,6 +17,11 @@ export async function updateEvaluation(id, payload) {
   return response.data?.data?.evaluation;
 }
 
+export async function getEvaluation(id) {
+  const response = await api.get(`${basePath}/${id}`);
+  return response.data?.data?.evaluation;
+}
+
 export async function archiveEvaluation(evaluation) {
   const d = new Date(evaluation.deadline);
   const pad = (n) => String(n).padStart(2, '0');

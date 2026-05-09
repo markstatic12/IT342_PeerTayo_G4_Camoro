@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/context/AuthContext';
-import { createEvaluation, updateEvaluation, getEvaluationParticipants } from './evaluationFormService';
+import { createEvaluation, updateEvaluation, getEvaluationParticipants, getEvaluation } from './evaluationFormService';
 import { searchUsers } from '../../user/search/userService';
 import { useNavigationGuard } from '../../../shared/context/NavigationGuardContext';
 import ExitConfirmModal from '../../../shared/components/ui/ExitConfirmModal';
@@ -389,9 +389,10 @@ export default function CreateEvaluationPage() {
   const { user: currentUser } = useAuth();
   const { registerGuard, clearGuard } = useNavigationGuard();
 
-  // Edit mode: evaluation passed via route state
-  const editEvaluation = location.state?.evaluation ?? null;
-  const isEditMode = !!editId && !!editEvaluation;
+  // Edit mode: evaluation may be passed via route state or loaded by id
+  const routeEvaluation = location.state?.evaluation ?? null;
+  const isEditMode = !!editId;
+  const [editEvaluation, setEditEvaluation] = useState(routeEvaluation);
 
   const [tab, setTab] = useState(1);
   const [form, setForm] = useState({
@@ -486,6 +487,24 @@ export default function CreateEvaluationPage() {
     let alive = true;
     (async () => {
       try {
+        // If evaluation data wasn't provided via route state, fetch it
+        if (!editEvaluation) {
+          const ev = await getEvaluation(editId);
+          if (!alive) return;
+          setEditEvaluation(ev);
+          // populate main fields from fetched evaluation
+          setForm((p) => ({
+            ...p,
+            title: ev?.title ?? p.title,
+            description: ev?.description ?? p.description,
+            deadline: ev?.deadline ? (() => {
+              const d = new Date(ev.deadline);
+              const pad = (n) => String(n).padStart(2, '0');
+              return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            })() : p.deadline,
+          }));
+        }
+
         const participants = await getEvaluationParticipants(editId);
         if (!alive) return;
         const evrs = participants?.evaluators ?? [];

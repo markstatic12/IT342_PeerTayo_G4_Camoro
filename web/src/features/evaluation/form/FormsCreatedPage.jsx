@@ -257,6 +257,8 @@ export default function FormsCreatedPage() {
   const [activeTab, setActiveTab] = useState('All');
   const [archiveTarget, setArchiveTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [notice, setNotice] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -280,6 +282,7 @@ export default function FormsCreatedPage() {
   const active     = evaluations.filter((e) => normalizedStatus(e) === 'ACTIVE').length;
   const attention  = evaluations.filter((e) => normalizedStatus(e) === 'NEEDS_ATTENTION').length;
   const closed     = evaluations.filter((e) => normalizedStatus(e) === 'CLOSED').length;
+  const archived   = evaluations.filter((e) => e.status?.toUpperCase() === 'ARCHIVED').length;
 
   /* ── Filtered list ──────────────────────────────────────────────────── */
   const filtered = evaluations.filter((e) => {
@@ -290,7 +293,8 @@ export default function FormsCreatedPage() {
       (activeTab === 'Closed' && status === 'CLOSED') ||
       (activeTab === 'Needs Attention' && status === 'NEEDS_ATTENTION');
     const matchesSearch = !search.trim() || e.title?.toLowerCase().includes(search.toLowerCase());
-    return matchesTab && matchesSearch;
+    const matchesArchive = showArchived ? (e.status?.toUpperCase() === 'ARCHIVED') : (e.status?.toUpperCase() !== 'ARCHIVED');
+    return matchesTab && matchesSearch && matchesArchive;
   });
 
   /* ── Handlers ───────────────────────────────────────────────────────── */
@@ -304,6 +308,19 @@ export default function FormsCreatedPage() {
   const handleDeleted = (id) => {
     setEvaluations((prev) => prev.filter((e) => e.id !== id));
     setDeleteTarget(null);
+  };
+
+  const showNotice = (msg) => {
+    setNotice(msg);
+    setTimeout(() => setNotice(''), 3000);
+  };
+
+  const handleEditClick = (ev, variant) => {
+    if (variant === 'closed') {
+      showNotice('This evaluation is closed and cannot be edited.');
+      return;
+    }
+    navigate(`/forms-created/${ev.id}/edit`, { state: { evaluation: ev } });
   };
 
   return (
@@ -333,6 +350,11 @@ export default function FormsCreatedPage() {
           </button>
         </div>
       </div>
+      {notice && (
+        <div style={{ margin: '8px 0', padding: '8px 12px', background: '#fef3c7', color: '#92400e', borderRadius: 8 }}>
+          {notice}
+        </div>
+      )}
 
       {/* ── Stats strip ─────────────────────────────────────────────── */}
       <div className="fc-stats">
@@ -399,7 +421,14 @@ export default function FormsCreatedPage() {
             </button>
           ))}
         </div>
-        <button className="fc-archives-btn" type="button">Archives</button>
+        <button
+          className={`fc-archives-btn${showArchived ? ' active' : ''}`}
+          type="button"
+          title="View archived forms"
+          onClick={() => setShowArchived((s) => !s)}
+        >
+          Archives <span className="fc-archives-count">{archived}</span>
+        </button>
       </div>
 
       {/* ── Card list ───────────────────────────────────────────────── */}
@@ -472,8 +501,13 @@ export default function FormsCreatedPage() {
                   onClick={() => setArchiveTarget(ev)}>
                   <IconArchive />
                 </button>
-                <button className="fc-icon-btn fc-icon-btn--edit" type="button" title="Edit"
-                  onClick={() => navigate(`/forms-created/${ev.id}/edit`, { state: { evaluation: ev } })}>
+                <button
+                  className="fc-icon-btn fc-icon-btn--edit"
+                  type="button"
+                  title={variant === 'closed' ? 'Cannot edit closed evaluation' : 'Edit'}
+                  onClick={() => handleEditClick(ev, variant)}
+                  disabled={variant === 'closed'}
+                >
                   <IconEdit />
                 </button>
                 <button className="fc-icon-btn fc-icon-btn--danger" type="button" title="Delete"

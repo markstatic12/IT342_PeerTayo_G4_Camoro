@@ -176,8 +176,24 @@ public class EvaluationFormService {
                 }).toList();
     }
 
-    @Transactional
-    public CreatedEvaluationListItemResponse update(Long id, UpdateEvaluationRequest request, String email) {
+        @Transactional(readOnly = true)
+        public CreatedEvaluationListItemResponse getById(Long id, String email) {
+        User creator = getUser(email);
+        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
+            .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+
+        long total = evaluationAssignmentRepository.countByEvaluation(ev);
+        long submitted = evaluationAssignmentRepository.countByEvaluationAndSubmittedTrue(ev);
+
+        return CreatedEvaluationListItemResponse.builder()
+            .id(ev.getId()).title(ev.getTitle()).deadline(ev.getDeadline())
+            .createdAt(ev.getCreatedAt()).description(ev.getDescription())
+            .status(ev.getStatus()).submissionProgress(submitted + "/" + total)
+            .build();
+        }
+
+        @Transactional
+        public CreatedEvaluationListItemResponse update(Long id, UpdateEvaluationRequest request, String email) {
         User creator = getUser(email);
         EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
                 .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
