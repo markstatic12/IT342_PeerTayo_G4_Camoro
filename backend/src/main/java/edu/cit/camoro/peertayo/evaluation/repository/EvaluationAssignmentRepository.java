@@ -36,6 +36,8 @@ public interface EvaluationAssignmentRepository extends JpaRepository<Evaluation
 
     List<EvaluationAssignment> findAllByEvaluationAndSubmittedTrue(EvaluationForm evaluation);
 
+    List<EvaluationAssignment> findAllByEvaluationAndEvaluatee(EvaluationForm evaluation, User evaluatee);
+
     long countByEvaluatorAndSubmittedTrue(User evaluator);
 
     long countByEvaluatorAndSubmittedTrueAndSubmittedAtBetween(User evaluator, LocalDateTime start, LocalDateTime end);

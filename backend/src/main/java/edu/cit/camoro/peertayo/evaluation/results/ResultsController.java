@@ -48,4 +48,15 @@ public class ResultsController {
         EvaluationResultsResponse response = resultsService.getEvaluationResults(id, userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
+
+    @GetMapping("/{evaluationId}/results/{evaluateeId}/submissions")
+    @PreAuthorize("hasRole('FACILITATOR')")
+    public ResponseEntity<ApiResponse<EvaluateeSubmissionsResponse>> getEvaluateeSubmissions(
+            @PathVariable Long evaluationId,
+            @PathVariable Long evaluateeId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        EvaluateeSubmissionsResponse response = resultsService.getEvaluateeSubmissions(
+                evaluationId, evaluateeId, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(response));
+    }
 }

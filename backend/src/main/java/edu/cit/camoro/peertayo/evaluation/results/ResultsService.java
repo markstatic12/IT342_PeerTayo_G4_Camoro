@@ -64,6 +64,65 @@ public class ResultsService {
     }
 
     @Transactional(readOnly = true)
+    public EvaluateeSubmissionsResponse getEvaluateeSubmissions(Long evaluationId, Long evaluateeId, String email) {
+        User creator = getUser(email);
+        EvaluationForm evaluation = evaluationFormRepository.findByIdAndCreatedBy(evaluationId, creator)
+                .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+
+        User evaluatee = userRepository.findById(evaluateeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Evaluatee not found"));
+
+        // All assignments for this evaluatee in this evaluation
+        List<EvaluationAssignment> allAssignments =
+                evaluationAssignmentRepository.findAllByEvaluationAndEvaluatee(evaluation, evaluatee);
+
+        List<EvaluatorSubmissionResponse> evaluators = allAssignments.stream().map(assignment -> {
+            User evaluator = assignment.getEvaluator();
+            String evaluatorName = (evaluator.getFirstName() + " " + evaluator.getLastName()).trim();
+
+            List<Rating> ratings = assignment.isSubmitted()
+                    ? ratingRepository.findAllByAssignmentInAndActiveTrue(List.of(assignment))
+                    : Collections.emptyList();
+
+            double avg = ratings.stream().mapToInt(Rating::getRating).average().orElse(0);
+
+            List<CriterionRatingResponse> criteriaRatings = ratings.stream()
+                    .sorted(Comparator.comparing(r -> r.getCriterion().getId()))
+                    .map(r -> CriterionRatingResponse.builder()
+                            .criteriaId(r.getCriterion().getId())
+                            .criteriaName(r.getCriterion().getTitle())
+                            .score(r.getRating())
+                            .build())
+                    .toList();
+
+            return EvaluatorSubmissionResponse.builder()
+                    .evaluatorId(evaluator.getId())
+                    .evaluatorName(evaluatorName)
+                    .overallAverage(avg)
+                    .submitted(assignment.isSubmitted())
+                    .submittedAt(assignment.getSubmittedAt())
+                    .comment(assignment.getComment())
+                    .criteriaRatings(criteriaRatings)
+                    .build();
+        }).toList();
+
+        long submittedCount = allAssignments.stream().filter(EvaluationAssignment::isSubmitted).count();
+        double overallAvg = evaluators.stream()
+                .filter(EvaluatorSubmissionResponse::isSubmitted)
+                .mapToDouble(EvaluatorSubmissionResponse::getOverallAverage)
+                .average().orElse(0);
+
+        return EvaluateeSubmissionsResponse.builder()
+                .evaluateeId(evaluateeId)
+                .evaluateeName((evaluatee.getFirstName() + " " + evaluatee.getLastName()).trim())
+                .submittedCount((int) submittedCount)
+                .totalCount(allAssignments.size())
+                .overallAverage(overallAvg)
+                .evaluators(evaluators)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     public EvaluationResultsResponse getEvaluationResults(Long evaluationId, String email) {
         User creator = getUser(email);
         EvaluationForm evaluation = evaluationFormRepository.findByIdAndCreatedBy(evaluationId, creator)
