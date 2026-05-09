@@ -16,6 +16,8 @@ const SvgCheck   = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="curren
 const SvgInfo    = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
 const SvgLogout  = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
 const SvgX       = () => <svg viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+const SvgEye     = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>;
+const SvgEyeOff  = () => <svg viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>;
 
 /* ── Password strength helper ─────────────────────────────────────────── */
 function getStrength(pwd) {
@@ -51,11 +53,15 @@ export default function SettingsPage() {
   const [confirmPwd, setConfirmPwd] = useState('');
   const [pwdSaving,  setPwdSaving]  = useState(false);
   const [pwdAlert,   setPwdAlert]   = useState(null);
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew,     setShowNew]     = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const strength = getStrength(newPwd);
 
   const closePwdModal = () => {
     setPwdModalOpen(false);
     setCurrentPwd(''); setNewPwd(''); setConfirmPwd(''); setPwdAlert(null);
+    setShowCurrent(false); setShowNew(false); setShowConfirm(false);
   };
 
   /* ── Notification prefs — loaded from and saved to backend ── */
@@ -609,7 +615,7 @@ export default function SettingsPage() {
 
             <div className="pwd-modal-body">
               {pwdAlert && (
-                <div className={`s-alert s-alert-${pwdAlert.type}`} style={{ marginBottom: 16 }}>
+                <div className={`s-alert s-alert-${pwdAlert.type}`} style={{ marginBottom: 14 }}>
                   {pwdAlert.type === 'success' ? <SvgCheck /> : <SvgInfo />}
                   {pwdAlert.msg}
                 </div>
@@ -617,50 +623,66 @@ export default function SettingsPage() {
 
               <div className="pwd-field">
                 <label className="pwd-label-text">Current Password</label>
-                <input
-                  className="field-input"
-                  type="password"
-                  placeholder="Enter your current password"
-                  value={currentPwd}
-                  onChange={(e) => setCurrentPwd(e.target.value)}
-                  autoFocus
-                />
+                <div className="pwd-input-wrap">
+                  <input
+                    className="field-input"
+                    type={showCurrent ? 'text' : 'password'}
+                    placeholder="Enter your current password"
+                    value={currentPwd}
+                    onChange={(e) => setCurrentPwd(e.target.value)}
+                    autoFocus
+                  />
+                  <button type="button" className="pwd-eye" onClick={() => setShowCurrent(v => !v)}>
+                    {showCurrent ? <SvgEyeOff /> : <SvgEye />}
+                  </button>
+                </div>
               </div>
 
               <div className="pwd-field">
                 <label className="pwd-label-text">New Password</label>
-                <input
-                  className="field-input"
-                  type="password"
-                  placeholder="Enter new password"
-                  value={newPwd}
-                  onChange={(e) => setNewPwd(e.target.value)}
-                />
-                <div className="pwd-strength">
-                  <div className={`pwd-bar${strength.level >= 1 ? ' s1' : ''}`} />
-                  <div className={`pwd-bar${strength.level >= 2 ? ' s2' : ''}`} />
-                  <div className={`pwd-bar${strength.level >= 3 ? ' s3' : ''}`} />
+                <div className="pwd-input-wrap">
+                  <input
+                    className="field-input"
+                    type={showNew ? 'text' : 'password'}
+                    placeholder="Enter new password"
+                    value={newPwd}
+                    onChange={(e) => setNewPwd(e.target.value)}
+                  />
+                  <button type="button" className="pwd-eye" onClick={() => setShowNew(v => !v)}>
+                    {showNew ? <SvgEyeOff /> : <SvgEye />}
+                  </button>
                 </div>
-                <div className="pwd-label">{strength.label}</div>
+                {newPwd && (
+                  <>
+                    <div className="pwd-strength">
+                      <div className={`pwd-bar${strength.level >= 1 ? ' s1' : ''}`} />
+                      <div className={`pwd-bar${strength.level >= 2 ? ' s2' : ''}`} />
+                      <div className={`pwd-bar${strength.level >= 3 ? ' s3' : ''}`} />
+                    </div>
+                    <div className="pwd-label">{strength.label}</div>
+                  </>
+                )}
               </div>
 
               <div className="pwd-field">
                 <label className="pwd-label-text">Confirm New Password</label>
-                <input
-                  className="field-input"
-                  type="password"
-                  placeholder="Repeat new password"
-                  value={confirmPwd}
-                  onChange={(e) => setConfirmPwd(e.target.value)}
-                />
+                <div className="pwd-input-wrap">
+                  <input
+                    className="field-input"
+                    type={showConfirm ? 'text' : 'password'}
+                    placeholder="Repeat new password"
+                    value={confirmPwd}
+                    onChange={(e) => setConfirmPwd(e.target.value)}
+                  />
+                  <button type="button" className="pwd-eye" onClick={() => setShowConfirm(v => !v)}>
+                    {showConfirm ? <SvgEyeOff /> : <SvgEye />}
+                  </button>
+                </div>
               </div>
             </div>
 
             <div className="pwd-modal-foot">
-              <div className="save-bar-hint" style={{ fontSize: 11 }}>
-                <SvgShield /> Changes take effect immediately on all devices.
-              </div>
-              <div className="save-bar-actions">
+              <div className="save-bar-actions" style={{ width: '100%', justifyContent: 'flex-end' }}>
                 <button className="s-btn s-btn-ghost" type="button" onClick={closePwdModal} disabled={pwdSaving}>
                   Cancel
                 </button>
