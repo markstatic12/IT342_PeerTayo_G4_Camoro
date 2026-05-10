@@ -40,12 +40,8 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        binding.tvRegister.setOnClickListener {
+        binding.tvRegisterLink.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
-        }
-
-        binding.tvBack.setOnClickListener {
-            finish()
         }
     }
 }

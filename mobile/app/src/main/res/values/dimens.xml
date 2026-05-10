@@ -45,11 +45,9 @@
     
     <!-- Typography Scales -->
     <dimen name="text_label_size">11sp</dimen>
-    <dimen name="text_label_letter_spacing">0.04em</dimen>
     <dimen name="button_text_size">13sp</dimen>
-    <dimen name="button_letter_spacing">0.02em</dimen>
     <dimen name="divider_text_size">10sp</dimen>
-    <dimen name="divider_letter_spacing">0.1em</dimen>
+    <!-- Letter-spacing handled directly in styles/themes as unitless floats -->
     
     <!-- Shadows -->
     <dimen name="shadow_sm">0dp</dimen>
