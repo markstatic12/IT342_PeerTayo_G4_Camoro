@@ -11,4 +11,28 @@
     <color name="teal_700">#FF018786</color>
     <color name="gray_200">#FFEEEEEE</color>
     <color name="gray_400">#FFBDBDBD</color>
+    
+    <!-- PeerTayo Brand Colors (matching web version) -->
+    <color name="primary_color">#3b82f6</color>
+    <color name="primary_dark">#1e40af</color>
+    <color name="accent_color">#60a5fa</color>
+    <color name="accent_warm">#f59e0b</color>
+    
+    <!-- Dark Theme Colors -->
+    <color name="dark_bg">#0f1117</color>
+    <color name="dark_surface">#111827</color>
+    <color name="dark_surface_2">#161b27</color>
+    <color name="dark_card">#161b27</color>
+    <color name="dark_border">#1e2d3d</color>
+    <color name="dark_border_hi">#2a3f54</color>
+    
+    <!-- Text Colors -->
+    <color name="primary_text_color">#f1f5f9</color>
+    <color name="secondary_text_color">#94a3b8</color>
+    <color name="muted_text">#64748b</color>
+    <color name="dim_text">#475569</color>
+    
+    <!-- Background Colors -->
+    <color name="light_gray_background">#f9fafb</color>
+    <color name="card_background">#ffffff</color>
 </resources>
