@@ -2,6 +2,7 @@ package com.example.peertayo_mobile.auth.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -27,13 +28,26 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
         binding.btnLogin.setOnClickListener {
+            clearErrors()
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
+            
+            // Validate inputs
+            if (email.isEmpty() || password.isEmpty()) {
+                showError("Please fill in all fields")
+                return@setOnClickListener
+            }
+            
             viewModel.login(email, password)
         }
 
         binding.tvRegisterLink.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
+        }
+        
+        binding.btnGoogleSignIn.setOnClickListener {
+            // TODO: Implement Google Sign-In
+            Toast.makeText(this, "Google Sign-In coming soon", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -42,9 +56,11 @@ class LoginActivity : AppCompatActivity() {
             when (state) {
                 is LoginState.Loading -> {
                     binding.btnLogin.isEnabled = false
-                    binding.btnLogin.text = "Logging in..."
+                    binding.btnLogin.text = "Signing in..."
+                    binding.progressBar.visibility = View.VISIBLE
                 }
                 is LoginState.Success -> {
+                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(this, "Welcome ${state.user.fullName}!", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -52,11 +68,21 @@ class LoginActivity : AppCompatActivity() {
                     finish()
                 }
                 is LoginState.Error -> {
+                    binding.progressBar.visibility = View.GONE
                     binding.btnLogin.isEnabled = true
-                    binding.btnLogin.text = "Login"
-                    Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
+                    binding.btnLogin.text = "Sign In"
+                    showError(state.message)
                 }
             }
         }
+    }
+    
+    private fun showError(message: String) {
+        binding.tvError.text = message
+        binding.tvError.visibility = View.VISIBLE
+    }
+    
+    private fun clearErrors() {
+        binding.tvError.visibility = View.GONE
     }
 }

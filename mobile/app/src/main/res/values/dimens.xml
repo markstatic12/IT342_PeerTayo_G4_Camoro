@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Typography - Font Family References -->
+    <!-- Note: Plus Jakarta Sans font files should be placed in res/font/ directory -->
+    <string name="font_family_display">sans-serif</string>
+    <string name="font_family_body">sans-serif</string>
+    
+    <!-- Font Sizes (in sp) -->
+    <dimen name="font_size_xs">12sp</dimen>
+    <dimen name="font_size_sm">13sp</dimen>
+    <dimen name="font_size_base">14sp</dimen>
+    <dimen name="font_size_md">16sp</dimen>
+    <dimen name="font_size_lg">20sp</dimen>
+    <dimen name="font_size_xl">24sp</dimen>
+    <dimen name="font_size_2xl">28sp</dimen>
+    <dimen name="font_size_3xl">32sp</dimen>
+    
+    <!-- Spacing (in dp) -->
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_sm">8dp</dimen>
+    <dimen name="space_md">12dp</dimen>
+    <dimen name="space_lg">16dp</dimen>
+    <dimen name="space_xl">20dp</dimen>
+    <dimen name="space_2xl">24dp</dimen>
+    <dimen name="space_3xl">28dp</dimen>
+    <dimen name="space_4xl">32dp</dimen>
+    
+    <!-- Radii (in dp) -->
+    <dimen name="radius_sm">6dp</dimen>
+    <dimen name="radius_md">9dp</dimen>
+    <dimen name="radius_lg">12dp</dimen>
+    <dimen name="radius_full">999dp</dimen>
+    
+    <!-- Component Heights -->
+    <dimen name="button_height_sm">40dp</dimen>
+    <dimen name="button_height_md">48dp</dimen>
+    <dimen name="button_height_lg">56dp</dimen>
+    <dimen name="input_height">48dp</dimen>
+    
+    <!-- Component Paddings -->
+    <dimen name="button_padding_horizontal">18dp</dimen>
+    <dimen name="button_padding_vertical">11dp</dimen>
+    <dimen name="input_padding_horizontal">13dp</dimen>
+    <dimen name="input_padding_vertical">10dp</dimen>
+    
+    <!-- Typography Scales -->
+    <dimen name="text_label_size">11sp</dimen>
+    <dimen name="text_label_letter_spacing">0.04em</dimen>
+    <dimen name="button_text_size">13sp</dimen>
+    <dimen name="button_letter_spacing">0.02em</dimen>
+    <dimen name="divider_text_size">10sp</dimen>
+    <dimen name="divider_letter_spacing">0.1em</dimen>
+    
+    <!-- Shadows -->
+    <dimen name="shadow_sm">0dp</dimen>
+    <dimen name="shadow_md">4dp</dimen>
+    
+    <!-- Navigation -->
+    <dimen name="nav_height">64dp</dimen>
+    <dimen name="nav_padding">16dp</dimen>
+</resources>

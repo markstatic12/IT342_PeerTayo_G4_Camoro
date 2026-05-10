@@ -1,9 +1,176 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme - Dark mode (matching web AuthShell) -->
     <style name="Base.Theme.Peertayomobile" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Dark theme colors matching web -->
+        <item name="android:windowBackground">@color/bg_primary</item>
+        <item name="colorPrimary">@color/blue_primary</item>
+        <item name="colorSecondary">@color/blue_light</item>
+        <item name="colorTertiary">@color/green_success</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:statusBarColor">@color/bg_primary</item>
+        <item name="android:navigationBarColor">@color/bg_primary</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        
+        <!-- Typography -->
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
     </style>
 
     <style name="Theme.Peertayomobile" parent="Base.Theme.Peertayomobile" />
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         PRIMARY BUTTON STYLE (Sign In, Sign Up, Create Account)
+         Matches web: #3b82f6 blue with shimmer effect on hover
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="AuthButton" parent="Widget.Material3.Button.ElevatedButton">
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:paddingTop">11dp</item>
+        <item name="android:paddingBottom">11dp</item>
+        <item name="cornerRadius">9dp</item>
+        <item name="backgroundColor">@color/blue_primary</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="elevation">4dp</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SECONDARY BUTTON STYLE (Outlined - Google Sign-In/Up)
+         Matches web: Outlined with blue border on hover
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="SecondaryButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">9dp</item>
+        <item name="strokeColor">@color/border_normal</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         FORM INPUT LAYOUT
+         Matches web: Dark surface, subtle border, blue focus state
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="FormInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/bg_surface</item>
+        <item name="boxStrokeColor">@color/border_subtle</item>
+        <item name="boxFocusedStrokeColor">@color/blue_primary</item>
+        <item name="boxCornerRadiusBottomEnd">9dp</item>
+        <item name="boxCornerRadiusBottomStart">9dp</item>
+        <item name="boxCornerRadiusTopEnd">9dp</item>
+        <item name="boxCornerRadiusTopStart">9dp</item>
+        <item name="boxStrokeWidth">1.5dp</item>
+        <item name="android:textColorHint">@color/text_dim</item>
+        <item name="hintTextColor">@color/text_dim</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         FORM INPUT EDIT TEXT
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="FormInputEditText" parent="Widget.Material3.EditText.OutlinedBox">
+        <item name="android:paddingStart">13dp</item>
+        <item name="android:paddingEnd">13dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorHint">@color/text_dim</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         FORM LABEL
+         Matches web: 11sp, 600 weight, uppercase, 0.04em letter-spacing
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="FormLabel">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_muted</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         HEADING STYLE
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="HeadingLarge">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <style name="HeadingMedium">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         BODY TEXT STYLE
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="BodyText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+    
+    <style name="BodyTextSmall">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CAPTION/MUTED TEXT
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="CaptionText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/text_dim</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ERROR TEXT
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="ErrorText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#fca5a5</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         DIVIDER TEXT
+         Matches web: 10sp, 700 weight, uppercase, 0.1em letter-spacing
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="DividerText">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_dim</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════
+         LINK/ACCENT TEXT
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style name="LinkText">
+        <item name="android:textColor">@color/blue_primary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+    </style>
 </resources>

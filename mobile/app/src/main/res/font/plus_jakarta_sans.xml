@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- Plus Jakarta Sans - Regular (400) -->
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="400"
+        android:font="@font/plus_jakarta_sans_regular"
+        app:fontStyle="normal"
+        app:fontWeight="400" />
+    
+    <!-- Plus Jakarta Sans - Medium (500) -->
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="500"
+        android:font="@font/plus_jakarta_sans_medium"
+        app:fontStyle="normal"
+        app:fontWeight="500" />
+    
+    <!-- Plus Jakarta Sans - SemiBold (600) -->
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="600"
+        android:font="@font/plus_jakarta_sans_semibold"
+        app:fontStyle="normal"
+        app:fontWeight="600" />
+    
+    <!-- Plus Jakarta Sans - Bold (700) -->
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="700"
+        android:font="@font/plus_jakarta_sans_bold"
+        app:fontStyle="normal"
+        app:fontWeight="700" />
+</font-family>

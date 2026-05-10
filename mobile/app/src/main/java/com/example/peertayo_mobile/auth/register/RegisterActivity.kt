@@ -2,6 +2,7 @@ package com.example.peertayo_mobile.auth.register
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -27,16 +28,42 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
         binding.btnRegister.setOnClickListener {
-            val firstName = binding.etFirstName.text.toString()
-            val lastName = binding.etLastName.text.toString()
-            val email = binding.etEmail.text.toString()
-            val password = binding.etPassword.text.toString()
-            viewModel.register(firstName, lastName, email, password)
+            clearErrors()
+            validateAndRegister()
         }
 
         binding.tvLoginLink.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
+        }
+        
+        binding.btnGoogleSignUp.setOnClickListener {
+            // TODO: Implement Google Sign-Up
+            Toast.makeText(this, "Google Sign-Up coming soon", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun validateAndRegister() {
+        val firstName = binding.etFirstName.text.toString()
+        val lastName = binding.etLastName.text.toString()
+        val email = binding.etEmail.text.toString()
+        val password = binding.etPassword.text.toString()
+        val confirmPassword = binding.etConfirmPassword.text.toString()
+
+        // Validation
+        when {
+            firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
+                showError("Please fill in all fields")
+            }
+            password != confirmPassword -> {
+                showError("Passwords do not match")
+            }
+            password.length < 6 -> {
+                showError("Password must be at least 6 characters")
+            }
+            else -> {
+                viewModel.register(firstName, lastName, email, password)
+            }
         }
     }
 
@@ -45,9 +72,11 @@ class RegisterActivity : AppCompatActivity() {
             when (state) {
                 is RegisterState.Loading -> {
                     binding.btnRegister.isEnabled = false
-                    binding.btnRegister.text = "Registering..."
+                    binding.btnRegister.text = "Creating account..."
+                    binding.progressBar.visibility = View.VISIBLE
                 }
                 is RegisterState.Success -> {
+                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(this, "Welcome ${state.user.fullName}!", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -55,11 +84,21 @@ class RegisterActivity : AppCompatActivity() {
                     finish()
                 }
                 is RegisterState.Error -> {
+                    binding.progressBar.visibility = View.GONE
                     binding.btnRegister.isEnabled = true
-                    binding.btnRegister.text = "Register"
-                    Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
+                    binding.btnRegister.text = "Create Account"
+                    showError(state.message)
                 }
             }
         }
+    }
+    
+    private fun showError(message: String) {
+        binding.tvError.text = message
+        binding.tvError.visibility = View.VISIBLE
+    }
+    
+    private fun clearErrors() {
+        binding.tvError.visibility = View.GONE
     }
 }
