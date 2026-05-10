@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Typography styles for PeerTayo landing page - using Android system fonts -->
+    <style name="HeroTitleStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary_text_color</item>
+        <item name="android:letterSpacing">-0.03</item>
+    </style>
+    
+    <style name="HeroAccentStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/accent_color</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+    
+    <style name="HeroWarmStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/accent_warm</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+    
+    <style name="SubtitleStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/secondary_text_color</item>
+        <item name="android:lineSpacingMultiplier">1.1</item>
+    </style>
+    
+    <style name="SectionTitleStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary_text_color</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+    
+    <style name="SectionLabelStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary_color</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+    
+    <style name="StatNumberStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary_color</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+    
+    <style name="StatLabelStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/secondary_text_color</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+    
+    <style name="FeatureTitleStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary_text_color</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+    
+    <style name="FeatureDescStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/secondary_text_color</item>
+        <item name="android:lineSpacingMultiplier">1.1</item>
+    </style>
+    
+    <style name="CTATitleStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary_text_color</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+    
+    <style name="CTADescStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/secondary_text_color</item>
+        <item name="android:lineSpacingMultiplier">1.1</item>
+    </style>
+</resources>

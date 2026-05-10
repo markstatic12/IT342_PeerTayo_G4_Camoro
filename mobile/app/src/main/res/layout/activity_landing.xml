@@ -1,433 +1,266 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_primary"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    tools:context=".landing.LandingActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <!-- Top Navigation Bar -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/navBar"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:paddingLeft="@dimen/space_xl"
-            android:paddingRight="@dimen/space_xl"
-            android:paddingTop="@dimen/space_lg"
-            android:paddingBottom="@dimen/space_lg"
-            android:background="@color/bg_primary"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <TextView
-                android:id="@+id/tvBrandNav"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PeerTayo"
-                android:textSize="@dimen/font_size_lg"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:fontFamily="@font/plus_jakarta_sans"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnNavLogin"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="Sign In"
-                android:textSize="@dimen/font_size_xs"
-                android:textColor="@color/text_primary"
-                android:fontFamily="@font/plus_jakarta_sans"
-                app:backgroundTint="@android:color/transparent"
-                style="@style/Widget.Material3.Button.TextButton"
-                app:layout_constraintEnd_toStartOf="@id/btnNavSignUp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginEnd="@dimen/space_sm" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnNavSignUp"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="Sign Up"
-                android:textSize="@dimen/font_size_xs"
-                android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans"
-                style="@style/AuthButton"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <!-- Hero Section -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/heroSection"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/space_2xl"
-            android:paddingRight="@dimen/space_2xl"
-            android:paddingTop="@dimen/space_2xl"
-            android:paddingBottom="@dimen/space_2xl"
-            app:layout_constraintTop_toBottomOf="@id/navBar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:background="@color/dark_bg">
 
-            <!-- Hero Badge -->
             <TextView
-                android:id="@+id/heroBadge"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="• Structured · Private · Insightful"
-                android:textSize="@dimen/font_size_xs"
-                android:textStyle="bold"
-                android:textColor="@color/blue_primary"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginTop="@dimen/space_xl"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:text="Peer Evaluation."
+                style="@style/HeroTitleStyle"
+                android:gravity="center"
+                android:layout_marginTop="48dp" />
 
-            <!-- Hero Title -->
             <TextView
-                android:id="@+id/heroTitle"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Peer Evaluation.\nReimagined for\nReal Teams."
-                android:textSize="@dimen/font_size_3xl"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginTop="@dimen/space_lg"
-                android:lineSpacingExtra="8dp"
-                app:layout_constraintTop_toBottomOf="@id/heroBadge"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                android:text="Reimagined"
+                style="@style/HeroAccentStyle"
+                android:gravity="center" />
 
-            <!-- Hero Subtitle -->
             <TextView
-                android:id="@+id/heroSubtitle"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="for Real Teams."
+                style="@style/HeroWarmStyle"
+                android:gravity="center"
+                android:layout_marginBottom="24dp" />
+
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="PeerTayo transforms how teams assess each other with structured, private, and actionable feedback. Built for classrooms, organizations, and collaborative groups."
-                android:textSize="@dimen/font_size_sm"
-                android:textColor="@color/text_muted"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginTop="@dimen/space_lg"
-                android:lineSpacingExtra="4dp"
-                app:layout_constraintTop_toBottomOf="@id/heroTitle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                style="@style/SubtitleStyle"
+                android:gravity="center"
+                android:layout_marginBottom="32dp" />
 
-            <!-- CTA Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGetStarted"
-                style="@style/AuthButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
                 android:text="Get Started Free"
-                android:textSize="@dimen/button_text_size"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginTop="@dimen/space_2xl"
-                app:layout_constraintTop_toBottomOf="@id/heroSubtitle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                android:textColor="@color/dark_bg"
+                android:backgroundTint="@color/primary_color"
+                app:cornerRadius="28dp"
+                android:layout_marginBottom="16dp" />
 
-            <!-- Secondary CTA -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnHowItWorks"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:id="@+id/btnLearnMore"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
                 android:text="See How It Works"
-                android:textSize="@dimen/button_text_size"
-                android:textColor="@color/text_secondary"
-                android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginTop="@dimen/space_md"
-                app:icon="@android:drawable/ic_media_play"
-                app:iconTint="@color/text_secondary"
-                app:strokeColor="@color/border_normal"
+                android:textSize="16sp"
+                android:textColor="@color/secondary_text_color"
+                android:backgroundTint="@android:color/transparent"
+                app:strokeColor="@color/dark_border_hi"
                 app:strokeWidth="1dp"
-                app:cornerRadius="9dp"
-                app:backgroundTint="@color/bg_surface"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                app:layout_constraintTop_toBottomOf="@id/btnGetStarted"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                app:cornerRadius="28dp"
+                android:layout_marginBottom="32dp" />
+
+            <!-- Stats -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/statEvaluations"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="500+"
+                        style="@style/StatNumberStyle" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Evaluations"
+                        style="@style/StatLabelStyle" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/statUsers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1,000+"
+                        style="@style/StatNumberStyle" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Users"
+                        style="@style/StatLabelStyle" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/statTeams"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="50+"
+                        style="@style/StatNumberStyle" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Teams"
+                        style="@style/StatLabelStyle" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
 
         <!-- Features Section -->
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/featuresSection"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/space_2xl"
-            android:paddingRight="@dimen/space_2xl"
-            android:paddingTop="@dimen/space_2xl"
-            android:paddingBottom="@dimen/space_2xl"
-            app:layout_constraintTop_toBottomOf="@id/heroSection"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:background="@color/dark_surface">
 
             <TextView
-                android:id="@+id/featuresTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Why Choose PeerTayo?"
-                android:textSize="@dimen/font_size_xl"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:fontFamily="@font/plus_jakarta_sans"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:text="Platform Features"
+                style="@style/SectionLabelStyle"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
 
-            <!-- Feature 1 -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/feature1"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_lg"
-                app:layout_constraintTop_toBottomOf="@id/featuresTitle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:text="Everything your team needs to evaluate well."
+                style="@style/SectionTitleStyle"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
 
-                <View
-                    android:id="@+id/featureIcon1"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@color/bg_surface"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/featureTitle1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Structured Feedback"
-                    android:textSize="@dimen/font_size_sm"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:layout_marginStart="@dimen/space_md"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/featureIcon1"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-                <TextView
-                    android:id="@+id/featureDesc1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Capture meaningful insights with guided evaluation forms"
-                    android:textSize="@dimen/font_size_xs"
-                    android:textColor="@color/text_muted"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:layout_marginStart="@dimen/space_md"
-                    android:layout_marginTop="4dp"
-                    app:layout_constraintTop_toBottomOf="@id/featureTitle1"
-                    app:layout_constraintStart_toEndOf="@id/featureIcon1"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- Feature 2 -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/feature2"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_lg"
-                app:layout_constraintTop_toBottomOf="@id/feature1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:text="From private submissions to real-time analytics, PeerTayo equips both respondents and facilitators with the right tools."
+                style="@style/SubtitleStyle"
+                android:gravity="center"
+                android:layout_marginBottom="24dp" />
 
-                <View
-                    android:id="@+id/featureIcon2"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@color/bg_surface"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/featureTitle2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Complete Privacy"
-                    android:textSize="@dimen/font_size_sm"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:layout_marginStart="@dimen/space_md"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/featureIcon2"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-                <TextView
-                    android:id="@+id/featureDesc2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Anonymous evaluations ensure honest and unbiased feedback"
-                    android:textSize="@dimen/font_size_xs"
-                    android:textColor="@color/text_muted"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:layout_marginStart="@dimen/space_md"
-                    android:layout_marginTop="4dp"
-                    app:layout_constraintTop_toBottomOf="@id/featureTitle2"
-                    app:layout_constraintStart_toEndOf="@id/featureIcon2"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- Feature 3 -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/feature3"
-                android:layout_width="0dp"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvFeatures"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_lg"
-                app:layout_constraintTop_toBottomOf="@id/feature2"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:layout_marginBottom="32dp" />
+        </LinearLayout>
 
-                <View
-                    android:id="@+id/featureIcon3"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@color/bg_surface"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/featureTitle3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Actionable Insights"
-                    android:textSize="@dimen/font_size_sm"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:layout_marginStart="@dimen/space_md"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/featureIcon3"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-                <TextView
-                    android:id="@+id/featureDesc3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Get comprehensive reports and analytics to drive growth"
-                    android:textSize="@dimen/font_size_xs"
-                    android:textColor="@color/text_muted"
-                    android:fontFamily="@font/plus_jakarta_sans"
-                    android:layout_marginStart="@dimen/space_md"
-                    android:layout_marginTop="4dp"
-                    app:layout_constraintTop_toBottomOf="@id/featureTitle3"
-                    app:layout_constraintStart_toEndOf="@id/featureIcon3"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- CTA Section -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/ctaSection"
-            android:layout_width="0dp"
+        <!-- How It Works Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/space_2xl"
-            android:paddingRight="@dimen/space_2xl"
-            android:paddingTop="@dimen/space_2xl"
-            android:paddingBottom="@dimen/space_2xl"
-            app:layout_constraintTop_toBottomOf="@id/featuresSection"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:background="@color/dark_surface">
 
             <TextView
-                android:id="@+id/ctaTitle"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ready to Transform Your Team's Feedback?"
-                android:textSize="@dimen/font_size_lg"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:fontFamily="@font/plus_jakarta_sans"
+                android:text="Process Flow"
+                style="@style/SectionLabelStyle"
                 android:gravity="center"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                android:layout_marginBottom="8dp" />
 
             <TextView
-                android:id="@+id/ctaSubtitle"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Join thousands of teams using PeerTayo to improve collaboration and performance"
-                android:textSize="@dimen/font_size_sm"
-                android:textColor="@color/text_muted"
-                android:fontFamily="@font/plus_jakarta_sans"
+                android:text="How PeerTayo Works"
+                style="@style/SectionTitleStyle"
                 android:gravity="center"
-                android:layout_marginTop="@dimen/space_md"
-                app:layout_constraintTop_toBottomOf="@id/ctaTitle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Four steps from setup to insight, built for speed and accountability."
+                style="@style/SubtitleStyle"
+                android:gravity="center"
+                android:layout_marginBottom="24dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvHowItWorks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- Final CTA Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:background="@color/dark_bg">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ready to transform your team's evaluation process?"
+                style="@style/CTATitleStyle"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Join thousands of users already using PeerTayo for better team insights."
+                style="@style/CTADescStyle"
+                android:gravity="center"
+                android:layout_marginBottom="24dp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnFinalCTA"
-                style="@style/AuthButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:text="Create Free Account"
-                android:textSize="@dimen/button_text_size"
-                android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginTop="@dimen/space_lg"
-                app:layout_constraintTop_toBottomOf="@id/ctaSubtitle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Get Started Now"
+                style="@style/Widget.AppCompat.Button"
+                android:textColor="@color/dark_bg"
+                android:backgroundTint="@color/primary_color"
+                app:cornerRadius="28dp" />
+        </LinearLayout>
 
-        <!-- Footer -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/footer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/space_2xl"
-            android:paddingRight="@dimen/space_2xl"
-            android:paddingTop="@dimen/space_2xl"
-            android:paddingBottom="@dimen/space_2xl"
-            android:background="@color/bg_secondary"
-            app:layout_constraintTop_toBottomOf="@id/ctaSection"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <TextView
-                android:id="@+id/footerBrand"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PeerTayo"
-                android:textSize="@dimen/font_size_md"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:fontFamily="@font/plus_jakarta_sans"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/footerText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="© 2024 PeerTayo. All rights reserved."
-                android:textSize="@dimen/font_size_xs"
-                android:textColor="@color/text_dim"
-                android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginTop="@dimen/space_md"
-                app:layout_constraintTop_toBottomOf="@id/footerBrand"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -2,87 +2,50 @@ package com.example.peertayo_mobile.auth.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.peertayo_mobile.MainActivity
 import com.example.peertayo_mobile.auth.register.RegisterActivity
 import com.example.peertayo_mobile.databinding.ActivityLoginBinding
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupUI()
         setupClickListeners()
-        observeLoginState()
+    }
+
+    private fun setupUI() {
+        // Set up the login form
+        binding.etEmail.hint = "Email address"
+        binding.etPassword.hint = "Enter your password"
+        binding.btnLogin.text = "Sign In"
     }
 
     private fun setupClickListeners() {
         binding.btnLogin.setOnClickListener {
-            clearErrors()
-            val email = binding.etEmail.text.toString()
-            val password = binding.etPassword.text.toString()
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
             
-            // Validate inputs
-            if (email.isEmpty() || password.isEmpty()) {
-                showError("Please fill in all fields")
-                return@setOnClickListener
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                // TODO: Implement actual login logic
+                Toast.makeText(this, "Login clicked for: $email", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
             }
-            
-            viewModel.login(email, password)
         }
 
-        binding.tvRegisterLink.setOnClickListener {
+        binding.tvRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
-        
-        binding.btnGoogleSignIn.setOnClickListener {
-            // TODO: Implement Google Sign-In
-            Toast.makeText(this, "Google Sign-In coming soon", Toast.LENGTH_SHORT).show()
-        }
-    }
 
-    private fun observeLoginState() {
-        viewModel.loginState.observe(this) { state ->
-            when (state) {
-                is LoginState.Loading -> {
-                    binding.btnLogin.isEnabled = false
-                    binding.btnLogin.text = "Signing in..."
-                    binding.progressBar.visibility = View.VISIBLE
-                }
-                is LoginState.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(this, "Welcome ${state.user.fullName}!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    })
-                    finish()
-                }
-                is LoginState.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnLogin.isEnabled = true
-                    binding.btnLogin.text = "Sign In"
-                    showError(state.message)
-                }
-            }
+        binding.tvBack.setOnClickListener {
+            finish()
         }
-    }
-    
-    private fun showError(message: String) {
-        binding.tvError.text = message
-        binding.tvError.visibility = View.VISIBLE
-    }
-    
-    private fun clearErrors() {
-        binding.tvError.visibility = View.GONE
     }
 }
