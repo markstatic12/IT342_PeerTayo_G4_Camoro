@@ -27,11 +27,11 @@
         </activity>
 
         <activity
-            android:name=".auth.LoginActivity"
+            android:name=".auth.login.LoginActivity"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".auth.RegisterActivity"
+            android:name=".auth.register.RegisterActivity"
             android:windowSoftInputMode="adjustResize" />
 
         <activity android:name=".MainActivity" />

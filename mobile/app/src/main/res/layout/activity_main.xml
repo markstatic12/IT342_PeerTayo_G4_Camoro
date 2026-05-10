@@ -5,66 +5,82 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
+    android:background="@color/bg_primary"
+    android:paddingLeft="@dimen/space_2xl"
+    android:paddingRight="@dimen/space_2xl"
+    android:paddingTop="@dimen/space_4xl"
     tools:context=".MainActivity">
 
+    <!-- Brand Logo -->
     <TextView
         android:id="@+id/tvAppName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="PeerTayo"
-        android:textSize="28sp"
+        android:textSize="@dimen/font_size_2xl"
         android:textStyle="bold"
-        android:textColor="@color/purple_700"
-        android:layout_marginTop="48dp"
+        android:textColor="@color/blue_primary"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:layout_marginTop="@dimen/space_4xl"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Welcome Heading -->
     <TextView
         android:id="@+id/tvWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Welcome!"
-        android:textSize="24sp"
+        android:textSize="@dimen/font_size_xl"
         android:textStyle="bold"
-        android:layout_marginTop="48dp"
+        android:textColor="@color/text_primary"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:layout_marginTop="@dimen/space_4xl"
         app:layout_constraintTop_toBottomOf="@id/tvAppName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- User Email -->
     <TextView
         android:id="@+id/tvEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="user@example.com"
-        android:textSize="16sp"
-        android:textColor="@android:color/darker_gray"
-        android:layout_marginTop="16dp"
+        android:textSize="@dimen/font_size_sm"
+        android:textColor="@color/text_secondary"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:layout_marginTop="@dimen/space_md"
         app:layout_constraintTop_toBottomOf="@id/tvWelcome"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Message -->
     <TextView
         android:id="@+id/tvMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="You have successfully logged in to PeerTayo!\n\nThis is a placeholder main screen. Future features will be added here."
-        android:textSize="14sp"
+        android:text="You have successfully logged in to PeerTayo!\n\nThis is your dashboard. Navigate through the app to access evaluations, feedback, and more."
+        android:textSize="@dimen/font_size_sm"
+        android:textColor="@color/text_muted"
         android:textAlignment="center"
-        android:layout_marginTop="32dp"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:layout_marginTop="@dimen/space_3xl"
         app:layout_constraintTop_toBottomOf="@id/tvEmail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Logout Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:textSize="16sp"
-        app:cornerRadius="8dp"
-        android:layout_marginBottom="48dp"
+        style="@style/AuthButton"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:text="Sign Out"
+        android:textSize="@dimen/button_text_size"
+        android:textStyle="bold"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:layout_marginBottom="@dimen/space_4xl"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
