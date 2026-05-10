@@ -8,6 +8,7 @@ import AuthShell from './features/auth/AuthShell';
 import AuthCallbackPage from './features/auth/callback/AuthCallbackPage';
 import LoginPage from './features/auth/login/LoginPage';
 import RegisterPage from './features/auth/register/RegisterPage';
+import LandingPage from './features/landing/LandingPage';
 import DashboardPage from './features/dashboard/DashboardPage';
 import FormsCreatedPage from './features/evaluation/form/FormsCreatedPage';
 import CreateEvaluationPage from './features/evaluation/form/CreateEvaluationPage';
@@ -25,6 +26,8 @@ export default function App() {
       <AuthProvider>
         <NavigationGuardProvider>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
+
           {/* Auth routes — AuthShell stays mounted, only Outlet swaps */}
           <Route element={<AuthShell />}>
             <Route path="/login"    element={<LoginPage />} />
@@ -58,7 +61,7 @@ export default function App() {
           </Route>
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         </NavigationGuardProvider>
       </AuthProvider>
