@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.peertayo_mobile.auth.login.LoginActivity
+import com.example.peertayo_mobile.auth.register.RegisterActivity
 import com.example.peertayo_mobile.databinding.ActivityLandingBinding
 
 class LandingActivity : AppCompatActivity() {
@@ -39,7 +41,7 @@ class LandingActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
         binding.btnGetStarted.setOnClickListener {
-            showLoginRegisterDialog()
+            navigateToRegister()
         }
 
         binding.btnLogin.setOnClickListener {
@@ -52,27 +54,12 @@ class LandingActivity : AppCompatActivity() {
         }
     }
     
-    private fun showLoginRegisterDialog() {
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Get Started")
-            .setMessage("Choose how you want to continue:")
-            .setPositiveButton("Register") { _, _ ->
-                navigateToRegister()
-            }
-            .setNegativeButton("Login") { _, _ ->
-                navigateToLogin()
-            }
-            .show()
-    }
-    
     private fun navigateToLogin() {
-        // TODO: Navigate to login activity
-        Toast.makeText(this, "Navigating to Login", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, LoginActivity::class.java))
     }
     
     private fun navigateToRegister() {
-        // TODO: Navigate to register activity  
-        Toast.makeText(this, "Navigating to Register", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, RegisterActivity::class.java))
     }
 
     private fun setupStats() {
