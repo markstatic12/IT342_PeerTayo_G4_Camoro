@@ -6,4 +6,10 @@
     </style>
 
     <style name="Theme.Peertayomobile" parent="Base.Theme.Peertayomobile" />
+    
+    <!-- Theme for LandingActivity without ActionBar -->
+    <style name="Theme.Peertayomobile.NoActionBar" parent="Theme.Peertayomobile">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>

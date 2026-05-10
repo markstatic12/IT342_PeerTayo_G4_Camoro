@@ -3,60 +3,48 @@ package com.example.peertayo_mobile.auth.login
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.peertayo_mobile.MainActivity
-import com.example.peertayo_mobile.auth.register.RegisterActivity
 import com.example.peertayo_mobile.databinding.ActivityLoginBinding
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupUI()
         setupClickListeners()
-        observeLoginState()
+    }
+
+    private fun setupUI() {
+        // Set up the login form
+        binding.etEmail.hint = "Email address"
+        binding.etPassword.hint = "Enter your password"
+        binding.btnLogin.text = "Sign In"
     }
 
     private fun setupClickListeners() {
         binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString()
-            val password = binding.etPassword.text.toString()
-            viewModel.login(email, password)
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
+            
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                // TODO: Implement actual login logic
+                Toast.makeText(this, "Login clicked for: $email", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        binding.tvRegisterLink.setOnClickListener {
+        binding.tvRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
-    }
 
-    private fun observeLoginState() {
-        viewModel.loginState.observe(this) { state ->
-            when (state) {
-                is LoginState.Loading -> {
-                    binding.btnLogin.isEnabled = false
-                    binding.btnLogin.text = "Logging in..."
-                }
-                is LoginState.Success -> {
-                    Toast.makeText(this, "Welcome ${state.user.fullName}!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    })
-                    finish()
-                }
-                is LoginState.Error -> {
-                    binding.btnLogin.isEnabled = true
-                    binding.btnLogin.text = "Login"
-                    Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
-                }
-            }
+        binding.tvBack.setOnClickListener {
+            finish()
         }
     }
 }
