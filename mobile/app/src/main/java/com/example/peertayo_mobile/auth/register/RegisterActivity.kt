@@ -2,58 +2,148 @@ package com.example.peertayo_mobile.auth.register
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
+import android.view.View
+import android.view.animation.AnimationUtils
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.example.peertayo_mobile.MainActivity
+import com.example.peertayo_mobile.R
 import com.example.peertayo_mobile.auth.login.LoginActivity
+import com.example.peertayo_mobile.data.api.RetrofitClient
+import com.example.peertayo_mobile.data.model.RegisterRequest
+import com.example.peertayo_mobile.data.repository.AuthRepository
 import com.example.peertayo_mobile.databinding.ActivityRegisterBinding
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
+    private lateinit var viewModel: RegisterViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupUI()
+        setupViewModel()
+        runEntranceAnimation()
         setupClickListeners()
+        observeViewModel()
     }
 
-    private fun setupUI() {
-        // Set up the registration form
-        binding.etFirstName.hint = "First name"
-        binding.etLastName.hint = "Last name"
-        binding.etEmail.hint = "Email address"
-        binding.etPassword.hint = "Create a password"
-        binding.etConfirmPassword.hint = "Confirm password"
-        binding.btnRegister.text = "Create Account"
+    private fun setupViewModel() {
+        val repository = AuthRepository(RetrofitClient.authApi)
+        val factory = object : ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return RegisterViewModel(repository) as T
+            }
+        }
+        viewModel = ViewModelProvider(this, factory)[RegisterViewModel::class.java]
+    }
+
+    private fun runEntranceAnimation() {
+        val anim = AnimationUtils.loadAnimation(this, R.anim.slide_up)
+        binding.brandRow.startAnimation(anim)
+
+        binding.tvHeading.alpha = 0f
+        binding.tvHeading.postDelayed({
+            binding.tvHeading.alpha = 1f
+            binding.tvHeading.startAnimation(
+                AnimationUtils.loadAnimation(this, R.anim.slide_up)
+            )
+        }, 80)
+
+        binding.tilFirstName.alpha = 0f
+        binding.tilFirstName.postDelayed({
+            binding.tilFirstName.alpha = 1f
+            binding.tilFirstName.startAnimation(
+                AnimationUtils.loadAnimation(this, R.anim.slide_up)
+            )
+            binding.tilLastName.alpha = 1f
+        }, 160)
     }
 
     private fun setupClickListeners() {
+        binding.etConfirmPassword.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                handleRegister()
+                true
+            } else false
+        }
+
         binding.btnRegister.setOnClickListener {
-            val firstName = binding.etFirstName.text.toString().trim()
-            val lastName = binding.etLastName.text.toString().trim()
-            val email = binding.etEmail.text.toString().trim()
-            val password = binding.etPassword.text.toString().trim()
-            val confirmPassword = binding.etConfirmPassword.text.toString().trim()
-            
-            if (firstName.isNotEmpty() && lastName.isNotEmpty() && email.isNotEmpty() && 
-                password.isNotEmpty() && confirmPassword.isNotEmpty()) {
-                
-                if (password == confirmPassword) {
-                    // TODO: Implement actual registration logic
-                    Toast.makeText(this, "Account created for: $email", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
-            }
+            handleRegister()
         }
 
         binding.tvLoginLink.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
+    }
+
+    private fun observeViewModel() {
+        viewModel.registerState.observe(this) { state ->
+            when (state) {
+                is RegisterState.Loading -> {
+                    binding.btnRegister.isEnabled = false
+                    binding.progressBar.visibility = View.VISIBLE
+                    hideError()
+                }
+                is RegisterState.Success -> {
+                    binding.btnRegister.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(this, "Account created for ${state.response.user?.firstName}!", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                }
+                is RegisterState.Error -> {
+                    binding.btnRegister.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                    showError(state.message)
+                }
+                is RegisterState.Idle -> {
+                    binding.btnRegister.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun handleRegister() {
+        val firstName = binding.etFirstName.text.toString().trim()
+        val lastName = binding.etLastName.text.toString().trim()
+        val email = binding.etEmail.text.toString().trim()
+        val password = binding.etPassword.text.toString().trim()
+        val confirmPassword = binding.etConfirmPassword.text.toString().trim()
+
+        when {
+            firstName.isEmpty() -> binding.tilFirstName.error = "First name is required"
+            lastName.isEmpty() -> binding.tilLastName.error = "Last name is required"
+            email.isEmpty() -> binding.tilEmail.error = "Email is required"
+            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> binding.tilEmail.error = "Enter a valid email"
+            password.isEmpty() -> binding.tilPassword.error = "Password is required"
+            password.length < 8 -> binding.tilPassword.error = "At least 8 characters"
+            confirmPassword.isEmpty() -> binding.tilConfirmPassword.error = "Confirm your password"
+            password != confirmPassword -> showError("Passwords do not match")
+            else -> {
+                viewModel.register(RegisterRequest(firstName, lastName, email, password))
+            }
+        }
+    }
+
+    private fun showError(message: String) {
+        binding.errorBanner.visibility = View.VISIBLE
+        binding.tvError.text = message
+    }
+
+    private fun hideError() {
+        binding.errorBanner.visibility = View.GONE
+        binding.tilFirstName.error = null
+        binding.tilLastName.error = null
+        binding.tilEmail.error = null
+        binding.tilPassword.error = null
+        binding.tilConfirmPassword.error = null
     }
 }

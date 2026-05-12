@@ -2,46 +2,137 @@ package com.example.peertayo_mobile.auth.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.animation.AnimationUtils
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.example.peertayo_mobile.MainActivity
+import com.example.peertayo_mobile.R
 import com.example.peertayo_mobile.auth.register.RegisterActivity
+import com.example.peertayo_mobile.data.api.RetrofitClient
+import com.example.peertayo_mobile.data.model.LoginRequest
+import com.example.peertayo_mobile.data.repository.AuthRepository
 import com.example.peertayo_mobile.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var viewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupUI()
+        setupViewModel()
+        runEntranceAnimation()
         setupClickListeners()
+        observeViewModel()
     }
 
-    private fun setupUI() {
-        // Set up the login form
-        binding.etEmail.hint = "Email address"
-        binding.etPassword.hint = "Enter your password"
-        binding.btnLogin.text = "Sign In"
+    private fun setupViewModel() {
+        val repository = AuthRepository(RetrofitClient.authApi)
+        val factory = object : ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return LoginViewModel(repository) as T
+            }
+        }
+        viewModel = ViewModelProvider(this, factory)[LoginViewModel::class.java]
+    }
+
+    private fun runEntranceAnimation() {
+        val anim = AnimationUtils.loadAnimation(this, R.anim.slide_up)
+        binding.brandRow.startAnimation(anim)
+
+        binding.tvHeading.alpha = 0f
+        binding.tvHeading.postDelayed({
+            binding.tvHeading.alpha = 1f
+            binding.tvHeading.startAnimation(
+                AnimationUtils.loadAnimation(this, R.anim.slide_up)
+            )
+        }, 80)
+
+        binding.tilEmail.alpha = 0f
+        binding.tilEmail.postDelayed({
+            binding.tilEmail.alpha = 1f
+            binding.tilEmail.startAnimation(
+                AnimationUtils.loadAnimation(this, R.anim.slide_up)
+            )
+        }, 160)
     }
 
     private fun setupClickListeners() {
+        binding.etPassword.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                handleLogin()
+                true
+            } else false
+        }
+
         binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString().trim()
-            val password = binding.etPassword.text.toString().trim()
-            
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                // TODO: Implement actual login logic
-                Toast.makeText(this, "Login clicked for: $email", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
-            }
+            handleLogin()
         }
 
         binding.tvRegisterLink.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
+    }
+
+    private fun observeViewModel() {
+        viewModel.loginState.observe(this) { state ->
+            when (state) {
+                is LoginState.Loading -> {
+                    binding.btnLogin.isEnabled = false
+                    binding.progressBar.visibility = View.VISIBLE
+                    hideError()
+                }
+                is LoginState.Success -> {
+                    binding.btnLogin.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(this, "Welcome ${state.response.user?.fullName}!", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                }
+                is LoginState.Error -> {
+                    binding.btnLogin.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                    showError(state.message)
+                }
+                is LoginState.Idle -> {
+                    binding.btnLogin.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun handleLogin() {
+        val email = binding.etEmail.text.toString().trim()
+        val password = binding.etPassword.text.toString().trim()
+
+        if (email.isEmpty()) {
+            binding.tilEmail.error = "Email is required"
+            return
+        }
+        if (password.isEmpty()) {
+            binding.tilPassword.error = "Password is required"
+            return
+        }
+
+        viewModel.login(LoginRequest(email, password))
+    }
+
+    private fun showError(message: String) {
+        binding.errorBanner.visibility = View.VISIBLE
+        binding.tvError.text = message
+    }
+
+    private fun hideError() {
+        binding.errorBanner.visibility = View.GONE
+        binding.tilEmail.error = null
+        binding.tilPassword.error = null
     }
 }
