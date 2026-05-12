@@ -7,10 +7,6 @@
     -->
     <style name="Base.Theme.Peertayomobile" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/bg_primary</item>
-        <item name="android:windowSplashScreenBackground" tools:targetApi="31">@color/bg_primary</item>
-        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="31">@drawable/ic_peertayo_logo</item>
-        <item name="android:windowSplashScreenIconBackgroundColor" tools:targetApi="31">@android:color/transparent</item>
-        <item name="android:postSplashScreenTheme" tools:targetApi="31">@style/Theme.Peertayomobile</item>
         <item name="colorPrimary">@color/blue_primary</item>
         <item name="colorSurface">@color/bg_surface</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
