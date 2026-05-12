@@ -46,6 +46,8 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="Theme.Peertayomobile.Splash" parent="Theme.Peertayomobile.NoActionBar" />
+
 
     <!-- ═══════════════════════════════════════════════════════════════════
          FORM INPUT LAYOUT — Filled/Outlined dark style matching web

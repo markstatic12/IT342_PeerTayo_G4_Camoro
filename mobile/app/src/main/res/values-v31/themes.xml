@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Peertayomobile.Splash" parent="Theme.Peertayomobile.NoActionBar">
+        <item name="android:windowSplashScreenBackground">@color/bg_primary</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_peertayo_logo</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+        <item name="android:postSplashScreenTheme">@style/Theme.Peertayomobile.NoActionBar</item>
+    </style>
+</resources>
