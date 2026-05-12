@@ -2,7 +2,7 @@
 <resources>
     <style name="Theme.Peertayomobile.Splash" parent="Theme.Peertayomobile.NoActionBar">
         <item name="android:windowSplashScreenBackground">@color/bg_primary</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_peertayo_logo</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_peertayo_logo_splash</item>
         <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
     </style>
 </resources>
