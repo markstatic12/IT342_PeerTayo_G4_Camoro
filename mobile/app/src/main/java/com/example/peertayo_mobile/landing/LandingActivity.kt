@@ -2,9 +2,11 @@ package com.example.peertayo_mobile.landing
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.view.View
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.peertayo_mobile.R
 import com.example.peertayo_mobile.auth.login.LoginActivity
 import com.example.peertayo_mobile.auth.register.RegisterActivity
 import com.example.peertayo_mobile.databinding.ActivityLandingBinding
@@ -20,23 +22,28 @@ class LandingActivity : AppCompatActivity() {
 
         setupUI()
         setupClickListeners()
+        runEntranceAnimations()
     }
 
     private fun setupUI() {
-        // Setup RecyclerView for features
+        // Features RecyclerView
         binding.rvFeatures.apply {
             layoutManager = LinearLayoutManager(this@LandingActivity)
             adapter = FeaturesAdapter(getFeaturesList())
+            isNestedScrollingEnabled = false
         }
 
-        // Setup RecyclerView for how it works steps
+        // How It Works RecyclerView
         binding.rvHowItWorks.apply {
             layoutManager = LinearLayoutManager(this@LandingActivity)
             adapter = HowItWorksAdapter(getHowItWorksList())
+            isNestedScrollingEnabled = false
         }
 
-        // Setup stats
-        setupStats()
+        // Stats (can animate counting in a real implementation)
+        binding.statEvaluations.text = "500+"
+        binding.statUsers.text = "1,000+"
+        binding.statTeams.text = "50+"
     }
 
     private fun setupClickListeners() {
@@ -49,24 +56,45 @@ class LandingActivity : AppCompatActivity() {
         }
 
         binding.btnLearnMore.setOnClickListener {
-            // Scroll to features section
-            binding.scrollView.smoothScrollTo(0, binding.featuresSection.top)
+            // Smooth scroll to features section
+            binding.scrollView.post {
+                binding.scrollView.smoothScrollTo(0, binding.featuresSection.top)
+            }
+        }
+
+        // CTA section secondary link
+        binding.tvSignInLink.setOnClickListener {
+            navigateToLogin()
         }
     }
-    
-    private fun navigateToLogin() {
-        startActivity(Intent(this, LoginActivity::class.java))
-    }
-    
-    private fun navigateToRegister() {
-        startActivity(Intent(this, RegisterActivity::class.java))
+
+    private fun runEntranceAnimations() {
+        val fadeUp = AnimationUtils.loadAnimation(this, R.anim.fade_up)
+
+        // Stagger the hero elements
+        binding.heroBadge.alpha = 0f
+        binding.heroBadge.postDelayed({
+            binding.heroBadge.alpha = 1f
+            binding.heroBadge.startAnimation(fadeUp)
+        }, 80)
+
+        binding.statsStrip.alpha = 0f
+        binding.statsStrip.postDelayed({
+            binding.statsStrip.alpha = 1f
+            binding.statsStrip.startAnimation(
+                AnimationUtils.loadAnimation(this, R.anim.fade_up)
+            )
+        }, 220)
     }
 
-    private fun setupStats() {
-        // Animate stats counting (simplified version)
-        binding.statEvaluations.text = "500+"
-        binding.statUsers.text = "1,000+"
-        binding.statTeams.text = "50+"
+    private fun navigateToLogin() {
+        startActivity(Intent(this, LoginActivity::class.java))
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    }
+
+    private fun navigateToRegister() {
+        startActivity(Intent(this, RegisterActivity::class.java))
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     private fun getFeaturesList(): List<FeatureItem> {

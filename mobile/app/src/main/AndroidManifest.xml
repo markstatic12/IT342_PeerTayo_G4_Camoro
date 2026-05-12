@@ -28,10 +28,12 @@
 
         <activity
             android:name=".auth.login.LoginActivity"
+            android:theme="@style/Theme.Peertayomobile.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".auth.register.RegisterActivity"
+            android:theme="@style/Theme.Peertayomobile.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
 
         <activity android:name=".MainActivity" />
