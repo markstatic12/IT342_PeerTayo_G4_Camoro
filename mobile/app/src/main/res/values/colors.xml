@@ -1,63 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary Background Colors (Dark Theme) -->
-    <color name="bg_primary">#080b14</color>
-    <color name="bg_secondary">#0f1623</color>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         DESIGN TOKENS — Matches web global.css & LandingPage.css
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <!-- Background Layers -->
+    <color name="bg_primary">#080B14</color>
+    <color name="bg_secondary">#0F1623</color>
     <color name="bg_surface">#111827</color>
-    
-    <!-- Text Colors -->
-    <color name="text_primary">#f8fafc</color>
-    <color name="text_secondary">#94a3b8</color>
-    <color name="text_muted">#64748b</color>
+    <color name="bg_surface_2">#161B27</color>
+    <color name="bg_card">#161B27</color>
+    <color name="bg_card_hover">#1C2333</color>
+
+    <!-- Text Hierarchy -->
+    <color name="text_primary">#F8FAFC</color>
+    <color name="text_secondary">#94A3B8</color>
+    <color name="text_muted">#64748B</color>
     <color name="text_dim">#475569</color>
-    
+    <color name="text_placeholder">#2D3F55</color>
+
+    <!-- Brand Blue Palette -->
+    <color name="blue_primary">#3B82F6</color>
+    <color name="blue_light">#60A5FA</color>
+    <color name="blue_dark">#1E40AF</color>
+    <color name="blue_darker">#1D4ED8</color>
+    <color name="blue_600">#2563EB</color>
+    <color name="blue_dim">#0D1929</color>
+
+    <!-- Border & Divider -->
+    <color name="border_subtle">#1E2D3D</color>
+    <color name="border_normal">#2A3F54</color>
+    <color name="border_focus">#3B82F6</color>
+
     <!-- Accent Colors -->
-    <color name="blue_primary">#3b82f6</color>
-    <color name="blue_light">#60a5fa</color>
-    <color name="blue_dark">#1e40af</color>
-    
-    <!-- Border & Overlay Colors -->
-    <color name="border_subtle">#1e2d3d</color>
-    <color name="border_normal">#2a3f54</color>
-    <color name="overlay_light">@android:color/transparent</color>
-    
+    <color name="accent_warm">#F59E0B</color>
+    <color name="accent_orange">#F97316</color>
+    <color name="accent_purple">#A78BFA</color>
+
     <!-- Status Colors -->
-    <color name="green_success">#22c55e</color>
-    <color name="red_error">#ef4444</color>
-    <color name="orange_warning">#f97316</color>
-    
-    <!-- Legacy Material Colors -->
-    <color name="black">#FF000000</color>
+    <color name="green_success">#22C55E</color>
+    <color name="red_error">#EF4444</color>
+    <color name="red_error_dim">#120A0A</color>
+    <color name="red_error_border">#3D1515</color>
+    <color name="red_error_text">#FCA5A5</color>
+    <color name="orange_warning">#F97316</color>
+    <color name="yellow_warning">#EAB308</color>
+
+    <!-- Utility -->
+    <color name="transparent">@android:color/transparent</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="gray_200">#FFEEEEEE</color>
-    <color name="gray_400">#FFBDBDBD</color>
-    
-    <!-- PeerTayo Brand Colors (matching web version) -->
-    <color name="primary_color">#3b82f6</color>
-    <color name="primary_dark">#1e40af</color>
-    <color name="accent_color">#60a5fa</color>
-    <color name="accent_warm">#f59e0b</color>
-    
-    <!-- Dark Theme Colors -->
-    <color name="dark_bg">#0f1117</color>
+    <color name="black">#FF000000</color>
+
+    <!-- Legacy aliases kept for backward compat -->
+    <color name="primary_color">#3B82F6</color>
+    <color name="primary_dark">#1E40AF</color>
+    <color name="accent_color">#60A5FA</color>
+    <color name="dark_bg">#0F1117</color>
     <color name="dark_surface">#111827</color>
-    <color name="dark_surface_2">#161b27</color>
-    <color name="dark_card">#161b27</color>
-    <color name="dark_border">#1e2d3d</color>
-    <color name="dark_border_hi">#2a3f54</color>
-    
-    <!-- Text Colors -->
-    <color name="primary_text_color">#f1f5f9</color>
-    <color name="secondary_text_color">#94a3b8</color>
-    <color name="muted_text">#64748b</color>
+    <color name="dark_surface_2">#161B27</color>
+    <color name="dark_card">#161B27</color>
+    <color name="dark_border">#1E2D3D</color>
+    <color name="dark_border_hi">#2A3F54</color>
+    <color name="primary_text_color">#F1F5F9</color>
+    <color name="secondary_text_color">#94A3B8</color>
+    <color name="muted_text">#64748B</color>
     <color name="dim_text">#475569</color>
-    
-    <!-- Background Colors -->
-    <color name="light_gray_background">#f9fafb</color>
-    <color name="card_background">#ffffff</color>
+    <color name="overlay_light">@android:color/transparent</color>
+
 </resources>
