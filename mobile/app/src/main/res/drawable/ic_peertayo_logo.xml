@@ -4,23 +4,15 @@
     android:height="32dp"
     android:viewportWidth="32"
     android:viewportHeight="32">
-    <rect
-        android:width="32"
-        android:height="32"
+    <path
         android:fillColor="#3b82f6"
-        android:rx="8"
-        android:ry="8" />
+        android:pathData="M0,8 C0,3.58 3.58,0 8,0 H24 C28.42,0 32,3.58 32,8 V24 C32,28.42 28.42,32 24,32 H8 C3.58,32 0,28.42 0,24 Z" />
 
-    <rect
-        android:x="7"
-        android:y="7"
-        android:width="18"
-        android:height="18"
+    <path
         android:fillColor="#26ffffff"
         android:strokeColor="#ffffff"
         android:strokeWidth="2"
-        android:rx="4"
-        android:ry="4" />
+        android:pathData="M7,11 C7,8.79 8.79,7 11,7 H21 C23.21,7 25,8.79 25,11 V21 C25,23.21 23.21,25 21,25 H11 C8.79,25 7,23.21 7,21 Z" />
 
     <path
         android:fillColor="#00000000"
