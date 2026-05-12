@@ -1,68 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/dark_surface"
-    app:strokeColor="@color/dark_border"
-    app:strokeWidth="1dp">
+    android:orientation="vertical"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/bg_feature_card"
+    android:padding="16dp">
 
+    <!-- Step Number + Icon + Title Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
 
+        <!-- Step badge + icon column -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginEnd="16dp">
+            android:gravity="center_horizontal"
+            android:layout_marginEnd="14dp">
 
+            <!-- Step number badge -->
             <TextView
                 android:id="@+id/tvStep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="01"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/accent_color"
-                android:fontFamily="sans-serif-medium"
+                style="@style/StepNumberStyle"
                 android:layout_marginBottom="4dp" />
 
-            <ImageView
-                android:id="@+id/ivStepIcon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@color/dark_surface_2"
-                android:padding="8dp"
-                android:src="@drawable/ic_default"
-                android:contentDescription="Step icon" />
+            <!-- Icon container -->
+            <FrameLayout
+                android:layout_width="@dimen/step_icon_size"
+                android:layout_height="@dimen/step_icon_size"
+                android:background="@drawable/bg_step_icon">
+
+                <ImageView
+                    android:id="@+id/ivStepIcon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_default"
+                    android:contentDescription="Step icon" />
+
+            </FrameLayout>
+
         </LinearLayout>
 
-        <LinearLayout
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvStepTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:text="Step Title"
+            style="@style/FeatureTitleStyle" />
 
-            <TextView
-                android:id="@+id/tvStepTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Step Title"
-                style="@style/FeatureTitleStyle" />
-
-            <TextView
-                android:id="@+id/tvStepDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Step description goes here and explains what happens in this step."
-                style="@style/FeatureDescStyle" />
-        </LinearLayout>
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+
+    <!-- Description — indented to align with icon -->
+    <TextView
+        android:id="@+id/tvStepDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="58dp"
+        android:text="Step description goes here and explains what happens in this step."
+        style="@style/FeatureDescStyle" />
+
+</LinearLayout>

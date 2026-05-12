@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="@color/bg_primary"
     tools:context=".landing.LandingActivity">
 
     <LinearLayout
@@ -13,46 +14,87 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Hero Section -->
+        <!-- Header / Logo Area -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:contentDescription="@string/brand_logo_description"
+                android:src="@drawable/ic_peertayo_logo"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PeerTayo"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:letterSpacing="-0.02" />
+
+        </LinearLayout>
+
+        <!-- ═══════════════════════════════════════════════════
+             HERO SECTION
+             ═══════════════════════════════════════════════════ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp"
-            android:background="@color/dark_bg">
-
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="56dp"
+            android:paddingBottom="40dp"
+            android:background="@color/bg_primary">
+            <!-- Live Badge (matches web hero-badge pill) -->
             <LinearLayout
+                android:id="@+id/heroBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"
+                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:background="@drawable/bg_badge"
+                android:paddingStart="12dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="24dp">
 
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:contentDescription="@string/brand_logo_description"
-                    android:src="@drawable/ic_peertayo_logo" />
+                <!-- Pulsing dot -->
+                <View
+                    android:id="@+id/heroBadgeDot"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/dot_blue_pulse" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="PeerTayo"
-                    style="@style/SectionTitleStyle"
-                    android:textColor="@color/primary_text_color" />
+                    android:text="Now on Android"
+                    style="@style/BadgeLabelStyle" />
+
             </LinearLayout>
 
+            <!-- Hero Title line 1 -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Peer Evaluation."
                 style="@style/HeroTitleStyle"
-                android:gravity="center"
-                android:layout_marginTop="48dp" />
+                android:gravity="center" />
 
+            <!-- Hero Title line 2 — blue accent -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -60,14 +102,16 @@
                 style="@style/HeroAccentStyle"
                 android:gravity="center" />
 
+            <!-- Hero Title line 3 — warm accent -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="for Real Teams."
                 style="@style/HeroWarmStyle"
                 android:gravity="center"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="20dp" />
 
+            <!-- Subtitle -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -76,44 +120,42 @@
                 android:gravity="center"
                 android:layout_marginBottom="32dp" />
 
+            <!-- CTA Buttons -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGetStarted"
+                style="@style/LandingPrimaryButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="Get Started Free"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/dark_bg"
-                android:backgroundTint="@color/primary_color"
-                app:cornerRadius="28dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="12dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLearnMore"
+                style="@style/LandingGhostButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="See How It Works"
-                android:textSize="16sp"
-                android:textColor="@color/secondary_text_color"
-                android:backgroundTint="@android:color/transparent"
-                app:strokeColor="@color/dark_border_hi"
-                app:strokeWidth="1dp"
-                app:cornerRadius="28dp"
-                android:layout_marginBottom="32dp" />
+                android:layout_marginBottom="36dp" />
 
-            <!-- Stats -->
+            <!-- Stats Strip (matches web hero-stats grid) -->
             <LinearLayout
+                android:id="@+id/statsStrip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center">
+                android:background="@drawable/bg_stats_strip"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp">
 
+                <!-- Stat 1 -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="18dp">
 
                     <TextView
                         android:id="@+id/statEvaluations"
@@ -126,15 +168,26 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Evaluations"
-                        style="@style/StatLabelStyle" />
+                        style="@style/StatLabelStyle"
+                        android:layout_marginTop="4dp" />
+
                 </LinearLayout>
 
+                <!-- Vertical divider -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/border_subtle" />
+
+                <!-- Stat 2 -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="18dp">
 
                     <TextView
                         android:id="@+id/statUsers"
@@ -147,15 +200,26 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Users"
-                        style="@style/StatLabelStyle" />
+                        style="@style/StatLabelStyle"
+                        android:layout_marginTop="4dp" />
+
                 </LinearLayout>
 
+                <!-- Vertical divider -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/border_subtle" />
+
+                <!-- Stat 3 -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="18dp">
 
                     <TextView
                         android:id="@+id/statTeams"
@@ -168,66 +232,85 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Teams"
-                        style="@style/StatLabelStyle" />
+                        style="@style/StatLabelStyle"
+                        android:layout_marginTop="4dp" />
+
                 </LinearLayout>
+
             </LinearLayout>
+
         </LinearLayout>
 
-        <!-- Features Section -->
+        <!-- ═══════════════════════════════════════════════════
+             FEATURES SECTION
+             ═══════════════════════════════════════════════════ -->
         <LinearLayout
             android:id="@+id/featuresSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp"
-            android:background="@color/dark_surface">
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="48dp"
+            android:paddingBottom="48dp"
+            android:background="@color/bg_surface">
 
+            <!-- Section label pill -->
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Platform Features"
                 style="@style/SectionLabelStyle"
                 android:gravity="center"
-                android:layout_marginBottom="8dp" />
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="10dp" />
 
+            <!-- Section title -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Everything your team needs to evaluate well."
                 style="@style/SectionTitleStyle"
                 android:gravity="center"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="10dp" />
 
+            <!-- Section subtitle -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="From private submissions to real-time analytics, PeerTayo equips both respondents and facilitators with the right tools."
                 style="@style/SubtitleStyle"
                 android:gravity="center"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="28dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvFeatures"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp" />
+                android:nestedScrollingEnabled="false" />
+
         </LinearLayout>
 
-        <!-- How It Works Section -->
+        <!-- ═══════════════════════════════════════════════════
+             HOW IT WORKS SECTION
+             ═══════════════════════════════════════════════════ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp"
-            android:background="@color/dark_surface">
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="48dp"
+            android:paddingBottom="48dp"
+            android:background="@color/bg_primary">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Process Flow"
                 style="@style/SectionLabelStyle"
-                android:gravity="center"
-                android:layout_marginBottom="8dp" />
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="10dp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -235,7 +318,7 @@
                 android:text="How PeerTayo Works"
                 style="@style/SectionTitleStyle"
                 android:gravity="center"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="10dp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -243,21 +326,28 @@
                 android:text="Four steps from setup to insight, built for speed and accountability."
                 style="@style/SubtitleStyle"
                 android:gravity="center"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="28dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvHowItWorks"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
         </LinearLayout>
 
-        <!-- Final CTA Section -->
+        <!-- ═══════════════════════════════════════════════════
+             CTA SECTION
+             ═══════════════════════════════════════════════════ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp"
-            android:background="@color/dark_bg">
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="48dp"
+            android:paddingBottom="56dp"
+            android:background="@color/bg_surface">
 
             <TextView
                 android:layout_width="match_parent"
@@ -265,7 +355,7 @@
                 android:text="Ready to transform your team's evaluation process?"
                 style="@style/CTATitleStyle"
                 android:gravity="center"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="14dp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -273,17 +363,30 @@
                 android:text="Join thousands of users already using PeerTayo for better team insights."
                 style="@style/CTADescStyle"
                 android:gravity="center"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="28dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogin"
+                style="@style/LandingPrimaryButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="Get Started Now"
-                style="@style/Widget.AppCompat.Button"
-                android:textColor="@color/dark_bg"
-                android:backgroundTint="@color/primary_color"
-                app:cornerRadius="28dp" />
+                android:layout_marginBottom="12dp" />
+
+            <!-- Secondary: Sign In link -->
+            <TextView
+                android:id="@+id/tvSignInLink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Already have an account? Sign in"
+                android:textColor="@color/text_dim"
+                android:textSize="13sp"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="4dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+
         </LinearLayout>
 
     </LinearLayout>

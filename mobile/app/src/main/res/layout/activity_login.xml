@@ -10,122 +10,140 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/space_2xl"
-        android:paddingRight="@dimen/space_2xl"
-        android:paddingTop="@dimen/space_4xl">
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="52dp"
+        android:paddingBottom="40dp">
 
-        <!-- App Logo/Brand -->
+        <!-- ── Brand Name ──────────────────────────────────────── -->
         <LinearLayout
-            android:id="@+id/brandLayout"
+            android:id="@+id/brandRow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="4dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
+            <!-- PeerTayo logo -->
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:contentDescription="@string/brand_logo_description"
-                android:src="@drawable/ic_peertayo_logo" />
+                android:src="@drawable/ic_peertayo_logo"
+                android:layout_marginEnd="10dp" />
 
             <TextView
+                android:id="@+id/tvBrandName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
                 android:text="PeerTayo"
-                android:textSize="@dimen/font_size_2xl"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
-                android:fontFamily="@font/plus_jakarta_sans" />
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:letterSpacing="-0.02" />
+
         </LinearLayout>
 
-        <!-- Welcome Heading -->
+        <!-- ── Welcome Heading ────────────────────────────────── -->
         <TextView
             android:id="@+id/tvHeading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Welcome back"
-            android:textSize="@dimen/font_size_xl"
+            android:textSize="26sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
             android:fontFamily="@font/plus_jakarta_sans"
-            android:layout_marginTop="@dimen/space_2xl"
-            app:layout_constraintTop_toBottomOf="@id/brandLayout"
+            android:letterSpacing="-0.02"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@id/brandRow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Subtitle -->
+        <!-- ── Subtitle ───────────────────────────────────────── -->
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sign in to your PeerTayo account"
-            android:textSize="@dimen/font_size_sm"
+            android:textSize="13sp"
             android:textColor="@color/text_dim"
             android:fontFamily="@font/plus_jakarta_sans"
             android:layout_marginTop="6dp"
+            android:layout_marginBottom="4dp"
             app:layout_constraintTop_toBottomOf="@id/tvHeading"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Error Message -->
-        <TextView
-            android:id="@+id/tvError"
+        <!-- ── Error Banner ───────────────────────────────────── -->
+        <LinearLayout
+            android:id="@+id/errorBanner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:visibility="gone"
-            android:padding="@dimen/space_md"
-            android:textSize="@dimen/font_size_xs"
-            android:textColor="#fca5a5"
-            android:textStyle="bold"
-            android:background="#1a1a1a"
-            android:fontFamily="@font/plus_jakarta_sans"
-            android:layout_marginTop="@dimen/space_2xl"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
+            android:background="@drawable/bg_error_banner"
+            android:padding="12dp"
+            android:layout_marginTop="20dp"
             app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:visibility="visible"
-            tools:text="Invalid credentials" />
+            tools:visibility="visible">
 
-        <!-- Email Input -->
+            <TextView
+                android:id="@+id/tvError"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:textColor="@color/red_error_text"
+                android:textStyle="bold"
+                android:fontFamily="@font/plus_jakarta_sans"
+                tools:text="Invalid email or password. Please try again." />
+
+        </LinearLayout>
+
+        <!-- ── Email Input ────────────────────────────────────── -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilEmail"
             style="@style/FormInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_3xl"
+            android:layout_marginTop="28dp"
             android:hint="Email address"
-            app:startIconDrawable="@android:drawable/ic_dialog_email"
+            app:startIconDrawable="@drawable/ic_email"
             app:startIconTint="@color/text_dim"
-            app:layout_constraintTop_toBottomOf="@id/tvError"
+            app:layout_constraintTop_toBottomOf="@id/errorBanner"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/input_height"
+                android:layout_height="52dp"
                 android:inputType="textEmailAddress"
                 android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_dim"
+                android:textColorHint="@color/text_placeholder"
                 android:fontFamily="@font/plus_jakarta_sans"
+                android:textSize="14sp"
                 android:maxLines="1" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Password Input -->
+        <!-- ── Password Input ─────────────────────────────────── -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilPassword"
             style="@style/FormInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_lg"
+            android:layout_marginTop="14dp"
             android:hint="Password"
-            app:startIconDrawable="@android:drawable/ic_lock_lock"
+            app:startIconDrawable="@drawable/ic_lock"
             app:startIconTint="@color/text_dim"
             app:endIconMode="password_toggle"
             app:endIconTint="@color/text_dim"
@@ -136,20 +154,22 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/input_height"
+                android:layout_height="52dp"
                 android:inputType="textPassword"
                 android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_dim"
+                android:textColorHint="@color/text_placeholder"
                 android:fontFamily="@font/plus_jakarta_sans"
+                android:textSize="14sp"
                 android:maxLines="1" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Progress Bar -->
+        <!-- ── Progress Bar ───────────────────────────────────── -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_lg"
+            android:layout_marginTop="16dp"
             android:visibility="gone"
             android:indeterminateTint="@color/blue_primary"
             app:layout_constraintTop_toBottomOf="@id/tilPassword"
@@ -157,29 +177,29 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:visibility="visible" />
 
-        <!-- Sign In Button -->
+        <!-- ── Sign In Button ─────────────────────────────────── -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             style="@style/AuthButton"
             android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="@dimen/space_3xl"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
             android:text="Sign In"
-            android:textSize="@dimen/button_text_size"
+            android:textSize="15sp"
             android:textStyle="bold"
             android:fontFamily="@font/plus_jakarta_sans"
             app:layout_constraintTop_toBottomOf="@id/progressBar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Divider -->
+        <!-- ── OR Divider ─────────────────────────────────────── -->
         <LinearLayout
             android:id="@+id/dividerLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="@dimen/space_xl"
+            android:gravity="center_vertical"
+            android:layout_marginTop="20dp"
             app:layout_constraintTop_toBottomOf="@id/btnLogin"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -195,52 +215,55 @@
                 android:layout_height="wrap_content"
                 android:text="or"
                 android:textColor="@color/text_dim"
-                android:textSize="@dimen/divider_text_size"
+                android:textSize="10sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/plus_jakarta_sans"
-                android:layout_marginStart="@dimen/space_lg"
-                android:layout_marginEnd="@dimen/space_lg" />
+                android:letterSpacing="0.1"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="14dp" />
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1"
                 android:background="@color/border_subtle" />
+
         </LinearLayout>
 
-        <!-- Google Sign In Button -->
+        <!-- ── Google Sign In Button ──────────────────────────── -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnGoogleSignIn"
+            style="@style/SecondaryButton"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="16dp"
             android:text="Continue with Google"
-            android:textSize="@dimen/button_text_size"
-            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
             android:textStyle="bold"
+            android:textColor="@color/text_secondary"
             android:fontFamily="@font/plus_jakarta_sans"
-            android:layout_marginTop="@dimen/space_lg"
-            app:icon="@android:drawable/ic_dialog_email"
-            app:iconTint="@color/text_secondary"
-            app:strokeColor="@color/border_normal"
-            app:strokeWidth="1dp"
-            app:cornerRadius="9dp"
-            app:backgroundTint="@color/bg_surface"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:icon="@drawable/google_icon"
+            app:iconTint="@null"
+            app:iconSize="20dp"
+            app:iconGravity="textStart"
+            app:iconPadding="10dp"
             app:layout_constraintTop_toBottomOf="@id/dividerLayout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Register Link -->
+        <!-- ── Register Link ─────────────────────────────────── -->
         <TextView
             android:id="@+id/tvRegisterLink"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Don't have an account? Create one"
             android:textColor="@color/text_dim"
-            android:textSize="@dimen/font_size_xs"
+            android:textSize="12sp"
             android:fontFamily="@font/plus_jakarta_sans"
-            android:layout_marginTop="@dimen/space_xl"
-            android:layout_marginBottom="@dimen/space_4xl"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             app:layout_constraintTop_toBottomOf="@id/btnGoogleSignIn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
