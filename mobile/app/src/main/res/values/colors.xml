@@ -40,12 +40,31 @@
 
     <!-- Status Colors -->
     <color name="green_success">#22C55E</color>
+    <color name="green_success_dim">#0C1F14</color>
     <color name="red_error">#EF4444</color>
     <color name="red_error_dim">#120A0A</color>
     <color name="red_error_border">#3D1515</color>
     <color name="red_error_text">#FCA5A5</color>
     <color name="orange_warning">#F97316</color>
     <color name="yellow_warning">#EAB308</color>
+
+    <!-- Dashboard Cyan/Orange Palette (from mockup) -->
+    <color name="cyan_primary">#00D4D4</color>
+    <color name="cyan_dim">#0D1A1A</color>
+    <color name="cyan_glow">#4000D4D4</color>
+    <color name="cyan_soft">#1400D4D4</color>
+    <color name="orange_accent">#E8845A</color>
+    <color name="orange_dim">#1AE8845A</color>
+    <color name="orange_glow">#33E8845A</color>
+
+    <!-- Dashboard Surface Colors -->
+    <color name="card_bg">#0D0DFF0DFF</color>
+    <color name="card_bg_solid">#111827</color>
+    <color name="card_hover">#14FFFFFF</color>
+    <color name="border_card">#14FFFFFF</color>
+    <color name="border_hi">#26FFFFFF</color>
+    <color name="bottom_nav_bg">#F8111827</color>
+    <color name="text_on_cyan">#000000</color>
 
     <!-- Utility -->
     <color name="transparent">@android:color/transparent</color>
