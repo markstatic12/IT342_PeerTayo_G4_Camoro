@@ -8,10 +8,11 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.peertayo_mobile.MainActivity
 import com.example.peertayo_mobile.R
 import com.example.peertayo_mobile.auth.register.RegisterActivity
+import com.example.peertayo_mobile.dashboard.DashboardActivity
 import com.example.peertayo_mobile.data.api.RetrofitClient
+import com.example.peertayo_mobile.data.local.SessionManager
 import com.example.peertayo_mobile.data.model.LoginRequest
 import com.example.peertayo_mobile.data.repository.AuthRepository
 import com.example.peertayo_mobile.databinding.ActivityLoginBinding
@@ -20,11 +21,15 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sessionManager = SessionManager(this)
+        RetrofitClient.init(this)
 
         setupViewModel()
         runEntranceAnimation()
@@ -92,8 +97,27 @@ class LoginActivity : AppCompatActivity() {
                 is LoginState.Success -> {
                     binding.btnLogin.isEnabled = true
                     binding.progressBar.visibility = View.GONE
-                    Toast.makeText(this, "Welcome ${state.response.user?.fullName}!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, MainActivity::class.java))
+
+                    // Save session
+                    val user = state.response.user
+                    val token = state.response.token
+                    if (user != null && token != null) {
+                        sessionManager.saveSession(
+                            token = token,
+                            userId = user.id,
+                            firstName = user.firstName,
+                            lastName = user.lastName,
+                            email = user.email,
+                            role = user.role
+                        )
+                    }
+
+                    Toast.makeText(this, "Welcome ${user?.fullName}!", Toast.LENGTH_SHORT).show()
+
+                    // Navigate to Dashboard
+                    val intent = Intent(this, DashboardActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
                     finish()
                 }
                 is LoginState.Error -> {
