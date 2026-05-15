@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Web: nav active = #3b82f6, inactive = #475569 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="#3B82F6" />
+    <item android:color="#475569" />
+</selector>

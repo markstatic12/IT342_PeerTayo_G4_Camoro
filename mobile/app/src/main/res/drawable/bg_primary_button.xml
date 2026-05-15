@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
+<!-- Web primary button: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #1d4ed8 100%), radius 9px -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
     <gradient
         android:startColor="#2563EB"
         android:centerColor="#3B82F6"
         android:endColor="#1D4ED8"
         android:angle="135"
         android:type="linear" />
-    <corners android:radius="9dp" />
+    <corners android:radius="10dp" />
 </shape>

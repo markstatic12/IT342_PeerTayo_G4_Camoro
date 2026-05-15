@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#0DFFFFFF" />
-    <stroke android:width="1dp" android:color="#14FFFFFF" />
-    <corners android:radius="10dp" />
+<!-- Web: icon button = rgba(255,255,255,0.04) bg, radius 8px -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#0AFFFFFF" />
+    <corners android:radius="8dp" />
 </shape>

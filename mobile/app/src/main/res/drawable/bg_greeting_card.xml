@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
-        android:startColor="#1F00D4D4"
-        android:endColor="#0FE8845A"
-        android:angle="135" />
-    <stroke android:width="1dp" android:color="#2600D4D4" />
-    <corners android:radius="18dp" />
-</shape>
+<!-- Web greeting banner: linear-gradient(120deg, #0f172a 0%, #111d35 55%, #0f1f3d 100%) + border rgba(59,130,246,0.18) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#0F172A"
+                android:centerColor="#111D35"
+                android:endColor="#0F1F3D"
+                android:angle="135"
+                android:type="linear" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="@android:color/transparent" />
+            <stroke android:width="1dp" android:color="#2E3B82F6" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+</layer-list>
