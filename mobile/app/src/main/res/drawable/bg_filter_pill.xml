@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Web filter/tab: active = #1e293b surface, inactive = transparent -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true">
+        <shape>
+            <solid android:color="#1E293B" />
+            <stroke android:width="1dp" android:color="#1E3B82F6" />
+            <corners android:radius="6dp" />
+        </shape>
+    </item>
     <item android:state_selected="true">
-        <shape android:shape="rectangle">
-            <solid android:color="#1F00D4D4" />
-            <stroke android:width="1dp" android:color="#4D00D4D4" />
-            <corners android:radius="20dp" />
+        <shape>
+            <solid android:color="#1E293B" />
+            <stroke android:width="1dp" android:color="#1E3B82F6" />
+            <corners android:radius="6dp" />
         </shape>
     </item>
     <item>
-        <shape android:shape="rectangle">
-            <solid android:color="#0DFFFFFF" />
-            <stroke android:width="1dp" android:color="#14FFFFFF" />
-            <corners android:radius="20dp" />
+        <shape>
+            <solid android:color="#06FFFFFF" />
+            <corners android:radius="6dp" />
         </shape>
     </item>
 </selector>

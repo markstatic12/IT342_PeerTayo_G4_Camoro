@@ -1,4 +1,36 @@
 <resources>
     <string name="app_name">PeerTayo</string>
     <string name="brand_logo_description">PeerTayo logo</string>
+
+    <!-- Dashboard Top Bar -->
+    <string name="notif_desc">Notifications</string>
+    <string name="settings_desc">Settings</string>
+
+    <!-- Home Fragment -->
+    <string name="stat_pending">Pending</string>
+    <string name="stat_average">My Average</string>
+    <string name="stat_submitted">Submitted</string>
+    <string name="stat_attention">Attention</string>
+    <string name="recent_activity">Recent Activity</string>
+    <string name="recent_empty">No recent activity yet. Your evaluations and results will show up here.</string>
+    <string name="default_quote">"Feedback is the breakfast of champions." — Ken Blanchard</string>
+
+    <!-- Facilitator Promo -->
+    <string name="promo_title">🚀 Become a Facilitator</string>
+    <string name="promo_desc">Create evaluations, manage teams, and gain deeper insights into performance.</string>
+    <string name="promo_button">Become Facilitator</string>
+
+    <!-- Pending Fragment -->
+    <string name="pending_empty">All caught up! No pending evaluations.</string>
+
+    <!-- Results Fragment -->
+    <string name="results_empty">No results yet. Complete evaluations to receive feedback.</string>
+
+    <!-- Completed Fragment -->
+    <string name="completed_empty">No completed evaluations yet.</string>
+
+    <!-- Forms Fragment (Facilitator) -->
+    <string name="forms_title">Forms Created</string>
+    <string name="forms_create">＋ Create</string>
+    <string name="forms_empty">No forms created yet. Tap Create to get started.</string>
 </resources>

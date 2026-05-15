@@ -2,7 +2,8 @@
 <resources>
 
     <!-- ═══════════════════════════════════════════════════════════════════
-         DESIGN TOKENS — Matches web global.css & LandingPage.css
+         DESIGN TOKENS — Exactly matches web variables.css + DashboardPage.css
+         Primary: Blue #3b82f6 | Background: #080b14 | Surface: #111827
          ═══════════════════════════════════════════════════════════════════ -->
 
     <!-- Background Layers -->
@@ -10,8 +11,9 @@
     <color name="bg_secondary">#0F1623</color>
     <color name="bg_surface">#111827</color>
     <color name="bg_surface_2">#161B27</color>
-    <color name="bg_card">#161B27</color>
-    <color name="bg_card_hover">#1C2333</color>
+    <color name="bg_card">#111827</color>
+    <color name="bg_card_hover">#1E293B</color>
+    <color name="bg_topbar">#0C1020</color>
 
     <!-- Text Hierarchy -->
     <color name="text_primary">#F8FAFC</color>
@@ -20,71 +22,80 @@
     <color name="text_dim">#475569</color>
     <color name="text_placeholder">#2D3F55</color>
 
-    <!-- Brand Blue Palette -->
+    <!-- ── Brand Blue (Primary Action Color) ───────────────── -->
     <color name="blue_primary">#3B82F6</color>
     <color name="blue_light">#60A5FA</color>
     <color name="blue_dark">#1E40AF</color>
     <color name="blue_darker">#1D4ED8</color>
     <color name="blue_600">#2563EB</color>
     <color name="blue_dim">#0D1929</color>
+    <!-- Surfaces with blue tint -->
+    <color name="blue_surface">#111D35</color>
+    <color name="blue_border">#1E3A5F</color>
+    <color name="blue_glow">#1A3B82F6</color>
 
     <!-- Border & Divider -->
-    <color name="border_subtle">#1E2D3D</color>
-    <color name="border_normal">#2A3F54</color>
+    <color name="border_subtle">#12FFFFFF</color>
+    <color name="border_normal">#1CFFFFFF</color>
     <color name="border_focus">#3B82F6</color>
+    <color name="border_card">#12FFFFFF</color>
 
     <!-- Accent Colors -->
-    <color name="accent_warm">#F59E0B</color>
-    <color name="accent_orange">#F97316</color>
+    <color name="orange_accent">#F97316</color>
+    <color name="orange_accent_dim">#1EF97316</color>
+    <color name="orange_accent_border">#38F97316</color>
     <color name="accent_purple">#A78BFA</color>
+    <color name="accent_purple_dim">#1EA78BFA</color>
+    <color name="accent_warm">#F59E0B</color>
+    <color name="yellow_warning">#EAB308</color>
+    <color name="yellow_warning_dim">#1EEAB308</color>
 
     <!-- Status Colors -->
     <color name="green_success">#22C55E</color>
-    <color name="green_success_dim">#0C1F14</color>
+    <color name="green_success_dim">#1222C55E</color>
+    <color name="green_success_border">#3322C55E</color>
     <color name="red_error">#EF4444</color>
-    <color name="red_error_dim">#120A0A</color>
-    <color name="red_error_border">#3D1515</color>
+    <color name="red_error_dim">#0FEF4444</color>
+    <color name="red_error_border">#33EF4444</color>
     <color name="red_error_text">#FCA5A5</color>
-    <color name="orange_warning">#F97316</color>
-    <color name="yellow_warning">#EAB308</color>
 
-    <!-- Dashboard Cyan/Orange Palette (from mockup) -->
-    <color name="cyan_primary">#00D4D4</color>
-    <color name="cyan_dim">#0D1A1A</color>
-    <color name="cyan_glow">#4000D4D4</color>
-    <color name="cyan_soft">#1400D4D4</color>
-    <color name="orange_accent">#E8845A</color>
-    <color name="orange_dim">#1AE8845A</color>
-    <color name="orange_glow">#33E8845A</color>
-
-    <!-- Dashboard Surface Colors -->
-    <color name="card_bg">#0D0DFF0DFF</color>
-    <color name="card_bg_solid">#111827</color>
-    <color name="card_hover">#14FFFFFF</color>
-    <color name="border_card">#14FFFFFF</color>
-    <color name="border_hi">#26FFFFFF</color>
-    <color name="bottom_nav_bg">#F8111827</color>
-    <color name="text_on_cyan">#000000</color>
+    <!-- Bottom Nav -->
+    <color name="bottom_nav_bg">#F5111827</color>
+    <color name="nav_active">#3B82F6</color>
+    <color name="nav_inactive">#475569</color>
 
     <!-- Utility -->
     <color name="transparent">@android:color/transparent</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
+    <color name="text_on_blue">#FFFFFFFF</color>
 
-    <!-- Legacy aliases kept for backward compat -->
+    <!-- ── Legacy aliases kept for backward compat ─────────── -->
     <color name="primary_color">#3B82F6</color>
     <color name="primary_dark">#1E40AF</color>
     <color name="accent_color">#60A5FA</color>
-    <color name="dark_bg">#0F1117</color>
+    <color name="dark_bg">#080B14</color>
     <color name="dark_surface">#111827</color>
     <color name="dark_surface_2">#161B27</color>
-    <color name="dark_card">#161B27</color>
-    <color name="dark_border">#1E2D3D</color>
-    <color name="dark_border_hi">#2A3F54</color>
-    <color name="primary_text_color">#F1F5F9</color>
+    <color name="dark_card">#111827</color>
+    <color name="dark_border">#1CFFFFFF</color>
+    <color name="dark_border_hi">#1CFFFFFF</color>
+    <color name="primary_text_color">#F8FAFC</color>
     <color name="secondary_text_color">#94A3B8</color>
     <color name="muted_text">#64748B</color>
     <color name="dim_text">#475569</color>
     <color name="overlay_light">@android:color/transparent</color>
+    <!-- old cyan names → remapped to blue for compatibility -->
+    <color name="cyan_primary">#3B82F6</color>
+    <color name="cyan_dim">#0D1929</color>
+    <color name="cyan_glow">#263B82F6</color>
+    <color name="cyan_soft">#123B82F6</color>
+    <color name="orange_warning">#F97316</color>
+    <color name="text_on_cyan">#FFFFFF</color>
+    <color name="card_bg">#0DFFFFFF</color>
+    <color name="card_bg_solid">#111827</color>
+    <color name="card_hover">#14FFFFFF</color>
+    <color name="accent_orange">#F97316</color>
+    <color name="blue_surface_dim">#0A3B82F6</color>
 
 </resources>

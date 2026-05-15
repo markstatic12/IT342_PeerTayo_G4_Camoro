@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#0600D4D4" />
-    <stroke android:width="1dp" android:color="#2600D4D4" />
-    <corners android:radius="20dp" />
+<!-- Web: role pill rgba(59,130,246,0.08) bg + border -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#143B82F6" />
+    <stroke android:width="1dp" android:color="#2E3B82F6" />
+    <corners android:radius="99dp" />
 </shape>
