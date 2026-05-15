@@ -3,6 +3,7 @@ package com.example.peertayo_mobile.settings
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -45,7 +46,12 @@ class SettingsActivity : AppCompatActivity() {
         val name = sessionManager.getFullName().ifEmpty { "User" }
         binding.tvFullNameHeader.text = name
         binding.tvInitial.text = name.take(1).uppercase()
-        binding.tvRoleHeader.text = sessionManager.getRole()
+        
+        val roles = sessionManager.getRole()
+        binding.tvRoleHeader.text = roles.uppercase()
+        binding.tvActiveRole.text = roles.uppercase()
+        
+        updatePermissionsList(roles)
         
         binding.etFirstName.setText(sessionManager.getFirstName())
         binding.etLastName.setText(sessionManager.getLastName())
@@ -216,6 +222,33 @@ class SettingsActivity : AppCompatActivity() {
             }.onFailure {
                 Toast.makeText(this@SettingsActivity, "Failed to sync preferences", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun updatePermissionsList(roleString: String) {
+        binding.permissionsContainer.removeAllViews()
+        val roles = roleString.split(",").map { it.trim().uppercase() }
+        
+        roles.forEach { role ->
+            val view = layoutInflater.inflate(R.layout.item_permission_badge, binding.permissionsContainer, false)
+            val title = view.findViewById<TextView>(R.id.tvPermTitle)
+            val desc = view.findViewById<TextView>(R.id.tvPermDesc)
+            
+            when (role) {
+                "RESPONDENT" -> {
+                    title.text = "Respondent Access"
+                    desc.text = "Full access to evaluate peers, view received feedback, and track performance results."
+                }
+                "FACILITATOR" -> {
+                    title.text = "Facilitator Access"
+                    desc.text = "Ability to create forms, manage evaluation cycles, and view team-wide analytics."
+                }
+                "ADMIN" -> {
+                    title.text = "Administrator Access"
+                    desc.text = "Global system control, user management, and advanced configuration settings."
+                }
+            }
+            binding.permissionsContainer.addView(view)
         }
     }
 }

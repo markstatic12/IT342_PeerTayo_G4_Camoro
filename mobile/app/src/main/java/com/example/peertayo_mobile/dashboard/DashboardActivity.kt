@@ -47,9 +47,7 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        // Show/hide Forms tab for facilitators
-        val menu = binding.bottomNav.menu
-        menu.findItem(R.id.nav_forms)?.isVisible = sessionManager.isFacilitator()
+        refreshNavMenu()
 
         binding.bottomNav.setOnItemSelectedListener { item ->
             val fragment = when (item.itemId) {
@@ -63,6 +61,12 @@ class DashboardActivity : AppCompatActivity() {
             loadFragment(fragment)
             true
         }
+    }
+
+    /** Dynamically show/hide the Forms tab based on the latest session role (GAP-06) */
+    fun refreshNavMenu() {
+        val menu = binding.bottomNav.menu
+        menu.findItem(R.id.nav_forms)?.isVisible = sessionManager.isFacilitator()
     }
 
     private fun setupTopBar() {

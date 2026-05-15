@@ -209,9 +209,14 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val result = repository.promoteToFacilitator()
-                result.onSuccess { _ ->
-                    // Save updated role in session
-                    sessionManager.saveRole("FACILITATOR")
+                result.onSuccess { user ->
+                    // Save updated role list in session (GAP-06 / Multiple Roles)
+                    val roles = user?.roles?.joinToString(", ") ?: "RESPONDENT, FACILITATOR"
+                    sessionManager.saveRole(roles)
+                    
+                    // Immediately show the 'Forms' tab in DashboardActivity
+                    (activity as? DashboardActivity)?.refreshNavMenu()
+                    
                     // Navigate to CreateEvaluation (matches web: navigate('/forms-created/new'))
                     startActivity(Intent(requireContext(), CreateEvaluationActivity::class.java))
                     binding.promoBanner.visibility = View.GONE
