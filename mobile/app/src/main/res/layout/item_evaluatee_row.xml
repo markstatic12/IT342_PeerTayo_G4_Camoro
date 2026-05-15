@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="8dp">
+
+    <!-- Avatar circle with initials -->
+    <FrameLayout
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:background="@drawable/bg_user_avatar">
+
+        <TextView
+            android:id="@+id/tvInitials"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/blue_primary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/plus_jakarta_sans" />
+    </FrameLayout>
+
+    <!-- Name + status sub-text -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp">
+
+        <TextView
+            android:id="@+id/tvEvaluateeName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="13sp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not yet submitted"
+            android:textColor="@color/text_muted"
+            android:textSize="11sp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:layout_marginTop="1dp" />
+    </LinearLayout>
+
+    <!-- Evaluate button — matches web's "Evaluate →" button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnEvaluate"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:text="Evaluate →"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:backgroundTint="@color/blue_primary"
+        android:textColor="@color/white"
+        app:cornerRadius="8dp" />
+
+</LinearLayout>

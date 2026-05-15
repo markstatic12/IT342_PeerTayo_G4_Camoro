@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_primary"
+    android:padding="16dp">
+
+    <!-- Header with Create Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/forms_title"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/plus_jakarta_sans" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreate"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="@string/forms_create"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:backgroundTint="@color/cyan_primary"
+            android:textColor="@color/text_on_cyan"
+            app:cornerRadius="8dp"
+            app:icon="@drawable/ic_create"
+            app:iconSize="14dp"
+            app:iconTint="@color/text_on_cyan" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvForms"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false" />
+
+    <LinearLayout android:id="@+id/emptyState"
+        android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:orientation="vertical"
+        android:gravity="center" android:visibility="gone">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="📋" android:textSize="40sp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/forms_empty" android:textColor="@color/text_muted"
+            android:textSize="14sp" android:fontFamily="@font/plus_jakarta_sans"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+</LinearLayout>
