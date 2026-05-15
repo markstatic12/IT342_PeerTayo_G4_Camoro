@@ -99,6 +99,7 @@ class PendingFragment : Fragment() {
                         binding.rvPending.visibility = View.VISIBLE
                         binding.emptyState.visibility = View.GONE
                         adapter.submitList(state.forms)
+                        binding.rvPending.scrollToPosition(0)
                     }
                     // Update stats — now matches web: Pending Count / Urgent / Submitted This Month
                     binding.tvPendingCount.text = state.totalPending.toString()

@@ -86,6 +86,7 @@
             android:visibility="gone">
 
             <TextView
+                android:id="@+id/promoTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/promo_title"
@@ -95,6 +96,7 @@
                 android:fontFamily="@font/plus_jakarta_sans" />
 
             <TextView
+                android:id="@+id/promoDesc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/promo_desc"

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -36,7 +37,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pending Count"
+                android:text="@string/pending_stat_count"
                 android:textColor="@color/text_muted"
                 android:textSize="10sp"
                 android:textStyle="bold"
@@ -70,7 +71,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Urgent"
+                android:text="@string/pending_stat_urgent"
                 android:textColor="@color/text_muted"
                 android:textSize="10sp"
                 android:textStyle="bold"
@@ -104,7 +105,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="This Month"
+                android:text="@string/pending_stat_month"
                 android:textColor="@color/text_muted"
                 android:textSize="10sp"
                 android:textStyle="bold"
@@ -132,7 +133,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:gravity="center"
-                android:text="All"
+                android:text="@string/filter_all"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/plus_jakarta_sans"
@@ -146,7 +147,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:gravity="center"
-                android:text="Urgent"
+                android:text="@string/filter_urgent"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/plus_jakarta_sans"
@@ -161,7 +162,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:gravity="center"
-                android:text="Missed"
+                android:text="@string/filter_missed"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/plus_jakarta_sans"
@@ -190,11 +191,11 @@
         android:gravity="center"
         android:visibility="gone">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🎉"
-            android:textSize="40sp" />
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_empty_check"
+            app:tint="@color/text_placeholder" />
 
         <TextView
             android:layout_width="wrap_content"

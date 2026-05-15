@@ -25,6 +25,21 @@ class CompletedAdapter : ListAdapter<CompletedForm, CompletedAdapter.ViewHolder>
             binding.tvEvaluatee.text = item.evaluateeName
             binding.tvDate.text = item.submittedAt ?: ""
             binding.tvInitial.text = item.evaluateeName.firstOrNull()?.uppercase() ?: "?"
+
+            // Context Menu (GAP-03)
+            binding.btnMenu.setOnClickListener { view ->
+                val popup = android.widget.PopupMenu(view.context, view)
+                popup.menu.add("Archive")
+                popup.menu.add("Delete")
+                popup.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.title) {
+                        "Archive" -> { /* TODO: API Archive */ true }
+                        "Delete" -> { /* TODO: API Delete */ true }
+                        else -> false
+                    }
+                }
+                popup.show()
+            }
         }
     }
 

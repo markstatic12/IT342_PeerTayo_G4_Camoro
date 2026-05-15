@@ -45,6 +45,14 @@ class SessionManager(context: Context) {
 
     fun isFacilitator(): Boolean = getRole().uppercase().contains("FACILITATOR")
 
+    fun saveUser(firstName: String, lastName: String, email: String) {
+        prefs.edit()
+            .putString(KEY_FIRST_NAME, firstName)
+            .putString(KEY_LAST_NAME, lastName)
+            .putString(KEY_EMAIL, email)
+            .apply()
+    }
+
     fun updateRole(role: String) {
         prefs.edit().putString(KEY_ROLE, role).apply()
     }

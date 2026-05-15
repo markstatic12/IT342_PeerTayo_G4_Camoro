@@ -1,81 +1,232 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  fragment_completed.xml
+  GAP-03 FIX:
+    • 3-stat strip aligned to web: Total Submitted / Submitted This Month / Avg Score Given
+    • Search bar added (matches web MyCompletedFormsPage)
+    • Filter tabs: All / This Week  (matches web filter tabs)
+    • Terminology corrected (GAP-12)
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/bg_primary"
     android:padding="16dp">
 
+    <!-- ── 3-Stat Strip ──────────────────────────────────────────────── -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="@drawable/bg_glass_card"
         android:padding="12dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="12dp">
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-            <TextView android:id="@+id/tvSubmittedCount"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="—" android:textColor="@color/cyan_primary"
-                android:textSize="20sp" android:textStyle="bold"
+        <!-- Total Submitted -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tvSubmittedCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="—"
+                android:textColor="@color/cyan_primary"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:fontFamily="@font/plus_jakarta_sans" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Total" android:textColor="@color/text_muted"
-                android:textSize="10sp" android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans" android:textAllCaps="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/completed_stat_total"
+                android:textColor="@color/text_muted"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textAllCaps="true"
+                android:letterSpacing="0.06" />
         </LinearLayout>
 
         <View android:layout_width="1dp" android:layout_height="match_parent"
             android:background="@color/border_card" />
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-            <TextView android:id="@+id/tvEvaluateesCount"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="—" android:textColor="@color/orange_accent"
-                android:textSize="20sp" android:textStyle="bold"
+        <!-- Submitted This Month -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tvEvaluateesCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="—"
+                android:textColor="@color/orange_accent"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:fontFamily="@font/plus_jakarta_sans" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="This Month" android:textColor="@color/text_muted"
-                android:textSize="10sp" android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans" android:textAllCaps="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/completed_stat_month"
+                android:textColor="@color/text_muted"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textAllCaps="true"
+                android:letterSpacing="0.06" />
         </LinearLayout>
 
         <View android:layout_width="1dp" android:layout_height="match_parent"
             android:background="@color/border_card" />
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-            <TextView android:id="@+id/tvLastDate"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="—" android:textColor="@color/green_success"
-                android:textSize="20sp" android:textStyle="bold"
+        <!-- Avg Score Given -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tvLastDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="—"
+                android:textColor="@color/green_success"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:fontFamily="@font/plus_jakarta_sans" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Avg Score" android:textColor="@color/text_muted"
-                android:textSize="10sp" android:textStyle="bold"
-                android:fontFamily="@font/plus_jakarta_sans" android:textAllCaps="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/completed_stat_avg"
+                android:textColor="@color/text_muted"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textAllCaps="true"
+                android:letterSpacing="0.06" />
         </LinearLayout>
     </LinearLayout>
 
+    <!-- ── Search Bar (GAP-03) ───────────────────────────────────────── -->
+    <EditText
+        android:id="@+id/etSearch"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:hint="Search completed forms…"
+        android:textSize="13sp"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_muted"
+        android:background="@drawable/bg_input_field"
+        android:paddingHorizontal="14dp"
+        android:inputType="text"
+        android:imeOptions="actionSearch"
+        android:singleLine="true"
+        android:layout_marginBottom="10dp"
+        android:drawableStart="@drawable/ic_assign"
+        android:drawablePadding="8dp" />
+
+    <!-- Archive Toggle (GAP-03) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="10dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Show Archived"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:fontFamily="@font/plus_jakarta_sans" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchArchived"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- ── Filter Tabs: All / This Week ─────────────────────────────── -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/filterAll"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:gravity="center"
+                android:text="@string/filter_all"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textColor="@color/text_on_cyan"
+                android:background="@drawable/bg_filter_pill_active"
+                android:paddingHorizontal="16dp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/filterThisWeek"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:gravity="center"
+                android:text="@string/filter_this_week"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textColor="@color/text_secondary"
+                android:background="@drawable/bg_filter_pill"
+                android:paddingHorizontal="16dp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- ── Completed Cards List ──────────────────────────────────────── -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCompleted"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        android:paddingBottom="8dp" />
 
-    <LinearLayout android:id="@+id/emptyState"
-        android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:orientation="vertical"
-        android:gravity="center" android:visibility="gone">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="✅" android:textSize="40sp" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/completed_empty" android:textColor="@color/text_muted"
-            android:textSize="14sp" android:fontFamily="@font/plus_jakarta_sans"
+    <!-- Empty State -->
+    <LinearLayout
+        android:id="@+id/emptyState"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_empty_check"
+            app:tint="@color/text_placeholder" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/completed_empty"
+            android:textColor="@color/text_muted"
+            android:textSize="14sp"
+            android:fontFamily="@font/plus_jakarta_sans"
             android:layout_marginTop="8dp" />
     </LinearLayout>
+
 </LinearLayout>
