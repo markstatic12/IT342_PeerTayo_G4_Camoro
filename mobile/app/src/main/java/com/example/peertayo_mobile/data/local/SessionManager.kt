@@ -49,6 +49,9 @@ class SessionManager(context: Context) {
         prefs.edit().putString(KEY_ROLE, role).apply()
     }
 
+    /** Alias for updateRole — used after facilitator promotion. */
+    fun saveRole(role: String) = updateRole(role)
+
     fun isLoggedIn(): Boolean = getToken() != null
 
     fun clearSession() {

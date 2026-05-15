@@ -108,7 +108,7 @@ class LoginActivity : AppCompatActivity() {
                             firstName = user.firstName,
                             lastName = user.lastName,
                             email = user.email,
-                            role = user.role
+                            role = user.primaryRole
                         )
                     }
 
@@ -124,6 +124,7 @@ class LoginActivity : AppCompatActivity() {
                     binding.btnLogin.isEnabled = true
                     binding.progressBar.visibility = View.GONE
                     showError(state.message)
+                    Toast.makeText(this, "Error: ${state.message}", Toast.LENGTH_LONG).show()
                 }
                 is LoginState.Idle -> {
                     binding.btnLogin.isEnabled = true

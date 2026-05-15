@@ -37,6 +37,29 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity android:name=".MainActivity" />
+
+        <activity
+            android:name=".dashboard.DashboardActivity"
+            android:theme="@style/Theme.Peertayomobile.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".evaluation.EvaluateFormActivity"
+            android:theme="@style/Theme.Peertayomobile.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".evaluation.CreateEvaluationActivity"
+            android:theme="@style/Theme.Peertayomobile.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".notification.NotificationActivity"
+            android:theme="@style/Theme.Peertayomobile.NoActionBar" />
+
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:theme="@style/Theme.Peertayomobile.NoActionBar" />
     </application>
 
 </manifest>
