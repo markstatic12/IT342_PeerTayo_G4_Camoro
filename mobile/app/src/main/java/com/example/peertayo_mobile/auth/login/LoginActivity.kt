@@ -135,7 +135,7 @@ class LoginActivity : AppCompatActivity() {
                             firstName = user.firstName,
                             lastName = user.lastName,
                             email = user.email,
-                            role = user.primaryRole
+                            role = user.roles?.joinToString(", ") ?: "RESPONDENT"
                         )
                     }
 

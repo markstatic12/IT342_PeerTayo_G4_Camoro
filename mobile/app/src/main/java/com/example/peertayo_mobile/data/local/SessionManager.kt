@@ -43,7 +43,10 @@ class SessionManager(context: Context) {
 
     fun getRole(): String = prefs.getString(KEY_ROLE, "RESPONDENT") ?: "RESPONDENT"
 
-    fun isFacilitator(): Boolean = getRole().uppercase().contains("FACILITATOR")
+    fun isFacilitator(): Boolean {
+        val roles = getRole().uppercase()
+        return roles.contains("FACILITATOR") || roles.contains("ADMIN")
+    }
 
     fun saveUser(firstName: String, lastName: String, email: String) {
         prefs.edit()
