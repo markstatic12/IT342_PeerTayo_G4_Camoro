@@ -100,6 +100,12 @@ class PendingAdapter(
 
                 binding.evaluateesContainer.addView(row)
             }
+
+            // Expand/collapse logic (GAP-02)
+            binding.root.setOnClickListener {
+                val isVisible = binding.detailPanel.visibility == View.VISIBLE
+                binding.detailPanel.visibility = if (isVisible) View.GONE else View.VISIBLE
+            }
         }
     }
 

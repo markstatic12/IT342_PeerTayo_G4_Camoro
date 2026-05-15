@@ -12,6 +12,14 @@ import com.example.peertayo_mobile.data.api.RetrofitClient
 import com.example.peertayo_mobile.data.repository.EvaluationRepository
 import com.example.peertayo_mobile.databinding.FragmentResultsBinding
 
+/**
+ * ResultsFragment — GAP-01 fix.
+ *
+ * Added:
+ * - 4th stat card: "Highest Criterion" (tvHighestCriterion)
+ * - Filter tabs: All / Highest / Most Recent  (delegates to ResultsViewModel.filter())
+ * - Correct terminology: "Evaluations Received", "Overall Avg Score", "Total Responses"
+ */
 class ResultsFragment : Fragment() {
 
     private var _binding: FragmentResultsBinding? = null
@@ -31,6 +39,7 @@ class ResultsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViewModel()
         setupRecyclerView()
+        setupFilterTabs()
         observeViewModel()
     }
 
@@ -46,7 +55,6 @@ class ResultsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = ResultsAdapter { resultSummary ->
-            // Navigate to ResultDetailFragment
             val fragment = ResultDetailFragment.newInstance(
                 title = resultSummary.title,
                 average = resultSummary.overallAverage ?: 0.0,
@@ -56,14 +64,37 @@ class ResultsFragment : Fragment() {
                 criteriaScores = ArrayList(resultSummary.questionAverages?.map { it.average.toFloat() } ?: emptyList())
             )
             parentFragmentManager.beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
-                    android.R.anim.fade_in, android.R.anim.fade_out)
+                .setCustomAnimations(
+                    android.R.anim.fade_in, android.R.anim.fade_out,
+                    android.R.anim.fade_in, android.R.anim.fade_out
+                )
                 .replace(R.id.fragmentContainer, fragment)
                 .addToBackStack(null)
                 .commit()
         }
         binding.rvResults.layoutManager = LinearLayoutManager(requireContext())
         binding.rvResults.adapter = adapter
+    }
+
+    /** Wires filter tabs to ResultsViewModel.filter() — matches web All/Highest/Most Recent */
+    private fun setupFilterTabs() {
+        val pills = listOf(
+            binding.filterAll     to "all",
+            binding.filterHighest to "highest",
+            binding.filterRecent  to "recent"
+        )
+        pills.forEach { (pill, type) ->
+            pill.setOnClickListener {
+                // Update visual selection
+                pills.forEach { (v, _) ->
+                    v.setTextColor(resources.getColor(R.color.text_secondary, null))
+                    v.setBackgroundResource(R.drawable.bg_filter_pill)
+                }
+                pill.setTextColor(resources.getColor(R.color.text_on_cyan, null))
+                pill.setBackgroundResource(R.drawable.bg_filter_pill_active)
+                viewModel.filter(type)
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -82,18 +113,19 @@ class ResultsFragment : Fragment() {
                         binding.rvResults.visibility = View.VISIBLE
                         binding.emptyState.visibility = View.GONE
                         adapter.submitList(evals)
+                        binding.rvResults.scrollToPosition(0)
                     }
-                    // Stats aligned with web MyResultsPage summary strip:
-                    // tvReceivedCount  = Evaluations Received (number of eval forms)
-                    // tvAverageScore   = Overall Avg Score
-                    // tvImprovedScore  = Total Responses (from peers)
+
+                    // Stats — aligned with web MyResultsPage 4-stat summary strip
                     val r = state.results
                     binding.tvReceivedCount.text = evals.size.toString()
-                    binding.tvAverageScore.text  =
+                    binding.tvAverageScore.text =
                         if ((r?.overallAverage ?: 0.0) > 0)
                             String.format("%.1f", r?.overallAverage ?: 0.0)
                         else "—"
                     binding.tvImprovedScore.text = (r?.totalResponses ?: 0).toString()
+                    // 4th stat: Highest Criterion (GAP-01)
+                    binding.tvHighestCriterion.text = state.highestCriterion
                 }
                 is ResultsState.Error -> {
                     binding.rvResults.visibility = View.GONE

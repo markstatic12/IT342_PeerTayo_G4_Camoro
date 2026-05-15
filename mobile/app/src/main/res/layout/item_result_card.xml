@@ -61,5 +61,15 @@
                 android:fontFamily="@font/plus_jakarta_sans"
                 android:layout_marginTop="2dp" />
         </LinearLayout>
+
+        <!-- Context Menu (GAP-01) -->
+        <ImageView
+            android:id="@+id/btnMenu"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="6dp"
+            android:src="@drawable/ic_menu_dots"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Options" />
     </LinearLayout>
 </LinearLayout>

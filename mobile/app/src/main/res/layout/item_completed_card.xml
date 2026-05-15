@@ -74,4 +74,15 @@
         android:textColor="@color/green_success"
         android:background="@drawable/bg_success_circle"
         android:paddingHorizontal="8dp" />
+
+    <!-- Context Menu (GAP-03) -->
+    <ImageView
+        android:id="@+id/btnMenu"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="6dp"
+        android:src="@drawable/ic_menu_dots"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Options"
+        android:layout_marginStart="4dp" />
 </LinearLayout>

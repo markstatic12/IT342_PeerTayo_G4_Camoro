@@ -97,19 +97,26 @@
             android:fontFamily="@font/plus_jakarta_sans" />
     </LinearLayout>
 
-    <!-- Divider before evaluatees list -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/border_card"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="8dp" />
-
-    <!-- Evaluatees list (populated programmatically) -->
+    <!-- Detail Panel (GAP-02) -->
     <LinearLayout
-        android:id="@+id/evaluateesContainer"
+        android:id="@+id/detailPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/border_card"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:id="@+id/evaluateesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </LinearLayout>
 
 </LinearLayout>

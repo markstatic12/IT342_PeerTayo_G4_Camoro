@@ -96,20 +96,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="56dp"
-        android:layout_marginBottom="64dp" />
+        android:layout_marginBottom="100dp" />
 
-    <!-- ═══════════ BOTTOM NAVIGATION ═══════════ -->
+    <!-- ═══════════ BOTTOM NAVIGATION — Floating Premium Style ═══════════ -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_gravity="bottom"
-        android:background="@color/bottom_nav_bg"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_floating_nav"
         app:itemIconTint="@color/bottom_nav_item_colors"
         app:itemTextColor="@color/bottom_nav_item_colors"
-        app:labelVisibilityMode="labeled"
+        app:labelVisibilityMode="unlabeled"
         app:itemRippleColor="@color/blue_glow"
         app:menu="@menu/bottom_nav_menu"
-        android:elevation="8dp" />
+        app:elevation="12dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
