@@ -37,6 +37,7 @@ data class UserResponse(
     @SerializedName("firstName") val firstName: String,
     @SerializedName("lastName") val lastName: String,
     @SerializedName("email") val email: String,
+    @SerializedName("provider") val provider: String?,
     @SerializedName("roles") val roles: List<String>?
 ) {
     val fullName: String get() = "$firstName $lastName"

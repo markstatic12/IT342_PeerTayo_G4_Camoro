@@ -16,12 +16,24 @@ import com.example.peertayo_mobile.data.local.SessionManager
 import com.example.peertayo_mobile.data.model.LoginRequest
 import com.example.peertayo_mobile.data.repository.AuthRepository
 import com.example.peertayo_mobile.databinding.ActivityLoginBinding
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
     private lateinit var sessionManager: SessionManager
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    companion object {
+        private const val RC_SIGN_IN = 9001
+        private const val WEB_CLIENT_ID = "483611707223-7t1djq3kppndrfrp08krvep4uadnsbbn.apps.googleusercontent.com"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,10 +43,21 @@ class LoginActivity : AppCompatActivity() {
         sessionManager = SessionManager(this)
         RetrofitClient.init(this)
 
+        setupGoogleSignIn()
         setupViewModel()
         runEntranceAnimation()
         setupClickListeners()
         observeViewModel()
+    }
+
+    private fun setupGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(WEB_CLIENT_ID)
+            .requestEmail()
+            .requestProfile()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
     private fun setupViewModel() {
@@ -78,6 +101,10 @@ class LoginActivity : AppCompatActivity() {
 
         binding.btnLogin.setOnClickListener {
             handleLogin()
+        }
+
+        binding.btnGoogleSignIn.setOnClickListener {
+            signInWithGoogle()
         }
 
         binding.tvRegisterLink.setOnClickListener {
@@ -148,6 +175,33 @@ class LoginActivity : AppCompatActivity() {
         }
 
         viewModel.login(LoginRequest(email, password))
+    }
+
+    private fun signInWithGoogle() {
+        val signInIntent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleGoogleSignInResult(task)
+        }
+    }
+
+    private fun handleGoogleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        try {
+            val account = completedTask.getResult(ApiException::class.java)
+            val idToken = account.idToken
+            if (idToken != null) {
+                viewModel.googleLogin(idToken)
+            } else {
+                showError("Google sign-in failed: No ID Token")
+            }
+        } catch (e: ApiException) {
+            showError("Google sign-in failed: ${e.statusCode}")
+        }
     }
 
     private fun showError(message: String) {

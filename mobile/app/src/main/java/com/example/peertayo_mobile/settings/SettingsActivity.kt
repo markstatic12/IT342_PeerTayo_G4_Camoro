@@ -2,26 +2,21 @@ package com.example.peertayo_mobile.settings
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.peertayo_mobile.R
+import com.example.peertayo_mobile.landing.LandingActivity
 import com.example.peertayo_mobile.data.api.RetrofitClient
 import com.example.peertayo_mobile.data.local.SessionManager
-import com.example.peertayo_mobile.data.model.*
+import com.example.peertayo_mobile.data.model.ChangePasswordRequest
+import com.example.peertayo_mobile.data.model.NotificationPreferences
+import com.example.peertayo_mobile.data.model.UpdateProfileRequest
 import com.example.peertayo_mobile.data.repository.EvaluationRepository
 import com.example.peertayo_mobile.databinding.ActivitySettingsBinding
-import com.example.peertayo_mobile.databinding.ItemSettingsToggleBinding
-import com.example.peertayo_mobile.landing.LandingActivity
 import kotlinx.coroutines.launch
 
-/**
- * SettingsActivity — Replicated from Web Settings (GAP-Parity)
- * Includes: Profile, Password & Security, Notifications, Roles & Access
- */
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
@@ -36,25 +31,70 @@ class SettingsActivity : AppCompatActivity() {
         sessionManager = SessionManager(this)
         repository = EvaluationRepository(RetrofitClient.evaluationApi)
 
+        setupToolbar()
         setupUI()
-        setupListeners()
+        setupClickListeners()
         fetchData()
+    }
+
+    private fun setupToolbar() {
+        binding.btnBack.setOnClickListener { finish() }
+    }
+
+    private fun setupUI() {
+        val name = sessionManager.getFullName().ifEmpty { "User" }
+        binding.tvFullNameHeader.text = name
+        binding.tvInitial.text = name.take(1).uppercase()
+        binding.tvRoleHeader.text = sessionManager.getRole()
+        
+        binding.etFirstName.setText(sessionManager.getFirstName())
+        binding.etLastName.setText(sessionManager.getLastName())
+        binding.etEmail.setText(sessionManager.getEmail())
+
+        // Setup Toggles (Web/Mobile Consistency)
+        binding.toggleNewEval.tvToggleTitle.text = "Evaluation Assignments"
+        binding.toggleNewEval.tvToggleDesc.text = "Get notified when you are assigned as an evaluator"
+        
+        binding.toggleDeadline.tvToggleTitle.text = "Deadline Reminders"
+        binding.toggleDeadline.tvToggleDesc.text = "Receive alerts for upcoming evaluation deadlines"
+        
+        binding.toggleResults.tvToggleTitle.text = "Results Published"
+        binding.toggleResults.tvToggleDesc.text = "Notifications when evaluation results are available"
+        
+        binding.toggleSystem.tvToggleTitle.text = "System Alerts"
+        binding.toggleSystem.tvToggleDesc.text = "Critical security and system maintenance updates"
     }
 
     private fun fetchData() {
         lifecycleScope.launch {
-            // Fetch Profile
+            // Profile
             repository.getProfile().onSuccess { profile ->
                 profile?.let {
+                    binding.etFirstName.setText(it.firstName)
+                    binding.etLastName.setText(it.lastName)
+                    binding.etEmail.setText(it.email)
+                    binding.tvFullNameHeader.text = it.fullName
+                    binding.tvInitial.text = it.firstName.take(1).uppercase()
+                    
+                    // Web Parity: Disable password change for Google accounts
+                    if (it.provider == "GOOGLE") {
+                        binding.btnChangePassword.isEnabled = false
+                        binding.btnChangePassword.alpha = 0.5f
+                        binding.tvSecuritySubtitle.visibility = View.VISIBLE
+                        binding.tvSecuritySubtitle.text = "Your account uses Google sign-in. Password management is handled by Google."
+                    }
+                    
                     sessionManager.saveUser(it.firstName, it.lastName, it.email)
-                    setupUI()
                 }
+            }.onFailure {
+                Toast.makeText(this@SettingsActivity, "Failed to load profile", Toast.LENGTH_SHORT).show()
             }
-            // Fetch Preferences
+
+            // Preferences
             repository.getPreferences().onSuccess { prefs ->
                 prefs?.let {
-                    binding.toggleNewEval.switchAction.isChecked = it.newEvaluation
-                    binding.toggleDeadline.switchAction.isChecked = it.deadlineReminders
+                    binding.toggleNewEval.switchAction.isChecked = it.evaluationAssigned
+                    binding.toggleDeadline.switchAction.isChecked = it.deadlineReminder
                     binding.toggleResults.switchAction.isChecked = it.resultsPublished
                     binding.toggleSystem.switchAction.isChecked = it.systemAnnouncements
                 }
@@ -62,92 +102,37 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupUI() {
-        // Header
-        val fullName = sessionManager.getFullName()
-        binding.tvFullNameHeader.text = fullName
-        binding.tvRoleHeader.text = sessionManager.getRole().uppercase()
-        binding.tvInitial.text = fullName.firstOrNull()?.uppercase() ?: "?"
-
-        // Profile Form
-        binding.etFirstName.setText(sessionManager.getFirstName())
-        binding.etLastName.setText(sessionManager.getLastName())
-        binding.etEmail.setText(sessionManager.getEmail())
-
-        // Notification Toggles (Sync with Web structure)
-        setupToggle(binding.toggleNewEval, "New Evaluation Assigned", "When a facilitator assigns you to a form")
-        setupToggle(binding.toggleDeadline, "Deadline Reminders", "48-hour and 24-hour reminders")
-        setupToggle(binding.toggleResults, "Results Published", "When your evaluation results are ready")
-        setupToggle(binding.toggleSystem, "System Announcements", "Important updates about PeerTayo")
-
-        // Roles & Permissions
-        binding.tvActiveRole.text = sessionManager.getRole()
-        populatePermissions()
-    }
-
-    private fun setupToggle(toggleBinding: ItemSettingsToggleBinding, title: String, desc: String) {
-        toggleBinding.tvToggleTitle.text = title
-        toggleBinding.tvToggleDesc.text = desc
-    }
-
-    private fun populatePermissions() {
-        val isFacilitator = sessionManager.getRole() == "FACILITATOR"
-        val permissions = mutableListOf(
-            PermissionItem("Submit peer evaluations", true),
-            PermissionItem("View personal performance results", true),
-            PermissionItem("Receive evaluation notifications", true),
-            PermissionItem("Create evaluation forms", isFacilitator),
-            PermissionItem("Assign evaluators and evaluatees", isFacilitator),
-            PermissionItem("View aggregated team results", isFacilitator)
-        )
-
-        binding.permissionsContainer.removeAllViews()
-        val inflater = LayoutInflater.from(this)
-        permissions.forEach { perm ->
-            val view = inflater.inflate(R.layout.item_permission_row, binding.permissionsContainer, false)
-            view.findViewById<TextView>(R.id.tvPermissionAction).text = perm.action
-            val statusTv = view.findViewById<TextView>(R.id.tvPermissionStatus)
-            
-            if (perm.isAllowed) {
-                statusTv.text = "✓ Allowed"
-                statusTv.setTextColor(getColor(R.color.green_success))
-            } else {
-                statusTv.text = "— Not available"
-                statusTv.setTextColor(getColor(R.color.text_muted))
-            }
-            binding.permissionsContainer.addView(view)
+    private fun setupClickListeners() {
+        binding.btnSaveChanges.setOnClickListener {
+            handleUpdateProfile()
         }
-    }
 
-    private fun setupListeners() {
-        binding.btnBack.setOnClickListener { finish() }
+        binding.btnDiscard.setOnClickListener {
+            fetchData() // Reset
+        }
 
-        // Save Profile
-        binding.btnSaveChanges.setOnClickListener { handleUpdateProfile() }
-        binding.btnDiscard.setOnClickListener { setupUI() } // Reset fields
-
-        // Save Preferences
         binding.btnSavePrefs.setOnClickListener {
-            val prefs = NotificationPreferences(
-                newEvaluation = binding.toggleNewEval.switchAction.isChecked,
-                deadlineReminders = binding.toggleDeadline.switchAction.isChecked,
-                resultsPublished = binding.toggleResults.switchAction.isChecked,
-                systemAnnouncements = binding.toggleSystem.switchAction.isChecked
-            )
-            handleUpdatePreferences(prefs)
+            handleUpdatePreferences()
         }
 
         binding.btnChangePassword.setOnClickListener {
             showChangePasswordSheet()
         }
 
-        // Logout
         binding.btnLogout.setOnClickListener {
-            sessionManager.clearSession()
-            val intent = Intent(this, LandingActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Sign Out")
+                .setMessage("Are you sure you want to sign out of PeerTayo?")
+                .setPositiveButton("Sign Out") { _, _ ->
+                    sessionManager.clearSession()
+                    Toast.makeText(this, "Signed out successfully", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, LandingActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
     }
 
@@ -194,7 +179,6 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
         }
-
         bottomSheet.show()
     }
 
@@ -202,42 +186,36 @@ class SettingsActivity : AppCompatActivity() {
         val first = binding.etFirstName.text.toString()
         val last = binding.etLastName.text.toString()
         val email = binding.etEmail.text.toString()
-
+        
         if (first.isEmpty() || last.isEmpty() || email.isEmpty()) return
-
-        binding.btnSaveChanges.isEnabled = false
-        binding.btnSaveChanges.text = "Saving…"
 
         lifecycleScope.launch {
             val result = repository.updateProfile(UpdateProfileRequest(first, last, email))
-            result.onSuccess { auth ->
-                auth?.user?.let { user ->
-                    // Update session with fresh token and user data
-                    sessionManager.saveSession(
-                        auth.token ?: "", user.id, user.firstName, 
-                        user.lastName, user.email, user.primaryRole
-                    )
-                    setupUI() // Refresh header
-                    Toast.makeText(this@SettingsActivity, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
-                }
-            }.onFailure { e ->
-                Toast.makeText(this@SettingsActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            result.onSuccess {
+                Toast.makeText(this@SettingsActivity, "Profile updated", Toast.LENGTH_SHORT).show()
+                sessionManager.saveUser(first, last, email)
+                binding.tvFullNameHeader.text = "$first $last"
+                binding.tvInitial.text = first.take(1).uppercase()
+            }.onFailure {
+                Toast.makeText(this@SettingsActivity, "Update failed", Toast.LENGTH_SHORT).show()
             }
-            binding.btnSaveChanges.isEnabled = true
-            binding.btnSaveChanges.text = "Update Profile"
         }
     }
 
-    private fun handleUpdatePreferences(prefs: NotificationPreferences) {
-        binding.btnSavePrefs.isEnabled = false
+    private fun handleUpdatePreferences() {
+        val prefs = NotificationPreferences(
+            evaluationAssigned = binding.toggleNewEval.switchAction.isChecked,
+            deadlineReminder = binding.toggleDeadline.switchAction.isChecked,
+            resultsPublished = binding.toggleResults.switchAction.isChecked,
+            systemAnnouncements = binding.toggleSystem.switchAction.isChecked
+        )
         lifecycleScope.launch {
             val result = repository.updatePreferences(prefs)
             result.onSuccess {
-                Toast.makeText(this@SettingsActivity, "Preferences saved!", Toast.LENGTH_SHORT).show()
-            }.onFailure { e ->
-                Toast.makeText(this@SettingsActivity, "Sync failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@SettingsActivity, "Preferences synced", Toast.LENGTH_SHORT).show()
+            }.onFailure {
+                Toast.makeText(this@SettingsActivity, "Failed to sync preferences", Toast.LENGTH_SHORT).show()
             }
-            binding.btnSavePrefs.isEnabled = true
         }
     }
 }
