@@ -138,7 +138,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.btnChangePassword.setOnClickListener {
-            Toast.makeText(this, "Security feature coming soon to mobile", Toast.LENGTH_SHORT).show()
+            showChangePasswordSheet()
         }
 
         // Logout
@@ -149,6 +149,53 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+    }
+
+    private fun showChangePasswordSheet() {
+        val bottomSheet = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.layout_change_password, null)
+        bottomSheet.setContentView(view)
+
+        val btnSubmit = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSubmitPassword)
+        val etCurrent = view.findViewById<android.widget.EditText>(R.id.etCurrentPassword)
+        val etNew = view.findViewById<android.widget.EditText>(R.id.etNewPassword)
+        val etConfirm = view.findViewById<android.widget.EditText>(R.id.etConfirmPassword)
+
+        btnSubmit.setOnClickListener {
+            val current = etCurrent.text.toString()
+            val new = etNew.text.toString()
+            val confirm = etConfirm.text.toString()
+
+            if (current.isEmpty() || new.isEmpty() || confirm.isEmpty()) {
+                Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (new != confirm) {
+                Toast.makeText(this, "New passwords do not match", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (new.length < 8) {
+                Toast.makeText(this, "Password must be at least 8 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            btnSubmit.isEnabled = false
+            btnSubmit.text = "Updating…"
+
+            lifecycleScope.launch {
+                val result = repository.changePassword(ChangePasswordRequest(current, new))
+                result.onSuccess {
+                    Toast.makeText(this@SettingsActivity, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                    bottomSheet.dismiss()
+                }.onFailure { e ->
+                    Toast.makeText(this@SettingsActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    btnSubmit.isEnabled = true
+                    btnSubmit.text = "Update Password"
+                }
+            }
+        }
+
+        bottomSheet.show()
     }
 
     private fun handleUpdateProfile() {
