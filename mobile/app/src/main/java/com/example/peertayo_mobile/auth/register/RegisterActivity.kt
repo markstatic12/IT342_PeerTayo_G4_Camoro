@@ -110,7 +110,7 @@ class RegisterActivity : AppCompatActivity() {
                             firstName = user.firstName,
                             lastName = user.lastName,
                             email = user.email,
-                            role = user.role
+                            role = user.primaryRole
                         )
                     }
 
@@ -124,6 +124,7 @@ class RegisterActivity : AppCompatActivity() {
                     binding.btnRegister.isEnabled = true
                     binding.progressBar.visibility = View.GONE
                     showError(state.message)
+                    Toast.makeText(this, "Error: ${state.message}", Toast.LENGTH_LONG).show()
                 }
                 is RegisterState.Idle -> {
                     binding.btnRegister.isEnabled = true
