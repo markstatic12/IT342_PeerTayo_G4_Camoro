@@ -48,7 +48,7 @@ interface EvaluationApi {
     ): Response<ApiResponse<CreateEvaluationResponse>>
 
     // ── User Search ──────────────────────────────────────────────────
-    @GET("users/search")
+    @GET("users")
     suspend fun searchUsers(
         @Query("q") query: String
     ): Response<ApiResponse<UserSearchResponse>>

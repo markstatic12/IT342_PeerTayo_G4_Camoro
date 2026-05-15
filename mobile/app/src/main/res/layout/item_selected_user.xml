@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/tvInitial"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/bg_avatar_premium"
+        android:gravity="center"
+        android:textColor="@color/bg_primary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/plus_jakarta_sans" />
+
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:text="John Doe"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:fontFamily="@font/plus_jakarta_sans" />
+
+    <ImageView
+        android:id="@+id/btnRemove"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_close"
+        app:tint="@color/text_muted"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+
+</LinearLayout>
