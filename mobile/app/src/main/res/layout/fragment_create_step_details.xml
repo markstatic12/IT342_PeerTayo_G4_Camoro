@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:paddingBottom="100dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Step 1: Evaluation Details"
+            android:textColor="@color/cyan_primary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:fontFamily="@font/plus_jakarta_sans" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Define the core information for this cycle."
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:layout_marginTop="8dp" />
+
+        <View android:layout_width="60dp" android:layout_height="4dp"
+            android:background="@color/cyan_primary" android:layout_marginTop="12dp" />
+
+        <!-- Title Input -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EVALUATION TITLE"
+            android:textColor="@color/text_muted"
+            android:textSize="11sp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:layout_marginTop="32dp" />
+        <EditText
+            android:id="@+id/etTitle"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:background="@drawable/bg_input_field"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:layout_marginTop="8dp"
+            android:hint="e.g. Q2 Team Peer Review"
+            android:textColorHint="@color/text_muted" />
+
+        <!-- Description Input -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DESCRIPTION (OPTIONAL)"
+            android:textColor="@color/text_muted"
+            android:textSize="11sp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:layout_marginTop="20dp" />
+        <EditText
+            android:id="@+id/etDescription"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:background="@drawable/bg_input_field"
+            android:padding="16dp"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:layout_marginTop="8dp"
+            android:gravity="top"
+            android:hint="Briefly explain the purpose of this evaluation..."
+            android:textColorHint="@color/text_muted" />
+
+        <!-- Deadline Picker -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SUBMISSION DEADLINE"
+            android:textColor="@color/text_muted"
+            android:textSize="11sp"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:layout_marginTop="20dp" />
+        <FrameLayout
+            android:id="@+id/btnDeadline"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:background="@drawable/bg_input_field"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:focusable="true">
+            <TextView
+                android:id="@+id/tvDeadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Select Date"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:fontFamily="@font/plus_jakarta_sans" />
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_vertical|end"
+                android:src="@drawable/ic_nav_notif"
+                app:tint="@color/text_muted" />
+        </FrameLayout>
+
+    </LinearLayout>
+</ScrollView>
