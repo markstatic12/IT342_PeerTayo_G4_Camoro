@@ -17,12 +17,14 @@ data class ChangePasswordRequest(
     @SerializedName("newPassword") val newPassword: String
 )
 
-// ── Preferences (Web Parity) ──────────────────────────────────────────
+// ── Preferences (Aligned with Backend) ───────────────────────────────
 
 data class NotificationPreferences(
-    @SerializedName("newEvaluation") val newEvaluation: Boolean = true,
-    @SerializedName("deadlineReminders") val deadlineReminders: Boolean = true,
+    @SerializedName("evaluationAssigned") val evaluationAssigned: Boolean = true,
+    @SerializedName("deadlineReminder") val deadlineReminder: Boolean = true,
     @SerializedName("resultsPublished") val resultsPublished: Boolean = true,
+    @SerializedName("formCreated") val formCreated: Boolean = true,
+    @SerializedName("submissionReceived") val submissionReceived: Boolean = true,
     @SerializedName("systemAnnouncements") val systemAnnouncements: Boolean = true
 )
 
