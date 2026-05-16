@@ -16,6 +16,7 @@ data class PendingEvaluation(
     @SerializedName("evaluateeName") val evaluateeName: String,
     @SerializedName("evaluateeId") val evaluateeId: Long,
     @SerializedName("deadline") val deadline: String?,
+    @SerializedName("creatorName") val creatorName: String?,
     @SerializedName("status") val status: String?,
     @SerializedName("criteria") val criteria: List<Criterion>?
 )

@@ -8,6 +8,8 @@ import edu.cit.camoro.peertayo.auth.repository.UserRepository;
 import edu.cit.camoro.peertayo.auth.shared.AuthResponseBuilder;
 import edu.cit.camoro.peertayo.auth.token.AuthResponse;
 import edu.cit.camoro.peertayo.shared.exception.DuplicateEntryException;
+import edu.cit.camoro.peertayo.notification.entity.NotificationType;
+import edu.cit.camoro.peertayo.notification.shared.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class RegisterService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthResponseBuilder authResponseBuilder;
+    private final NotificationService notificationService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -41,8 +44,15 @@ public class RegisterService {
                 .build();
 
         user.getRoles().add(respondentRole);
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        return authResponseBuilder.buildForUser(user);
+        // Trigger Welcome Notification (and Gmail email)
+        notificationService.send(
+            savedUser, 
+            "Welcome to PeerTayo! Your account has been successfully created. We're excited to have you on board.", 
+            NotificationType.WELCOME
+        );
+
+        return authResponseBuilder.buildForUser(savedUser);
     }
 }

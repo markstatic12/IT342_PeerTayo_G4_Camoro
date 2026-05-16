@@ -28,29 +28,36 @@ data class PendingForm(
     val id: Long,            // evaluationId (the form)
     val title: String,
     val deadline: String?,
+    val creatorName: String?,
     val evaluatees: List<PendingEvaluatee>
 ) {
-    /** Days left until deadline. Negative means overdue/missed. */
+    /** Precise check if the deadline has passed. */
+    fun isMissed(): Boolean {
+        val dl = deadline ?: return false
+        return try {
+            // Support full ISO formats (2026-05-16T23:59:00)
+            val fmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())
+            val d = fmt.parse(dl) ?: return false
+            Date().after(d) // True if current time is past the deadline
+        } catch (_: Exception) { false }
+    }
+
+    /** Days left until deadline. Used for the "Urgent" pill. */
     fun daysLeft(): Long? {
         val dl = deadline ?: return null
         return try {
-            // Take only the first 16 characters (YYYY-MM-DDTHH:mm) to be safe across formats
-            val cleanDl = if (dl.length > 16) dl.substring(0, 16) else dl
             val fmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())
-            val d = fmt.parse(cleanDl) ?: return null
+            val d = fmt.parse(dl) ?: return null
             val diff = d.time - Date().time
+            // Use precise division to ensure even partial days show as 0+
             TimeUnit.MILLISECONDS.toDays(diff)
         } catch (_: Exception) { null }
     }
 
     fun isUrgent(): Boolean {
+        if (isMissed()) return false
         val d = daysLeft() ?: return false
-        return d in 0..3
-    }
-
-    fun isMissed(): Boolean {
-        val d = daysLeft() ?: return false
-        return d < 0
+        return d in 0..1 // Match web's urgency feel (2 days or less)
     }
 }
 
@@ -138,6 +145,7 @@ class PendingViewModel(
                     id = formId,
                     title = item.title,
                     deadline = item.deadline,
+                    creatorName = item.creatorName,
                     evaluatees = listOf(evaluatee)
                 )
             } else {
