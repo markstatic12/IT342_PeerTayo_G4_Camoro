@@ -40,14 +40,14 @@ public class SubmissionService {
             .findAllByEvaluatorAndSubmittedFalseAndArchivedByEvaluatorOrderByEvaluationDeadlineAsc(currentUser, archived)
                 .stream()
                 .filter(item -> item.getEvaluation().getDeletedAt() == null) // BR-003: Skip deleted
-                .filter(item -> item.getEvaluation().getDeadline().isAfter(now))
                 .map(item -> PendingEvaluationResponse.builder()
                         .id(item.getEvaluation().getId())
                         .assignmentId(item.getId())
                         .title(item.getEvaluation().getTitle())
                         .deadline(item.getEvaluation().getDeadline())
                         .evaluateeName(fullName(item.getEvaluatee()))
-                .archived(item.isArchivedByEvaluator())
+                        .creatorName(fullName(item.getEvaluation().getCreatedBy()))
+                        .archived(item.isArchivedByEvaluator())
                         .build())
                 .toList();
     }

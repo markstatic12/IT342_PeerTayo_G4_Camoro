@@ -41,7 +41,7 @@ public class DeadlineManagementService {
      * 2. Flag evaluations as "Needs Attention" when 1 day away with incomplete submissions
      * 3. Send reminder notifications to pending evaluators
      */
-    @Scheduled(fixedDelay = 300_000) // 5 minutes
+    @Scheduled(fixedDelay = 60_000) // 1 minute
     @Transactional
     public void processDeadlineManagement() {
         LocalDateTime now = LocalDateTime.now();
@@ -95,9 +95,24 @@ public class DeadlineManagementService {
             return false;
         }
 
-        // Check if within 1 day of deadline
-        LocalDateTime oneDayBeforeDeadline = evaluation.getDeadline().minusDays(1);
-        if (now.isBefore(oneDayBeforeDeadline)) {
+        LocalDateTime createdAt = evaluation.getCreatedAt();
+        LocalDateTime deadline = evaluation.getDeadline();
+        
+        java.time.Duration totalDuration = java.time.Duration.between(createdAt, deadline);
+        long totalHours = totalDuration.toHours();
+        
+        // Senior Engineering Logic: Proportional Urgency
+        long warningThresholdHours;
+        if (totalHours > 72) { // > 3 days
+            warningThresholdHours = 24; 
+        } else if (totalHours > 24) { // 1-3 days
+            warningThresholdHours = Math.max(6, totalHours / 5); // 20% of time, min 6h
+        } else { // < 24 hours
+            warningThresholdHours = Math.max(1, totalHours / 2); // 50% of time, min 1h
+        }
+
+        LocalDateTime warningMark = deadline.minusHours(warningThresholdHours);
+        if (now.isBefore(warningMark)) {
             return false;
         }
 
@@ -115,6 +130,13 @@ public class DeadlineManagementService {
         evaluation.setStatus("NEEDS_ATTENTION");
         evaluationFormRepository.save(evaluation);
         log.info("Flagged evaluation {} as Needs Attention - deadline approaching with incomplete submissions", evaluation.getId());
+
+        // Notify Creator (Facilitator)
+        String creatorMsg = String.format(
+            "Evaluation '%s' is approaching its deadline with incomplete submissions. Reminders have been sent to pending evaluators.",
+            evaluation.getTitle()
+        );
+        notificationService.send(evaluation.getCreatedBy(), creatorMsg, NotificationType.DEADLINE_REMINDER);
 
         // Get all unsubmitted evaluators and send reminder notifications
         List<EvaluationAssignment> unsubmitted = evaluationAssignmentRepository

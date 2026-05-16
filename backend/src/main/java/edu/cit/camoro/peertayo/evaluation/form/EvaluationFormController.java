@@ -87,7 +87,22 @@ public class EvaluationFormController {
         if (newDeadlineStr == null) {
             throw new IllegalArgumentException("newDeadline is required");
         }
-        java.time.LocalDateTime newDeadline = java.time.LocalDateTime.parse(newDeadlineStr);
+        // Handle ISO-8601 strings with timezone offsets (like 'Z') by parsing as ZonedDateTime first
+        java.time.LocalDateTime newDeadline;
+        try {
+            if (newDeadlineStr.contains("Z") || newDeadlineStr.contains("+")) {
+                // Convert UTC/Offset time to the Server's Local Time
+                newDeadline = java.time.ZonedDateTime.parse(newDeadlineStr)
+                        .withZoneSameInstant(java.time.ZoneId.systemDefault())
+                        .toLocalDateTime();
+            } else {
+                newDeadline = java.time.LocalDateTime.parse(newDeadlineStr);
+            }
+        } catch (Exception e) {
+            newDeadline = java.time.OffsetDateTime.parse(newDeadlineStr)
+                    .atZoneSameInstant(java.time.ZoneId.systemDefault())
+                    .toLocalDateTime();
+        }
         evaluationFormService.extendDeadline(id, newDeadline, userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.ok(Map.of("message", "Deadline extended successfully")));
     }

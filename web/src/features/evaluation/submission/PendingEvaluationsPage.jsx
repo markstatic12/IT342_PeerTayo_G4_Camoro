@@ -22,13 +22,14 @@ function getInitials(name = '') {
 function daysLeft(deadline) {
   if (!deadline) return null;
   const diff = (new Date(deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
-  return Math.ceil(diff);
+  // Return the raw difference, we will floor it for display or check < 0 for missed
+  return diff;
 }
 
 function formatDeadline(deadline) {
   if (!deadline) return '—';
-  return new Date(deadline).toLocaleDateString([], {
-    month: 'short', day: 'numeric', year: 'numeric',
+  return new Date(deadline).toLocaleString([], {
+    month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 }
 
@@ -44,10 +45,11 @@ function groupByForm(flatList) {
   for (const item of flatList) {
     if (!map.has(item.id)) {
       map.set(item.id, {
-        id:         item.id,
-        title:      item.title,
-        deadline:   item.deadline,
-        evaluatees: [],
+        id:          item.id,
+        title:       item.title,
+        deadline:    item.deadline,
+        creatorName: item.creatorName,
+        evaluatees:  [],
       });
     }
     map.get(item.id).evaluatees.push({
@@ -116,7 +118,8 @@ function EvalCard({ form, isSelected, onSelect, onArchive, isArchived }) {
   const done   = form.evaluatees.filter((e) => e.done).length;
   const pct    = total ? ((done / total) * 100).toFixed(0) : 0;
   const dl     = daysLeft(form.deadline);
-  const urgent = dl !== null && dl <= 3;
+  const urgent = dl !== null && dl > 0 && dl <= 3;
+  const missed = dl !== null && dl <= 0;
 
   useEffect(() => {
     const handler = (e) => {
@@ -128,55 +131,30 @@ function EvalCard({ form, isSelected, onSelect, onArchive, isArchived }) {
 
   return (
     <div
-      className={`eval-card ${urgent ? 'ec-warn' : 'ec-blue'}${isSelected ? ' selected' : ''}`}
+      className={`eval-card ${missed ? 'ec-missed' : urgent ? 'ec-warn' : 'ec-blue'}${isSelected ? ' selected' : ''}`}
       onClick={() => onSelect(form.id)}
     >
       <div className="ec-top">
         <div className="ec-title">{form.title}</div>
         <div className="ec-top-right">
-          <span className={`ec-pill ${urgent ? 'ep-warn' : 'ep-blue'}`}>
-            {urgent ? 'Urgent' : 'Pending'}
+          <span className={`ec-pill ${missed ? 'ep-missed' : urgent ? 'ep-warn' : 'ep-blue'}`}>
+            {missed ? 'Missed' : urgent ? 'Urgent' : 'Pending'}
           </span>
-          <div
-            ref={dotsRef}
-            className="ec-dots"
-            title="Options"
-            onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
-          >
-            <SvgDots />
-            <div className={`ec-menu${menuOpen ? ' open' : ''}`}>
-              <div
-                className="ec-menu-item mi-archive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setMenuOpen(false);
-                  onArchive(form.id, isArchived);
-                }}
-              >
-                <SvgArchive /> {isArchived ? 'Unarchive' : 'Archive'}
-              </div>
-              <div
-                className="ec-menu-item mi-delete"
-                onClick={(e) => {
-                  e.stopPropagation(); setMenuOpen(false);
-                  if (window.confirm('Delete this evaluation? This cannot be undone.')) alert('Evaluation deleted.');
-                }}
-              >
-                <SvgTrash /> Delete
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
       <div className="ec-meta">
-        <span>{total} evaluatee{total !== 1 ? 's' : ''}</span>
-        <span className="ec-sep" />
         <span>Due {formatDeadline(form.deadline)}</span>
-        {urgent && dl !== null && (
+        {dl !== null && dl > 0 && dl <= 3 && (
           <>
             <span className="ec-sep" />
-            <span style={{ color: 'var(--pe-warn)', fontWeight: 700 }}>{dl}d left</span>
+            <span style={{ color: 'var(--pe-warn)', fontWeight: 700 }}>{Math.ceil(dl)}d left</span>
+          </>
+        )}
+        {dl !== null && dl <= 0 && (
+          <>
+            <span className="ec-sep" />
+            <span style={{ color: 'var(--pe-danger)', fontWeight: 700 }}>Deadline Passed</span>
           </>
         )}
       </div>
@@ -218,6 +196,8 @@ function DetailPanel({ form, onStartEvaluate }) {
         <div>
           <div className="dh-title">{form.title}</div>
           <div className="dh-meta">
+            <span>By {form.creatorName}</span>
+            <span className="dh-sep" />
             <span>Due {formatDeadline(form.deadline)}</span>
             <span className="dh-sep" />
             <span>{evaluatees.length} evaluatee{evaluatees.length !== 1 ? 's' : ''}</span>
@@ -228,10 +208,14 @@ function DetailPanel({ form, onStartEvaluate }) {
             <div className="dh-prog-num">{done}/{evaluatees.length}</div>
             <div className="dh-prog-lbl">evaluated</div>
           </div>
-          {urgent && dl !== null && (
-            <div className="dh-urgent-hero">
-              <div className="dh-urgent-num">{dl}d</div>
-              <div className="dh-urgent-lbl">days left</div>
+          {dl !== null && (
+            <div className={dl <= 0 ? 'dh-missed-hero' : 'dh-urgent-hero'}>
+              <div className={dl <= 0 ? 'dh-missed-num' : 'dh-urgent-num'}>
+                {dl <= 0 ? '!' : Math.ceil(dl) + 'd'}
+              </div>
+              <div className={dl <= 0 ? 'dh-missed-lbl' : 'dh-urgent-lbl'}>
+                {dl <= 0 ? 'Missed' : 'left'}
+              </div>
             </div>
           )}
         </div>
@@ -253,9 +237,10 @@ function DetailPanel({ form, onStartEvaluate }) {
                 <div className="ev-right">
                   <button
                     className="btn btn-primary"
+                    disabled={dl <= 0}
                     onClick={() => onStartEvaluate(form, ev)}
                   >
-                    Evaluate <SvgChevRight />
+                    {dl <= 0 ? 'Locked' : 'Evaluate'} <SvgChevRight />
                   </button>
                 </div>
               </div>
@@ -272,9 +257,10 @@ function DetailPanel({ form, onStartEvaluate }) {
         {evaluatees.filter((e) => !e.done).length > 0 && (
           <button
             className="btn btn-primary"
+            disabled={dl <= 0}
             onClick={() => onStartEvaluate(form, evaluatees.find((e) => !e.done))}
           >
-            Start Next <SvgChevRight />
+            {dl <= 0 ? 'Deadline Passed' : 'Start Next'} <SvgChevRight />
           </button>
         )}
       </div>
@@ -367,8 +353,11 @@ export default function PendingEvaluationsPage() {
       if (isArchived) return false;
       
       const dl = daysLeft(f.deadline);
-      if (filter === 'urgent' && !(dl !== null && dl <= 3)) return false;
-      if (filter === 'missed' && !(dl !== null && dl < 0)) return false;
+      const isUrgent = dl !== null && dl > 0 && dl <= 3;
+      const isMissed = dl !== null && dl <= 0;
+
+      if (filter === 'urgent' && !isUrgent) return false;
+      if (filter === 'missed' && !isMissed) return false;
     }
 
     if (search) {
@@ -517,13 +506,6 @@ export default function PendingEvaluationsPage() {
                     </div>
                   ))}
                 </div>
-                <button 
-                  className={`btn-archive${filter === 'archived' ? ' active' : ''}`} 
-                  title="View archived evaluations"
-                  onClick={() => setFilter(prev => prev === 'archived' ? 'all' : 'archived')}
-                >
-                  <SvgArchive /> Archives
-                </button>
               </div>
 
               <div className="eval-scroll">
