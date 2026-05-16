@@ -26,5 +26,8 @@ public enum NotificationType {
     ZERO_SUBMISSIONS,
 
     /** Sent to evaluators when a deadline is extended (BR-004). */
-    DEADLINE_EXTENDED
+    DEADLINE_EXTENDED,
+
+    /** Sent to new users upon successful registration. */
+    WELCOME
 }

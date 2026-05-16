@@ -23,6 +23,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserNotificationPreferenceRepository preferenceRepository;
+    private final EmailService emailService;
 
     /**
      * Send a notification to a single user if their preferences allow it.
@@ -38,6 +39,63 @@ public class NotificationService {
                         .type(type)
                         .read(false)
                         .build()
+        );
+
+        // Trigger Email Notification for high-priority events
+        triggerEmail(recipient, message, type);
+    }
+
+    private void triggerEmail(User recipient, String message, NotificationType type) {
+        String subject;
+        String title;
+        String buttonText = "Launch PeerTayo";
+        String buttonPath = "/pending-evaluations";
+        
+        String welcomeNote = "Visit the PeerTayo portal to manage your evaluations and stay updated with your team's performance.";
+
+        switch (type) {
+            case EVALUATION_ASSIGNED -> {
+                subject = "[PeerTayo] New Evaluation Task Assigned";
+                title = "New Assignment Received";
+            }
+            case DEADLINE_REMINDER -> {
+                subject = "[Action Required] Your PeerTayo Deadline is Approaching";
+                title = "Priority Deadline Reminder";
+            }
+            case DEADLINE_EXTENDED -> {
+                subject = "[Update] More Time Granted for Your Evaluation";
+                title = "Deadline Extended";
+            }
+            case ZERO_SUBMISSIONS -> {
+                subject = "[Urgent] Evaluation Closed with No Responses";
+                title = "Incomplete Evaluation Form";
+                buttonPath = "/forms-created";
+            }
+            case RESULTS_PUBLISHED -> {
+                subject = "[PeerTayo] Your Performance Results are Now Live";
+                title = "Results Published";
+                buttonPath = "/my-results";
+            }
+            case WELCOME -> {
+                subject = "Welcome to PeerTayo!";
+                title = "Account Created Successfully";
+                buttonText = "Explore Dashboard";
+                buttonPath = "/";
+            }
+            default -> {
+                return;
+            }
+        }
+
+        String fullContent = message + "\n\n" + welcomeNote;
+
+        emailService.sendHtmlEmail(
+            recipient.getEmail(),
+            subject,
+            title,
+            fullContent,
+            buttonText,
+            buttonPath
         );
     }
 
@@ -58,6 +116,8 @@ public class NotificationService {
 
         if (!toSave.isEmpty()) {
             notificationRepository.saveAll(toSave);
+            // Trigger Emails for each recipient
+            toSave.forEach(notif -> triggerEmail(notif.getUser(), notif.getMessage(), notif.getType()));
         }
     }
 
