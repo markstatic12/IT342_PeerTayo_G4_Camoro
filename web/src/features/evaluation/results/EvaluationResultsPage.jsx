@@ -66,6 +66,15 @@ const IcoAlert = () => (
   </svg>
 );
 
+function ProcessingOverlay() {
+  return (
+    <div className="er-processing-overlay animate-fade-in">
+      <div className="er-spinner"></div>
+      <span>Processing...</span>
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════════════
    EvaluationResultsPage — Screen 2: evaluatee list with score boxes
    ══════════════════════════════════════════════════════════════════════ */
@@ -123,6 +132,7 @@ export default function EvaluationResultsPage() {
 
   return (
     <div className="er-page animate-page">
+      {processing && <ProcessingOverlay />}
 
       {/* Back */}
       <button className="er-back" type="button" onClick={() => navigate('/forms-created')}>
@@ -198,8 +208,15 @@ export default function EvaluationResultsPage() {
                 <button className="er-btn er-btn-outline" onClick={() => setShowExtendModal(true)}>Extend Deadline</button>
                 <button className="er-btn er-btn-danger" onClick={async () => {
                   if (window.confirm('Are you sure you want to close this evaluation permanently?')) {
-                    await closePermanently(id);
-                    refreshData();
+                    setProcessing(true);
+                    try {
+                      await closePermanently(id);
+                      refreshData();
+                    } catch (err) {
+                      alert('Failed to close evaluation');
+                    } finally {
+                      setProcessing(false);
+                    }
                   }
                 }}>Close Permanently</button>
               </div>
@@ -299,19 +316,27 @@ export default function EvaluationResultsPage() {
       {/* Extend Deadline Modal */}
       {showExtendModal && (
         <div className="er-modal-overlay" onClick={() => !processing && setShowExtendModal(false)}>
-          <div className="er-modal" onClick={e => e.stopPropagation()}>
-            <div className="er-modal-title">Extend Deadline</div>
-            <div className="er-modal-text">Select a new future deadline for this evaluation. All assigned evaluators will be re-notified.</div>
-            <input 
-              type="datetime-local" 
-              className="er-input" 
-              value={newDeadline}
-              onChange={e => setNewDeadline(e.target.value)}
-              min={new Date().toISOString().slice(0, 16)}
-            />
+          <div className="er-modal animate-slide-down" onClick={e => e.stopPropagation()}>
+            <div className="er-modal-header">
+              <div className="er-modal-icon-bg"><IcoAlert /></div>
+              <div className="er-modal-title">Extend Deadline</div>
+            </div>
+            <div className="er-modal-text">Select a new future deadline. All evaluators who haven't submitted will be re-notified.</div>
+            
+            <div className="er-input-group">
+              <label className="er-input-label">New Deadline Date & Time</label>
+              <input 
+                type="datetime-local" 
+                className="er-input er-input--date" 
+                value={newDeadline}
+                onChange={e => setNewDeadline(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)}
+              />
+            </div>
+
             <div className="er-modal-actions">
               <button className="er-btn er-btn-ghost" onClick={() => setShowExtendModal(false)} disabled={processing}>Cancel</button>
-              <button className="er-btn er-btn-primary" onClick={async () => {
+              <button className="er-btn er-btn-primary er-btn--wide" onClick={async () => {
                 if (!newDeadline) return;
                 setProcessing(true);
                 try {

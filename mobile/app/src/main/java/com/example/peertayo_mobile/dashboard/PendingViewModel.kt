@@ -34,8 +34,10 @@ data class PendingForm(
     fun daysLeft(): Long? {
         val dl = deadline ?: return null
         return try {
-            val fmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            val d = fmt.parse(dl) ?: return null
+            // Take only the first 16 characters (YYYY-MM-DDTHH:mm) to be safe across formats
+            val cleanDl = if (dl.length > 16) dl.substring(0, 16) else dl
+            val fmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())
+            val d = fmt.parse(cleanDl) ?: return null
             val diff = d.time - Date().time
             TimeUnit.MILLISECONDS.toDays(diff)
         } catch (_: Exception) { null }

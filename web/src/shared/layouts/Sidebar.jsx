@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/context/AuthContext';
 import { useNavigationGuard } from '../context/NavigationGuardContext';
 import { listPendingEvaluations } from '../../features/evaluation/submission/evaluationSubmissionService';
+import { listCreatedEvaluations } from '../../features/evaluation/form/evaluationFormService';
 import {
   LogoIcon,
   DashboardIcon,
@@ -28,6 +29,7 @@ export default function Sidebar() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [facilitatorNoticeCount, setFacilitatorNoticeCount] = useState(0);
 
   const isFacilitator = useMemo(() => {
     return user?.roles?.some(
@@ -35,15 +37,40 @@ export default function Sidebar() {
     );
   }, [user]);
 
-  /* fetch pending count on mount and whenever user changes */
+  /* fetch counts on mount and whenever user changes */
   useEffect(() => {
     if (!user) return;
     let alive = true;
+
+    // 1. Pending evaluations for Respondent
     listPendingEvaluations()
       .then((data) => { if (alive) setPendingCount(data?.length ?? 0); })
       .catch(() => {});
+
+    // 2. Forms needing attention for Facilitator
+    if (isFacilitator) {
+      listCreatedEvaluations()
+        .then((data) => {
+          if (!alive) return;
+          const noticeCount = data.filter(ev => {
+            const status = ev.status?.toUpperCase();
+            const isOverdue = ev.deadline && new Date(ev.deadline) < new Date();
+            
+            // Needs attention if:
+            // - Status is NEEDS_ATTENTION
+            // - Status is ACTIVE but deadline passed
+            // - Status is CLOSED but 0 submissions and not permanently closed (needs extension/closure)
+            return (status === 'NEEDS_ATTENTION') ||
+                   (status === 'ACTIVE' && isOverdue) ||
+                   (status === 'CLOSED' && ev.submissionCount === 0 && !ev.permanentlyClosed);
+          }).length;
+          setFacilitatorNoticeCount(noticeCount);
+        })
+        .catch(() => {});
+    }
+
     return () => { alive = false; };
-  }, [user?.id]);
+  }, [user?.id, isFacilitator]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -110,6 +137,7 @@ export default function Sidebar() {
             >
               <FormsIcon size={16} />
               Forms Created
+              {facilitatorNoticeCount > 0 && <span className="sidebar__dot" />}
             </button>
           )}
           {!isFacilitator && (

@@ -13,5 +13,6 @@ public class PendingEvaluationResponse {
     private String title;
     private LocalDateTime deadline;
     private String evaluateeName;
+    private String creatorName;
     private boolean archived;
 }

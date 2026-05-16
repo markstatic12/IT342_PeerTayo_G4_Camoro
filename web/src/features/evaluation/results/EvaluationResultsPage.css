@@ -312,28 +312,80 @@
 .er-modal {
   background: #111827;
   border: 1px solid #1e293b;
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 20px;
+  padding: 32px;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  max-width: 440px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
-.er-modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 12px; }
-.er-modal-text { font-size: 13.5px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px; }
-.er-input {
+.er-modal-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.er-modal-icon-bg { 
+  width: 40px; height: 40px; border-radius: 12px; 
+  background: rgba(59, 130, 246, 0.1); color: #3b82f6;
+  display: flex; align-items: center; justify-content: center;
+}
+.er-modal-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: #fff; margin: 0; }
+.er-modal-text { font-size: 14px; color: #94a3b8; line-height: 1.6; margin-bottom: 24px; }
+
+.er-input-group { margin-bottom: 24px; }
+.er-input-label { display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.er-input--date {
   width: 100%;
   background: #0f172a;
-  border: 1px solid #1e293b;
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: #f1f5f9;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #fff;
   font-family: inherit;
-  margin-bottom: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
 }
-.er-modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
+.er-input--date:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+
+.er-modal-actions { display: flex; gap: 12px; }
+.er-btn--wide { flex: 1; }
 
 @keyframes slide-down {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-slide-down { animation: slide-down 0.3s ease-out; }
+
+/* ── Processing Overlay ──────────────────────────────────────────────── */
+.er-processing-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 2000;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.er-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: er-spin 0.8s linear infinite;
+}
+
+@keyframes er-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in { animation: fade-in 0.2s ease-out; }

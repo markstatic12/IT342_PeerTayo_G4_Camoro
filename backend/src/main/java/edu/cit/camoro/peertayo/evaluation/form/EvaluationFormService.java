@@ -284,7 +284,9 @@ public class EvaluationFormService {
         EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedByAndDeletedAtIsNull(id, creator)
                 .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
 
-        if (newDeadline.isBefore(LocalDateTime.now())) {
+        if (newDeadline.isBefore(java.time.LocalDateTime.now())) {
+            // Log the comparison to help debug if it still fails
+            log.warn("BR-004: Deadline extension rejected. New: {}, Server Now: {}", newDeadline, java.time.LocalDateTime.now());
             throw new BusinessRuleException("BR-004", "New deadline must be in the future.");
         }
 
