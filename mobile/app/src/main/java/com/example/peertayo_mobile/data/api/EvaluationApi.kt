@@ -85,4 +85,19 @@ interface EvaluationApi {
     suspend fun updatePreferences(
         @Body request: NotificationPreferences
     ): Response<ApiResponse<NotificationPreferences>>
+    @DELETE("evaluations/{id}")
+    suspend fun deleteEvaluation(
+        @Path("id") id: Long
+    ): Response<ApiResponse<Any>>
+
+    @POST("evaluations/{id}/extend-deadline")
+    suspend fun extendDeadline(
+        @Path("id") id: Long,
+        @Body request: Map<String, String>
+    ): Response<ApiResponse<Any>>
+
+    @POST("evaluations/{id}/close-permanently")
+    suspend fun closePermanently(
+        @Path("id") id: Long
+    ): Response<ApiResponse<Any>>
 }

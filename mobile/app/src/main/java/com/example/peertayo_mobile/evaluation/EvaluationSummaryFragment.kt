@@ -37,6 +37,17 @@ class EvaluationSummaryFragment : Fragment() {
         }
         viewModel.evaluatees.observe(viewLifecycleOwner) {
             binding.tvEvaluateeCount.text = it.size.toString()
+            updateOverlapWarning()
+        }
+    }
+
+    private fun updateOverlapWarning() {
+        val count = viewModel.getOverlapCount()
+        if (count > 0) {
+            binding.tvOverlapWarning.text = "Note: $count user${if(count > 1) "s are" else " is"} in both lists and won't evaluate themselves."
+            binding.tvOverlapWarning.visibility = View.VISIBLE
+        } else {
+            binding.tvOverlapWarning.visibility = View.GONE
         }
     }
 

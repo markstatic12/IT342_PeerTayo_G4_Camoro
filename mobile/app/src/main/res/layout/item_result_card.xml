@@ -60,6 +60,15 @@
                 android:textSize="12sp"
                 android:fontFamily="@font/plus_jakarta_sans"
                 android:layout_marginTop="2dp" />
+
+            <TextView
+                android:id="@+id/tvFacilitator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/cyan_primary"
+                android:textSize="10sp"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:layout_marginTop="1dp" />
         </LinearLayout>
 
         <!-- Context Menu (GAP-01) -->

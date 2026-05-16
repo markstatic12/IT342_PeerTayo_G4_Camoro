@@ -101,7 +101,13 @@ class ResultsControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post("/api/v1/evaluations/" + evaluationId + "/submit")
+        // Get assignmentId from pending list
+        var pendingResult = mockMvc.perform(get("/api/v1/evaluations/pending")
+                        .header("Authorization", "Bearer " + evaluatorToken))
+                .andReturn();
+        Long assignmentId = ((Number) JsonPath.read(pendingResult.getResponse().getContentAsString(), "$.data.evaluations[0].assignmentId")).longValue();
+
+        mockMvc.perform(post("/api/v1/evaluations/" + assignmentId + "/submit")
                 .header("Authorization", "Bearer " + evaluatorToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(submitBody));

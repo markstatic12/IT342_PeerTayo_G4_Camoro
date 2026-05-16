@@ -35,10 +35,62 @@ object RetrofitClient {
         chain.proceed(request)
     }
 
+    private val authenticator = okhttp3.Authenticator { _, response ->
+        val refreshToken = sessionManager?.getRefreshToken() ?: return@Authenticator null
+
+        // Avoid multiple refreshes
+        if (response.request.header("Authorization") != "Bearer ${sessionManager?.getToken()}") {
+            return@Authenticator null
+        }
+
+        synchronized(this) {
+            val newToken = sessionManager?.getToken()
+            // Check if it was already refreshed by another thread
+            if (response.request.header("Authorization") != "Bearer $newToken") {
+                return@Authenticator response.request.newBuilder()
+                    .header("Authorization", "Bearer $newToken")
+                    .build()
+            }
+
+            // Sync refresh call
+            val refreshResponse = kotlinx.coroutines.runBlocking {
+                val repository = AuthRepository(authApi)
+                repository.refreshSilent(refreshToken)
+            }
+
+            return@synchronized refreshResponse.fold(
+                onSuccess = { auth ->
+                    if (auth?.token != null) {
+                        sessionManager?.saveSession(
+                            auth.token,
+                            auth.refreshToken,
+                            auth.user?.id ?: -1L,
+                            auth.user?.firstName ?: "",
+                            auth.user?.lastName ?: "",
+                            auth.user?.email ?: "",
+                            auth.user?.primaryRole ?: ""
+                        )
+                        response.request.newBuilder()
+                            .header("Authorization", "Bearer ${auth.token}")
+                            .build()
+                    } else {
+                        sessionManager?.clearSession()
+                        null
+                    }
+                },
+                onFailure = {
+                    sessionManager?.clearSession()
+                    null
+                }
+            )
+        }
+    }
+
     private val client: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(logging)
+            .authenticator(authenticator)
             .build()
     }
 

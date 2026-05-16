@@ -20,5 +20,11 @@ public enum NotificationType {
     SUBMISSION_RECEIVED,
 
     /** Platform-wide announcements. */
-    SYSTEM
+    SYSTEM,
+
+    /** Sent to facilitator when deadline expires with 0 submissions (BR-004). */
+    ZERO_SUBMISSIONS,
+
+    /** Sent to evaluators when a deadline is extended (BR-004). */
+    DEADLINE_EXTENDED
 }

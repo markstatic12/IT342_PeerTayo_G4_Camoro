@@ -13,4 +13,5 @@ public class CreatedEvaluationResponse {
     private LocalDateTime deadline;
     private Long createdBy;
     private String status;
+    private boolean roleUpgraded;
 }

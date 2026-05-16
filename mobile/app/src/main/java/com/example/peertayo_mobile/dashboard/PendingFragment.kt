@@ -40,9 +40,10 @@ class PendingFragment : Fragment() {
 
     private fun setupViewModel() {
         val repository = EvaluationRepository(RetrofitClient.evaluationApi)
+        val sessionManager = com.example.peertayo_mobile.data.local.SessionManager(requireContext())
         val factory = object : ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                return PendingViewModel(repository) as T
+                return PendingViewModel(repository, sessionManager) as T
             }
         }
         viewModel = ViewModelProvider(this, factory)[PendingViewModel::class.java]

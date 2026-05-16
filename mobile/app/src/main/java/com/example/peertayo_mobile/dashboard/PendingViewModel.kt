@@ -11,6 +11,8 @@ import java.util.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import com.example.peertayo_mobile.data.local.SessionManager
+
 
 /**
  * Grouped pending form — mirrors web's client-side groupByForm() logic.
@@ -61,7 +63,11 @@ sealed class PendingState {
     data class Error(val message: String) : PendingState()
 }
 
-class PendingViewModel(private val repository: EvaluationRepository) : ViewModel() {
+
+class PendingViewModel(
+    private val repository: EvaluationRepository,
+    private val sessionManager: SessionManager
+) : ViewModel() {
 
     private val _state = MutableLiveData<PendingState>()
     val state: LiveData<PendingState> = _state
@@ -81,9 +87,14 @@ class PendingViewModel(private val repository: EvaluationRepository) : ViewModel
                 val summaryResult = repository.getSubmittedSummary()
 
                 val rawList = pendingResult.getOrNull() ?: emptyList()
+                val currentUserId = sessionManager.getUserId()
+                
+                // Defensive: Filter out self-evaluations even if returned by backend
+                val filteredList = rawList.filter { it.evaluateeId != currentUserId }
+                
                 submittedThisMonth = summaryResult.getOrNull()?.submittedThisMonth ?: 0
 
-                allForms = groupByForm(rawList)
+                allForms = groupByForm(filteredList)
                 emitFiltered("all")
             } catch (e: Exception) {
                 _state.value = PendingState.Error(e.message ?: "Failed to load")

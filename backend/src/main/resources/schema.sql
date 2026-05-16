@@ -26,3 +26,16 @@ ALTER TABLE user_notification_preferences ADD COLUMN IF NOT EXISTS results_publi
 ALTER TABLE user_notification_preferences ADD COLUMN IF NOT EXISTS form_created         BOOLEAN NOT NULL DEFAULT TRUE;
 ALTER TABLE user_notification_preferences ADD COLUMN IF NOT EXISTS submission_received  BOOLEAN NOT NULL DEFAULT TRUE;
 ALTER TABLE user_notification_preferences ADD COLUMN IF NOT EXISTS system_announcements BOOLEAN NOT NULL DEFAULT TRUE;
+
+-- BR-001: Self-Evaluation Prevention
+ALTER TABLE evaluation_assignments
+DROP CONSTRAINT IF EXISTS chk_evaluator_evaluatee_diff;
+
+ALTER TABLE evaluation_assignments
+ADD CONSTRAINT chk_evaluator_evaluatee_diff
+CHECK (evaluator_id <> evaluatee_id);
+
+-- BR-003: Response Retention & Soft Delete
+ALTER TABLE evaluations
+ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP,
+ADD COLUMN IF NOT EXISTS permanently_closed BOOLEAN DEFAULT FALSE;

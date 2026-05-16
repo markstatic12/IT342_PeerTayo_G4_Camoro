@@ -59,6 +59,9 @@ public class UserNotificationPreference {
             case FORM_CREATED         -> formCreated;
             case SUBMISSION_RECEIVED  -> submissionReceived;
             case SYSTEM               -> systemAnnouncements;
+            case ZERO_SUBMISSIONS     -> true; // Always enabled for now
+            case DEADLINE_EXTENDED    -> true; // Always enabled for now
+            default -> true;
         };
     }
 }

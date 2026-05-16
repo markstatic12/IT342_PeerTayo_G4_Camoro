@@ -18,10 +18,35 @@ const api = createApiClient({
 
     client.interceptors.response.use(
       (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          authSession.clearSession();
-          authEventBus.emit(AUTH_EVENTS.UNAUTHORIZED, { reason: 'token-expired-or-invalid' });
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+          const refreshToken = authSession.getRefreshToken();
+
+          if (refreshToken) {
+            try {
+              // Attempt to refresh token
+              const resp = await client.post('/auth/refresh-silent', { refreshToken });
+              const { token, refreshToken: newRefreshToken, user } = resp.data.data;
+              
+              authSession.setSession({ user, token, refreshToken: newRefreshToken });
+              
+              // Retry original request with new token
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              return client(originalRequest);
+            } catch (refreshError) {
+              // Refresh failed (both tokens expired)
+              authSession.clearSession();
+              authEventBus.emit(AUTH_EVENTS.UNAUTHORIZED, { reason: 'session-expired' });
+              return Promise.reject(refreshError);
+            }
+          } else {
+            // No refresh token available
+            authSession.clearSession();
+            authEventBus.emit(AUTH_EVENTS.UNAUTHORIZED, { reason: 'token-expired-or-invalid' });
+          }
         }
         return Promise.reject(error);
       }

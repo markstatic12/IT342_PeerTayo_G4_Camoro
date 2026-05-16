@@ -121,4 +121,11 @@ class FormsViewModel(private val repository: EvaluationRepository) : ViewModel()
             closed = closed
         )
     }
+    fun deleteEvaluation(id: Long) {
+        viewModelScope.launch {
+            repository.deleteEvaluation(id).onSuccess {
+                loadForms()
+            }
+        }
+    }
 }

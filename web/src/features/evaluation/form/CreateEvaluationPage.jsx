@@ -4,7 +4,9 @@ import { useAuth } from '../../auth/context/AuthContext';
 import { createEvaluation, updateEvaluation, getEvaluationParticipants, getEvaluation } from './evaluationFormService';
 import { searchUsers } from '../../user/search/userService';
 import { useNavigationGuard } from '../../../shared/context/NavigationGuardContext';
+import { Toast } from '../../../shared/components/ui';
 import ExitConfirmModal from '../../../shared/components/ui/ExitConfirmModal';
+
 import './CreateEvaluationPage.css';
 
 /* ── Criteria data ────────────────────────────────────────────────────── */
@@ -419,6 +421,8 @@ export default function CreateEvaluationPage() {
   const [saving,           setSaving]           = useState(false);
   const [apiError,         setApiError]         = useState('');
   const [submitted,        setSubmitted]        = useState(false);
+  const [showRoleToast,    setShowRoleToast]    = useState(false);
+
 
   /* dirty = user has entered anything */
   const isDirty = !!(form.title || form.deadline || form.description ||
@@ -554,13 +558,16 @@ export default function CreateEvaluationPage() {
           evaluateeIds,
         });
       } else {
-        await createEvaluation({
+        const res = await createEvaluation({
           title: form.title,
           description: form.description,
           deadline: form.deadline,
           evaluatorIds,
           evaluateeIds,
         });
+        if (res?.roleUpgraded) {
+          setShowRoleToast(true);
+        }
       }
       clearGuard();
       setSubmitted(true);
@@ -592,6 +599,13 @@ export default function CreateEvaluationPage() {
           <div className="ce-success-title">{isEditMode ? 'Evaluation Updated!' : 'Evaluation Created!'}</div>
           <div className="ce-success-sub">{isEditMode ? 'Your changes have been saved successfully.' : 'Your evaluation form has been saved and participants have been notified.'}</div>
         </div>
+        {showRoleToast && (
+          <Toast 
+            message="Account upgraded! You are now a FACILITATOR." 
+            onDismiss={() => setShowRoleToast(false)}
+            duration={5000}
+          />
+        )}
       </div>
     );
   }
@@ -692,8 +706,8 @@ export default function CreateEvaluationPage() {
                 <div className="ce-rule-note">
                   <IcoInfo />
                   <p>
-                    <strong>Assignment rules:</strong> A user cannot be both evaluator and evaluatee.
-                    As the creator, you are excluded from the evaluator list but may add yourself as an evaluatee.
+                    <strong>Self-Evaluation Restriction:</strong> A user can be both an Evaluator and an Evaluatee, 
+                    but the system will automatically prevent them from evaluating themselves.
                   </p>
                 </div>
 
@@ -704,10 +718,13 @@ export default function CreateEvaluationPage() {
                     label="Evaluators"
                     color="blue"
                     selectedIds={evaluatorIds}
-                    options={allUsers.filter((u) => u.id !== currentUser?.id)}
+                    options={allUsers}
                     search={evaluatorSearch}
                     onSearch={setEvaluatorSearch}
-                    onAdd={(id) => setEvaluatorIds((p) => p.includes(id) ? p : [...p, id])}
+                    onAdd={(id) => {
+                      setEvaluatorIds((p) => (p.includes(id) ? p : [...p, id]));
+                    }}
+
                     onRemove={(id) => setEvaluatorIds((p) => p.filter((x) => x !== id))}
                     usersById={usersById}
                     error={errors.evaluators}
@@ -720,7 +737,10 @@ export default function CreateEvaluationPage() {
                     options={allUsers}
                     search={evaluateeSearch}
                     onSearch={setEvaluateeSearch}
-                    onAdd={(id) => setEvaluateeIds((p) => p.includes(id) ? p : [...p, id])}
+                    onAdd={(id) => {
+                      setEvaluateeIds((p) => (p.includes(id) ? p : [...p, id]));
+                    }}
+
                     onRemove={(id) => setEvaluateeIds((p) => p.filter((x) => x !== id))}
                     usersById={usersById}
                     error={errors.evaluatees}

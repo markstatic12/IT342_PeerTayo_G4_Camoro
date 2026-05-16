@@ -1,4 +1,5 @@
 const TOKEN_KEY = 'token';
+const REFRESH_TOKEN_KEY = 'refresh_token';
 const USER_KEY = 'user';
 
 const parseUser = (rawUser) => {
@@ -14,6 +15,9 @@ export const authSession = {
   getToken() {
     return localStorage.getItem(TOKEN_KEY);
   },
+  getRefreshToken() {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  },
   getUser() {
     return parseUser(localStorage.getItem(USER_KEY));
   },
@@ -24,6 +28,13 @@ export const authSession = {
     }
     localStorage.removeItem(TOKEN_KEY);
   },
+  setRefreshToken(token) {
+    if (token) {
+      localStorage.setItem(REFRESH_TOKEN_KEY, token);
+      return;
+    }
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  },
   setUser(user) {
     if (user) {
       localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -31,12 +42,14 @@ export const authSession = {
     }
     localStorage.removeItem(USER_KEY);
   },
-  setSession({ user, token }) {
+  setSession({ user, token, refreshToken }) {
     this.setUser(user);
     this.setToken(token);
+    this.setRefreshToken(refreshToken);
   },
   clearSession() {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
   },
 };

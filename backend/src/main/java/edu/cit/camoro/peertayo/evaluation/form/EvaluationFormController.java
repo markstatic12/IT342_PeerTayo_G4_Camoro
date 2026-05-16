@@ -21,7 +21,7 @@ public class EvaluationFormController {
     private final EvaluationFormService evaluationFormService;
 
     @PostMapping
-    @PreAuthorize("hasRole('FACILITATOR')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<Map<String, CreatedEvaluationResponse>>> create(
             @Valid @RequestBody CreateEvaluationRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -75,5 +75,29 @@ public class EvaluationFormController {
             @AuthenticationPrincipal UserDetails userDetails) {
         evaluationFormService.delete(id, userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.ok(Map.of("message", "Evaluation deleted successfully")));
+    }
+
+    @PostMapping("/{id}/extend-deadline")
+    @PreAuthorize("hasRole('FACILITATOR')")
+    public ResponseEntity<ApiResponse<Map<String, String>>> extendDeadline(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> payload,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        String newDeadlineStr = payload.get("newDeadline");
+        if (newDeadlineStr == null) {
+            throw new IllegalArgumentException("newDeadline is required");
+        }
+        java.time.LocalDateTime newDeadline = java.time.LocalDateTime.parse(newDeadlineStr);
+        evaluationFormService.extendDeadline(id, newDeadline, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("message", "Deadline extended successfully")));
+    }
+
+    @PostMapping("/{id}/close-permanently")
+    @PreAuthorize("hasRole('FACILITATOR')")
+    public ResponseEntity<ApiResponse<Map<String, String>>> closePermanently(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        evaluationFormService.closePermanently(id, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("message", "Evaluation closed permanently")));
     }
 }

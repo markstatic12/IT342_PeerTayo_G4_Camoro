@@ -81,6 +81,13 @@ class CreateEvaluationActivity : AppCompatActivity() {
 
         binding.btnNext.setOnClickListener {
             val current = binding.viewPager.currentItem
+            val overlap = viewModel.getOverlapCount()
+            
+            if (current == 2 && overlap > 0) {
+                Toast.makeText(this, "❌ Error: Users cannot be in both lists (self-evaluation is not allowed). Please remove overlapping users.", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
             if (viewModel.isValidStep(current)) {
                 if (current < 3) {
                     binding.viewPager.currentItem += 1
@@ -88,7 +95,7 @@ class CreateEvaluationActivity : AppCompatActivity() {
                     publishEvaluation()
                 }
             } else {
-                Toast.makeText(this, "Please complete all required fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please complete all required fields correctly", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -115,8 +122,11 @@ class CreateEvaluationActivity : AppCompatActivity() {
                 evaluatorIds = evaluators,
                 evaluateeIds = evaluatees
             )
-            repository.createEvaluation(request).onSuccess {
-                Toast.makeText(this@CreateEvaluationActivity, "✅ Evaluation Created Successfully!", Toast.LENGTH_LONG).show()
+            repository.createEvaluation(request).onSuccess { res ->
+                Toast.makeText(this@CreateEvaluationActivity, "✅ Evaluation Created Successfully!", Toast.LENGTH_SHORT).show()
+                if (res.evaluation?.roleUpgraded == true) {
+                    Toast.makeText(this@CreateEvaluationActivity, "🎉 Account upgraded! You are now a FACILITATOR.", Toast.LENGTH_LONG).show()
+                }
                 finish()
             }.onFailure { e ->
                 binding.btnNext.isEnabled = true

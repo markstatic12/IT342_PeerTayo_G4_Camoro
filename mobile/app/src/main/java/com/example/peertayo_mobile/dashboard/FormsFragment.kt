@@ -15,6 +15,9 @@ import com.example.peertayo_mobile.data.repository.EvaluationRepository
 import com.example.peertayo_mobile.databinding.FragmentFormsBinding
 import com.example.peertayo_mobile.evaluation.CreateEvaluationActivity
 import android.content.Intent
+import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
+import com.example.peertayo_mobile.data.model.CreatedEvaluation
 
 /**
  * FormsFragment — GAP-04 fix.
@@ -63,9 +66,34 @@ class FormsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = FormsAdapter()
+        adapter = FormsAdapter(
+            onEdit = { ev -> /* TODO: Nav to edit */ },
+            onArchive = { ev -> /* TODO: Archive */ },
+            onDelete = { ev -> showDeleteConfirmation(ev) },
+            onViewResults = { ev -> 
+                val intent = Intent(requireContext(), EvaluationResultsActivity::class.java)
+                intent.putExtra("EVALUATION_ID", ev.id)
+                startActivity(intent)
+            }
+        )
         binding.rvForms.layoutManager = LinearLayoutManager(requireContext())
         binding.rvForms.adapter = adapter
+    }
+
+    private fun showDeleteConfirmation(evaluation: CreatedEvaluation) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Delete this evaluation form?")
+            .setMessage("This evaluation will be deleted. Submitted responses will be retained in evaluatees' results.")
+            .setPositiveButton("Yes, Delete") { _, _ ->
+                deleteEvaluation(evaluation)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteEvaluation(evaluation: CreatedEvaluation) {
+        viewModel.deleteEvaluation(evaluation.id)
+        Toast.makeText(requireContext(), "Evaluation deleted", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupSearch() {

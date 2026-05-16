@@ -36,6 +36,16 @@ public class TokenController {
         return ResponseEntity.ok(ApiResponse.ok(tokenService.refresh(userDetails.getUsername())));
     }
 
+    @PostMapping("/refresh-silent")
+    public ResponseEntity<ApiResponse<AuthResponse>> refreshSilent(
+            @RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+        if (refreshToken == null) {
+            throw new IllegalArgumentException("Refresh token is required");
+        }
+        return ResponseEntity.ok(ApiResponse.ok(tokenService.refreshWithToken(refreshToken)));
+    }
+
     @PostMapping("/promote-to-facilitator")
     public ResponseEntity<ApiResponse<AuthResponse>> promoteToFacilitator(
             @AuthenticationPrincipal UserDetails userDetails) {

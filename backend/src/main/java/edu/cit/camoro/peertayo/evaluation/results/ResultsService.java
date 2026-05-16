@@ -66,7 +66,7 @@ public class ResultsService {
     @Transactional(readOnly = true)
     public EvaluateeSubmissionsResponse getEvaluateeSubmissions(Long evaluationId, Long evaluateeId, String email) {
         User creator = getUser(email);
-        EvaluationForm evaluation = evaluationFormRepository.findByIdAndCreatedBy(evaluationId, creator)
+        EvaluationForm evaluation = evaluationFormRepository.findByIdAndCreatedByAndDeletedAtIsNull(evaluationId, creator)
                 .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
 
         User evaluatee = userRepository.findById(evaluateeId)
@@ -125,7 +125,7 @@ public class ResultsService {
     @Transactional(readOnly = true)
     public EvaluationResultsResponse getEvaluationResults(Long evaluationId, String email) {
         User creator = getUser(email);
-        EvaluationForm evaluation = evaluationFormRepository.findByIdAndCreatedBy(evaluationId, creator)
+        EvaluationForm evaluation = evaluationFormRepository.findByIdAndCreatedByAndDeletedAtIsNull(evaluationId, creator)
                 .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
 
         List<EvaluationAssignment> all = evaluationAssignmentRepository.findAllByEvaluation(evaluation);

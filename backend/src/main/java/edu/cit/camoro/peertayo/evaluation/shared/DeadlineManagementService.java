@@ -1,5 +1,6 @@
 package edu.cit.camoro.peertayo.evaluation.shared;
 
+import edu.cit.camoro.peertayo.auth.entity.User;
 import edu.cit.camoro.peertayo.evaluation.entity.EvaluationAssignment;
 import edu.cit.camoro.peertayo.evaluation.entity.EvaluationForm;
 import edu.cit.camoro.peertayo.evaluation.repository.EvaluationAssignmentRepository;
@@ -7,6 +8,7 @@ import edu.cit.camoro.peertayo.evaluation.repository.EvaluationFormRepository;
 import edu.cit.camoro.peertayo.notification.entity.NotificationType;
 import edu.cit.camoro.peertayo.notification.repository.NotificationRepository;
 import edu.cit.camoro.peertayo.notification.shared.NotificationService;
+import edu.cit.camoro.peertayo.shared.mail.MailService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,7 @@ public class DeadlineManagementService {
     private final EvaluationAssignmentRepository evaluationAssignmentRepository;
     private final NotificationService notificationService;
     private final NotificationRepository notificationRepository;
+    private final MailService mailService;
 
     /**
      * Runs every 5 minutes to:
@@ -61,9 +64,29 @@ public class DeadlineManagementService {
     }
 
     private void closeEvaluation(EvaluationForm evaluation) {
+        // BR-004: Check for zero submissions
+        long submissionCount = evaluationAssignmentRepository.countByEvaluationAndSubmittedTrue(evaluation);
+        
         evaluation.setStatus("CLOSED");
         evaluationFormRepository.save(evaluation);
-        log.info("Auto-closed evaluation {} - deadline passed", evaluation.getId());
+        log.info("Auto-closed evaluation {} - deadline passed (submissions: {})", evaluation.getId(), submissionCount);
+
+        if (submissionCount == 0) {
+            String message = String.format(
+                "Evaluation '%s' has expired with zero submissions. Please choose to extend the deadline or close it permanently.",
+                evaluation.getTitle()
+            );
+            notificationService.send(evaluation.getCreatedBy(), message, NotificationType.ZERO_SUBMISSIONS);
+            log.info("BR-004: Sent zero-submission alert to facilitator for evaluation {}", evaluation.getId());
+            
+            // Email alert placeholder (as per requirement)
+            sendEmailAlert(evaluation.getCreatedBy(), "Zero Submissions for Evaluation: " + evaluation.getTitle(), message);
+        }
+    }
+
+    private void sendEmailAlert(User user, String subject, String body) {
+        mailService.send(user.getEmail(), subject, body);
+        log.info("[EMAIL ALERT] To: {} | Subject: {} | Body: {}", user.getEmail(), subject, body);
     }
 
     private boolean shouldFlagAsNeedsAttention(EvaluationForm evaluation, LocalDateTime now) {

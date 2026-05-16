@@ -26,3 +26,13 @@ export async function unarchiveMyResult(evaluationId) {
   const response = await api.post(`${basePath}/my-results/${evaluationId}/unarchive`);
   return response.data?.data;
 }
+
+export async function extendDeadline(id, newDeadline) {
+  const response = await api.post(`${basePath}/${id}/extend-deadline`, { newDeadline });
+  return response.data?.data;
+}
+
+export async function closePermanently(id) {
+  const response = await api.post(`${basePath}/${id}/close-permanently`);
+  return response.data?.data;
+}

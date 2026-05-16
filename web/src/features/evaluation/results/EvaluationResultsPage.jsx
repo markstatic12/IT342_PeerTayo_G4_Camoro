@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getEvaluationResults } from './evaluationResultsService';
+import { getEvaluationResults, extendDeadline, closePermanently } from './evaluationResultsService';
 import { listCreatedEvaluations } from '../form/evaluationFormService';
 import Skeleton from '../../../shared/components/ui/Skeleton';
 import './EvaluationResultsPage.css';
@@ -76,6 +76,25 @@ export default function EvaluationResultsPage() {
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showExtendModal, setShowExtendModal] = useState(false);
+  const [newDeadline, setNewDeadline] = useState('');
+  const [processing, setProcessing] = useState(false);
+
+  const refreshData = async () => {
+    setLoading(true);
+    try {
+      const [res, list] = await Promise.all([
+        getEvaluationResults(id),
+        listCreatedEvaluations(),
+      ]);
+      setResults(res);
+      setMeta(list.find((e) => String(e.id) === String(id)) ?? null);
+    } catch {
+      setError('Unable to load results right now.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     let alive = true;
@@ -150,7 +169,7 @@ export default function EvaluationResultsPage() {
               {meta?.deadline && <span className="er-meta-dot">·</span>}
               {meta?.createdAt && <span>Created {formatDate(meta.createdAt)}</span>}
               {meta?.createdAt && <span className="er-meta-dot">·</span>}
-              {meta?.submissionProgress && <span>{meta.submissionProgress} submitted</span>}
+              {meta?.submissionProgress && <span>Based on {meta.submissionCount ?? 0} response{meta.submissionCount !== 1 ? 's' : ''}</span>}
               {meta?.status && (
                 <>
                   <span className="er-meta-dot">·</span>
@@ -162,6 +181,30 @@ export default function EvaluationResultsPage() {
               )}
             </div>
           </div>
+
+          {/* BR-004: Zero Submissions Alert */}
+          {meta?.status === 'CLOSED' && meta?.submissionCount === 0 && !meta?.permanentlyClosed && (
+            <div className="er-zero-alert animate-slide-down">
+              <div className="er-zero-alert__icon">
+                <IcoAlert />
+              </div>
+              <div className="er-zero-alert__content">
+                <div className="er-zero-alert__title">No responses received</div>
+                <div className="er-zero-alert__text">
+                  The deadline has passed with zero submissions. You can extend the deadline to give evaluators more time or close it permanently.
+                </div>
+              </div>
+              <div className="er-zero-alert__actions">
+                <button className="er-btn er-btn-outline" onClick={() => setShowExtendModal(true)}>Extend Deadline</button>
+                <button className="er-btn er-btn-danger" onClick={async () => {
+                  if (window.confirm('Are you sure you want to close this evaluation permanently?')) {
+                    await closePermanently(id);
+                    refreshData();
+                  }
+                }}>Close Permanently</button>
+              </div>
+            </div>
+          )}
 
           {/* Section label */}
           <div className="er-section-label">
@@ -208,7 +251,7 @@ export default function EvaluationResultsPage() {
                     {/* Name + sub */}
                     <div className="er-ev-info">
                       <div className="er-ev-name">{name}</div>
-                      <div className="er-ev-sub">{submitted} of {total} evaluators submitted</div>
+                      <div className="er-ev-sub">Based on {submitted} response{submitted !== 1 ? 's' : ''}</div>
                     </div>
 
                     {/* Score boxes — one per submitted evaluator */}
@@ -251,6 +294,41 @@ export default function EvaluationResultsPage() {
             )}
           </div>
         </>
+      )}
+
+      {/* Extend Deadline Modal */}
+      {showExtendModal && (
+        <div className="er-modal-overlay" onClick={() => !processing && setShowExtendModal(false)}>
+          <div className="er-modal" onClick={e => e.stopPropagation()}>
+            <div className="er-modal-title">Extend Deadline</div>
+            <div className="er-modal-text">Select a new future deadline for this evaluation. All assigned evaluators will be re-notified.</div>
+            <input 
+              type="datetime-local" 
+              className="er-input" 
+              value={newDeadline}
+              onChange={e => setNewDeadline(e.target.value)}
+              min={new Date().toISOString().slice(0, 16)}
+            />
+            <div className="er-modal-actions">
+              <button className="er-btn er-btn-ghost" onClick={() => setShowExtendModal(false)} disabled={processing}>Cancel</button>
+              <button className="er-btn er-btn-primary" onClick={async () => {
+                if (!newDeadline) return;
+                setProcessing(true);
+                try {
+                  await extendDeadline(id, new Date(newDeadline).toISOString());
+                  setShowExtendModal(false);
+                  refreshData();
+                } catch (err) {
+                  alert(err.response?.data?.message || 'Failed to extend deadline');
+                } finally {
+                  setProcessing(false);
+                }
+              }} disabled={processing || !newDeadline}>
+                {processing ? 'Extending...' : 'Extend Deadline'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

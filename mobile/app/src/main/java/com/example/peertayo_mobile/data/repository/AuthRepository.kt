@@ -39,6 +39,16 @@ class AuthRepository(private val api: AuthApi) {
         }
     }
 
+    suspend fun refreshSilent(refreshToken: String): Result<AuthResponse?> = runCatching {
+        val response = api.refreshSilent(mapOf("refreshToken" to refreshToken))
+        if (response.isSuccessful) {
+            response.body()?.data
+        } else {
+            val errorMsg = parseError(response.errorBody())
+            throw Exception(errorMsg ?: "Token refresh failed")
+        }
+    }
+
     private fun parseError(errorBody: ResponseBody?): String? {
         return try {
             val json = errorBody?.string()

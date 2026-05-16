@@ -22,11 +22,14 @@ public class AuthResponseBuilder {
     private final UserDetailsService userDetailsService;
 
     public AuthResponse buildForUser(User user) {
-        String token = jwtService.generateToken(
-                userDetailsService.loadUserByUsername(user.getEmail()));
+        var userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+        String token = jwtService.generateToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        
         return AuthResponse.builder()
                 .user(toUserResponse(user))
                 .token(token)
+                .refreshToken(refreshToken)
                 .build();
     }
 

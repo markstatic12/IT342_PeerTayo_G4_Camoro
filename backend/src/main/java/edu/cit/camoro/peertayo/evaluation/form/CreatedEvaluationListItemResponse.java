@@ -15,4 +15,6 @@ public class CreatedEvaluationListItemResponse {
     private String submissionProgress;
     private String status;
     private String description;
+    private long submissionCount;
+    private boolean permanentlyClosed;
 }
