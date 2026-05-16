@@ -76,7 +76,7 @@ class ResultDetailFragment : Fragment() {
         // Header
         binding.tvTitle.text = title
         binding.tvOverallScore.text = String.format("%.1f", average)
-        binding.tvResponseCount.text = "$responses peer response${if (responses != 1) "s" else ""}"
+        binding.tvResponseCount.text = "Based on $responses peer response${if (responses != 1) "s" else ""}"
 
         // Back
         binding.btnBack.setOnClickListener {

@@ -39,6 +39,7 @@ public class SubmissionService {
         return evaluationAssignmentRepository
             .findAllByEvaluatorAndSubmittedFalseAndArchivedByEvaluatorOrderByEvaluationDeadlineAsc(currentUser, archived)
                 .stream()
+                .filter(item -> item.getEvaluation().getDeletedAt() == null) // BR-003: Skip deleted
                 .filter(item -> item.getEvaluation().getDeadline().isAfter(now))
                 .map(item -> PendingEvaluationResponse.builder()
                         .id(item.getEvaluation().getId())
@@ -171,6 +172,10 @@ public class SubmissionService {
 
         EvaluationForm evaluation = assignment.getEvaluation();
         
+        if (evaluation.getDeletedAt() != null) {
+            throw new BusinessRuleException("EVAL-005", "This evaluation has been deleted and no longer accepts submissions");
+        }
+        
         // Prevent submissions on closed evaluations
         if ("CLOSED".equals(evaluation.getStatus())) {
             throw new BusinessRuleException("EVAL-004", "This evaluation is closed and no longer accepts submissions");
@@ -218,6 +223,7 @@ public class SubmissionService {
             .collect(Collectors.groupingBy(r -> r.getAssignment().getId()));
 
         return byEvaluation.values().stream()
+            .filter(group -> group.get(0).getEvaluation().getDeletedAt() == null) // BR-003: Skip deleted
             .map(group -> {
                 EvaluationForm evaluation = group.get(0).getEvaluation();
                 String creatorName = fullName(evaluation.getCreatedBy());

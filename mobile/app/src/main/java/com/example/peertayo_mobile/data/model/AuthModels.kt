@@ -29,6 +29,7 @@ data class RegisterRequest(
 
 data class AuthResponse(
     @SerializedName("token") val token: String?,
+    @SerializedName("refreshToken") val refreshToken: String?,
     @SerializedName("user") val user: UserResponse?
 )
 

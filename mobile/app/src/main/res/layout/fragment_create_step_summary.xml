@@ -124,6 +124,17 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/tvOverlapWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Note: 2 users are in both lists and won't evaluate themselves."
+                android:textColor="@color/orange_warning"
+                android:textSize="12sp"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                android:fontFamily="@font/plus_jakarta_sans" />
+
         </LinearLayout>
 
         <TextView

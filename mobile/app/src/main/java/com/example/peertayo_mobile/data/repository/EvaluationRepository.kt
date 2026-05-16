@@ -17,7 +17,7 @@ class EvaluationRepository(private val api: EvaluationApi) {
     suspend fun submitEvaluation(id: Long, request: SubmitEvaluationRequest): Result<Unit> = runCatching {
         val response = api.submitEvaluation(id, request)
         if (!response.isSuccessful) {
-            throw Exception("Failed to submit evaluation")
+            throw Exception(parseError(response.errorBody()) ?: "Failed to submit evaluation")
         }
     }
 
@@ -139,6 +139,38 @@ class EvaluationRepository(private val api: EvaluationApi) {
         val response = api.updatePreferences(request)
         if (!response.isSuccessful) {
             throw Exception("Failed to update preferences")
+        }
+    }
+
+    suspend fun deleteEvaluation(id: Long): Result<Unit> = runCatching {
+        val response = api.deleteEvaluation(id)
+        if (!response.isSuccessful) {
+            throw Exception("Failed to delete evaluation")
+        }
+    }
+
+    suspend fun extendDeadline(id: Long, newDeadline: String): Result<Unit> = runCatching {
+        val response = api.extendDeadline(id, mapOf("newDeadline" to newDeadline))
+        if (!response.isSuccessful) {
+            throw Exception("Failed to extend deadline")
+        }
+    }
+
+    suspend fun closePermanently(id: Long): Result<Unit> = runCatching {
+        val response = api.closePermanently(id)
+        if (!response.isSuccessful) {
+            throw Exception(parseError(response.errorBody()) ?: "Failed to close permanently")
+        }
+    }
+
+    private fun parseError(errorBody: okhttp3.ResponseBody?): String? {
+        return try {
+            val json = errorBody?.string()
+            val gson = com.google.gson.Gson()
+            val apiResponse = gson.fromJson(json, ApiResponse::class.java)
+            apiResponse.error?.message
+        } catch (e: Exception) {
+            null
         }
     }
 }

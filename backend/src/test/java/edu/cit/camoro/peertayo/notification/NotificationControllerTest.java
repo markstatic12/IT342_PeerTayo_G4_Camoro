@@ -69,7 +69,7 @@ class NotificationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.notifications").isArray())
                 .andExpect(jsonPath("$.data.notifications[0].message")
-                        .value("You have a new evaluation assigned."));
+                        .value("You have been assigned to evaluate: Notif Test"));
     }
 
     @Test

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Input, Button, Toast } from '../../../shared/components/ui';
 import PasswordInput from '../../../shared/components/ui/PasswordInput';
@@ -14,6 +14,8 @@ export default function LoginPage() {
   const [toast, setToast]       = useState(false);
   const { login, loading }      = useAuth();
   const navigate                = useNavigate();
+  const location                = useLocation();
+  const isExpired               = new URLSearchParams(location.search).get('expired') === 'true';
   const googleProvider          = createOAuthProvider('google');
 
   const handleSubmit = async (e) => {
@@ -34,6 +36,11 @@ export default function LoginPage() {
       <p className="ash-form-sub">Sign in to your PeerTayo account</p>
 
       {error && <div className="ash-error">{error}</div>}
+      {isExpired && !error && (
+        <div className="ash-error" style={{ background: 'rgba(234, 179, 8, 0.1)', color: '#eab308', borderColor: '#eab308' }}>
+          Your session has expired. Please sign in again.
+        </div>
+      )}
 
       <form className="ash-form" onSubmit={handleSubmit}>
         <Input

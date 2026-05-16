@@ -1,6 +1,9 @@
 package edu.cit.camoro.peertayo.evaluation.form;
 
+import edu.cit.camoro.peertayo.auth.entity.ERole;
+import edu.cit.camoro.peertayo.auth.entity.Role;
 import edu.cit.camoro.peertayo.auth.entity.User;
+import edu.cit.camoro.peertayo.auth.repository.RoleRepository;
 import edu.cit.camoro.peertayo.auth.repository.UserRepository;
 import edu.cit.camoro.peertayo.evaluation.entity.EvaluationAssignment;
 import edu.cit.camoro.peertayo.evaluation.entity.EvaluationForm;
@@ -12,6 +15,7 @@ import edu.cit.camoro.peertayo.notification.repository.NotificationRepository;
 import edu.cit.camoro.peertayo.notification.shared.NotificationService;
 import edu.cit.camoro.peertayo.shared.exception.BusinessRuleException;
 import edu.cit.camoro.peertayo.shared.exception.ResourceNotFoundException;
+import edu.cit.camoro.peertayo.shared.mail.MailService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,12 +38,28 @@ public class EvaluationFormService {
     private final EvaluationFormRepository evaluationFormRepository;
     private final EvaluationAssignmentRepository evaluationAssignmentRepository;
     private final NotificationService notificationService;
+    private final MailService mailService;
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     @Transactional
     public CreatedEvaluationResponse create(CreateEvaluationRequest request, String creatorEmail) {
         User creator = getUser(creatorEmail);
+        boolean upgraded = false;
+
+        // BR-002: Silent FACILITATOR auto-assignment
+        boolean isFacilitator = creator.getRoles().stream()
+                .anyMatch(r -> r.getName() == ERole.FACILITATOR);
+        
+        if (!isFacilitator) {
+            Role facilitatorRole = roleRepository.findByName(ERole.FACILITATOR)
+                    .orElseThrow(() -> new RuntimeException("Error: Facilitator role not found."));
+            creator.getRoles().add(facilitatorRole);
+            userRepository.save(creator);
+            upgraded = true;
+            log.info("BR-002: Silently auto-assigned FACILITATOR role to user {}", creatorEmail);
+        }
 
         EvaluationForm saved = evaluationFormRepository.save(
                 EvaluationForm.builder()
@@ -59,15 +81,14 @@ public class EvaluationFormService {
         List<EvaluationAssignment> assignments = new ArrayList<>();
         for (User evaluator : evaluators) {
             for (User evaluatee : evaluatees) {
-                if (Objects.equals(evaluator.getId(), evaluatee.getId())) continue;
-                assignments.add(EvaluationAssignment.builder()
-                        .evaluation(saved).evaluator(evaluator)
-                        .evaluatee(evaluatee).submitted(false).build());
+                // BR-001: Self-Evaluation Restriction. A user cannot evaluate themselves.
+                if (!evaluator.getId().equals(evaluatee.getId())) {
+                    assignments.add(EvaluationAssignment.builder()
+                            .evaluation(saved).evaluator(evaluator)
+                            .evaluatee(evaluatee).submitted(false).build());
+                }
             }
         }
-
-        if (assignments.isEmpty())
-            throw new BusinessRuleException("VALID-001", "No valid evaluator-evaluatee assignments could be created");
 
         evaluationAssignmentRepository.saveAll(assignments);
 
@@ -79,14 +100,15 @@ public class EvaluationFormService {
         return CreatedEvaluationResponse.builder()
                 .id(formId).title(formTitle)
                 .deadline(saved.getDeadline()).createdBy(creator.getId())
-                .status(saved.getStatus()).build();
+                .status(saved.getStatus())
+                .roleUpgraded(upgraded).build();
     }
 
     /**
      * Send notifications in a NEW transaction so any failure here
      * never affects the already-committed evaluation creation.
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void sendAssignmentNotifications(List<User> evaluators, String formTitle) {
         try {
             notificationService.sendToAll(
@@ -94,6 +116,20 @@ public class EvaluationFormService {
                     "You have been assigned to evaluate: " + formTitle,
                     NotificationType.EVALUATION_ASSIGNED
             );
+
+            // Also send SMTP email for Google-authenticated users
+            for (User user : evaluators) {
+                if ("GOOGLE".equalsIgnoreCase(user.getProvider())) {
+                    String subject = "New PeerTayo Evaluation Assignment: " + formTitle;
+                    String body = String.format(
+                            "Hello %s,\n\nYou have been assigned a new evaluation form: '%s'.\n" +
+                            "Please login to PeerTayo to complete it.\n\n" +
+                            "Best regards,\nPeerTayo Team",
+                            user.getFirstName(), formTitle
+                    );
+                    mailService.send(user.getEmail(), subject, body);
+                }
+            }
         } catch (Exception e) {
             log.warn("Failed to send assignment notifications (non-critical): {}", e.getMessage());
         }
@@ -104,20 +140,28 @@ public class EvaluationFormService {
      * Runs in its own transaction so failures never affect the caller.
      * Bypasses preference check to ensure delivery.
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void sendAssignmentNotificationsById(List<Long> evaluatorIds, String formTitle) {
         try {
             List<User> evaluators = userRepository.findAllById(evaluatorIds);
-            List<Notification> toSave = evaluators.stream()
-                    .map(u -> Notification.builder()
-                            .user(u)
-                            .message("You have been assigned to evaluate: " + formTitle)
-                            .type(NotificationType.EVALUATION_ASSIGNED)
-                            .read(false)
-                            .build())
-                    .toList();
-            if (!toSave.isEmpty()) {
-                notificationRepository.saveAll(toSave);
+            notificationService.sendToAll(
+                    evaluators,
+                    "You have been assigned to evaluate: " + formTitle,
+                    NotificationType.EVALUATION_ASSIGNED
+            );
+
+            // Also send SMTP email for Google-authenticated users
+            for (User user : evaluators) {
+                if ("GOOGLE".equalsIgnoreCase(user.getProvider())) {
+                    String subject = "New PeerTayo Evaluation Assignment: " + formTitle;
+                    String body = String.format(
+                            "Hello %s,\n\nYou have been assigned a new evaluation form: '%s'.\n" +
+                            "Please login to PeerTayo to complete it.\n\n" +
+                            "Best regards,\nPeerTayo Team",
+                            user.getFirstName(), formTitle
+                    );
+                    mailService.send(user.getEmail(), subject, body);
+                }
             }
         } catch (Exception e) {
             log.warn("Failed to send assignment notifications (non-critical): {}", e.getMessage());
@@ -127,7 +171,8 @@ public class EvaluationFormService {
     @Transactional(readOnly = true)
     public EvaluationParticipantsResponse getParticipants(Long id, String email) {
         User creator = getUser(email);
-        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
+        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedByAndDeletedAtIsNull(id, creator)
+
                 .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
 
         List<EvaluationAssignment> assignments = evaluationAssignmentRepository.findAllByEvaluation(ev);
@@ -165,21 +210,25 @@ public class EvaluationFormService {
     @Transactional(readOnly = true)
     public List<CreatedEvaluationListItemResponse> getCreated(String email) {
         User creator = getUser(email);
-        return evaluationFormRepository.findAllByCreatedByOrderByCreatedAtDesc(creator)
+        return evaluationFormRepository.findAllByCreatedByAndDeletedAtIsNullOrderByCreatedAtDesc(creator)
+
                 .stream().map(ev -> {
                     long total = evaluationAssignmentRepository.countByEvaluation(ev);
                     long submitted = evaluationAssignmentRepository.countByEvaluationAndSubmittedTrue(ev);
                     return CreatedEvaluationListItemResponse.builder()
                             .id(ev.getId()).title(ev.getTitle()).deadline(ev.getDeadline())
                             .createdAt(ev.getCreatedAt()).description(ev.getDescription())
-                            .status(ev.getStatus()).submissionProgress(submitted + "/" + total).build();
+                            .status(ev.getStatus()).submissionProgress(submitted + "/" + total)
+                            .submissionCount(submitted)
+                            .permanentlyClosed(ev.isPermanentlyClosed()).build();
                 }).toList();
     }
 
         @Transactional(readOnly = true)
         public CreatedEvaluationListItemResponse getById(Long id, String email) {
         User creator = getUser(email);
-        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
+        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedByAndDeletedAtIsNull(id, creator)
+
             .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
 
         long total = evaluationAssignmentRepository.countByEvaluation(ev);
@@ -189,13 +238,16 @@ public class EvaluationFormService {
             .id(ev.getId()).title(ev.getTitle()).deadline(ev.getDeadline())
             .createdAt(ev.getCreatedAt()).description(ev.getDescription())
             .status(ev.getStatus()).submissionProgress(submitted + "/" + total)
+            .submissionCount(submitted)
+            .permanentlyClosed(ev.isPermanentlyClosed())
             .build();
         }
 
         @Transactional
         public CreatedEvaluationListItemResponse update(Long id, UpdateEvaluationRequest request, String email) {
         User creator = getUser(email);
-        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
+        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedByAndDeletedAtIsNull(id, creator)
+
                 .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
 
         ev.setTitle(request.getTitle().trim());
@@ -217,10 +269,61 @@ public class EvaluationFormService {
     @Transactional
     public void delete(Long id, String email) {
         User creator = getUser(email);
-        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedBy(id, creator)
+        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedByAndDeletedAtIsNull(id, creator)
                 .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
-        evaluationAssignmentRepository.deleteAllByEvaluation(ev);
-        evaluationFormRepository.delete(ev);
+        
+        // BR-003: Soft delete by setting deleted_at. Responses in assignments are retained.
+        ev.setDeletedAt(LocalDateTime.now());
+        evaluationFormRepository.save(ev);
+        log.info("BR-003: Soft-deleted evaluation {} (responses retained)", id);
+    }
+
+    @Transactional
+    public void extendDeadline(Long id, LocalDateTime newDeadline, String email) {
+        User creator = getUser(email);
+        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedByAndDeletedAtIsNull(id, creator)
+                .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+
+        if (newDeadline.isBefore(LocalDateTime.now())) {
+            throw new BusinessRuleException("BR-004", "New deadline must be in the future.");
+        }
+
+        ev.setDeadline(newDeadline);
+        ev.setStatus("ACTIVE");
+        evaluationFormRepository.save(ev);
+
+        // Notify evaluators about the extension (BR-005: only those who haven't submitted)
+        List<User> evaluators = evaluationAssignmentRepository.findAllByEvaluation(ev)
+                .stream()
+                .filter(a -> !a.isSubmitted())
+                .map(EvaluationAssignment::getEvaluator)
+                .distinct()
+                .toList();
+        
+        String message = String.format("The deadline for evaluation '%s' has been extended to %s. Please submit your responses before then.", 
+                ev.getTitle(), newDeadline.format(java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a")));
+        
+        notificationService.sendToAll(evaluators, message, NotificationType.DEADLINE_EXTENDED);
+        
+        // BR-005: SMTP Email Notification for unsubmitted evaluators
+        String subject = "Deadline Extended: " + ev.getTitle();
+        for (User evaluator : evaluators) {
+            mailService.send(evaluator.getEmail(), subject, message);
+        }
+
+        log.info("BR-005: Extended deadline for evaluation {} to {}. Notified {} evaluators via In-App and SMTP.", id, newDeadline, evaluators.size());
+    }
+
+    @Transactional
+    public void closePermanently(Long id, String email) {
+        User creator = getUser(email);
+        EvaluationForm ev = evaluationFormRepository.findByIdAndCreatedByAndDeletedAtIsNull(id, creator)
+                .orElseThrow(() -> new ResourceNotFoundException("Evaluation not found"));
+
+        ev.setStatus("CLOSED");
+        ev.setPermanentlyClosed(true);
+        evaluationFormRepository.save(ev);
+        log.info("BR-004: Permanently closed evaluation {} (zero submissions received)", id);
     }
 
     private User getUser(String email) {

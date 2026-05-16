@@ -358,7 +358,8 @@ export default function MyResultsPage() {
                           </div>
                         </div>
                         <div className="ec-meta">
-                          <span>{ev.responses ?? 0} responses</span><span className="ec-sep"></span><span>{formatDate(ev.submittedAt)}</span>
+                          <span>By {ev.createdByName ?? '—'}</span><span className="ec-sep"></span>
+                          <span>Based on {ev.responses ?? 0} response{ev.responses !== 1 ? 's' : ''}</span><span className="ec-sep"></span><span>{formatDate(ev.submittedAt)}</span>
                         </div>
                         <div className="ec-bar-wrap">
                           <div className="ec-bar-track"><div className="ec-bar-fill" style={{ width: `${pct}%`, background: barColor(ev.colorKey) }} /></div>
@@ -382,7 +383,7 @@ export default function MyResultsPage() {
                     <div className="dh-left">
                       <div className="dh-title">{selected.title}</div>
                       <div className="dh-meta">
-                        <span>{selected.responses ?? 0} peer responses</span>
+                        <span>Based on {selected.responses ?? 0} peer response{selected.responses !== 1 ? 's' : ''}</span>
                         <span className="dh-sep" />
                         <span>{formatDate(selected.submittedAt)}</span>
                         <span className="dh-sep" />
@@ -456,7 +457,7 @@ export default function MyResultsPage() {
             <div className="modal-head">
               <div>
                 <div className="modal-title">{selected.title}</div>
-                <div className="modal-sub">{selected.responses ?? 0} responses · {formatDate(selected.submittedAt)} · Created by {selected.createdByName ?? '—'}</div>
+                <div className="modal-sub">Based on {selected.responses ?? 0} response{selected.responses !== 1 ? 's' : ''} · {formatDate(selected.submittedAt)} · Created by {selected.createdByName ?? '—'}</div>
               </div>
               <div className="modal-close" onClick={handleCloseModal}>×</div>
             </div>
@@ -468,7 +469,7 @@ export default function MyResultsPage() {
                   <div className="msh-badge">{selected.overallAverage >= 4.5 ? '✓ Excellent' : selected.overallAverage >= 4.0 ? '✓ Above Goal' : 'Needs Improvement'}</div>
                 </div>
                 <div className="modal-info-box">
-                  <div className="mib-row"><span className="mib-lbl">Responses</span><span className="mib-val">{selected.responses ?? 0} peers</span></div>
+                  <div className="mib-row"><span className="mib-lbl">Responses</span><span className="mib-val">Based on {selected.responses ?? 0} peer{selected.responses !== 1 ? 's' : ''}</span></div>
                   <div className="mib-row"><span className="mib-lbl">Submitted</span><span className="mib-val">{formatDate(selected.submittedAt)}</span></div>
                   <div className="mib-row"><span className="mib-lbl">Created by</span><span className="mib-val">{selected.createdByName ?? '—'}</span></div>
                   <div className="mib-row"><span className="mib-lbl">Criteria</span><span className="mib-val">10 / 10</span></div>

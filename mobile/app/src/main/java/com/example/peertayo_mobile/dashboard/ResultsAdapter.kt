@@ -26,8 +26,10 @@ class ResultsAdapter(
 
         fun bind(item: EvaluationResultSummary) {
             binding.tvTitle.text = item.title
+            binding.tvFacilitator.text = "By ${item.createdByName ?: "—"}"
             binding.tvScore.text = String.format("%.1f", item.overallAverage ?: 0.0)
-            binding.tvResponses.text = "${item.totalResponses ?: 0} responses"
+            val responses = item.totalResponses ?: 0
+            binding.tvResponses.text = "Based on $responses response${if (responses != 1) "s" else ""}"
             binding.root.setOnClickListener { onClick(item) }
 
             // Context Menu (GAP-01)

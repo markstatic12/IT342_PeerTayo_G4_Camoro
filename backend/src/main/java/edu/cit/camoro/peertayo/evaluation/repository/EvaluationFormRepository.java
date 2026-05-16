@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface EvaluationFormRepository extends JpaRepository<EvaluationForm, Long> {
 
-    List<EvaluationForm> findAllByCreatedByOrderByCreatedAtDesc(User createdBy);
+    List<EvaluationForm> findAllByCreatedByAndDeletedAtIsNullOrderByCreatedAtDesc(User createdBy);
 
-    Optional<EvaluationForm> findByIdAndCreatedBy(Long id, User createdBy);
+    Optional<EvaluationForm> findByIdAndCreatedByAndDeletedAtIsNull(Long id, User createdBy);
 }

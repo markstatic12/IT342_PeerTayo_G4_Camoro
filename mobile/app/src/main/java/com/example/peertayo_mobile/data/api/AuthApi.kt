@@ -17,4 +17,7 @@ interface AuthApi {
 
     @POST("auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<ApiResponse<AuthResponse>>
+
+    @POST("auth/refresh-silent")
+    suspend fun refreshSilent(@Body request: Map<String, String>): Response<ApiResponse<AuthResponse>>
 }

@@ -81,14 +81,24 @@ class EvaluationFormControllerTest {
     }
 
     @Test
-    @DisplayName("POST /evaluations — respondent gets 403")
-    void create_asRespondent_forbidden() throws Exception {
+    @DisplayName("POST /evaluations — respondent is auto-promoted and can create")
+    void create_asRespondent_autoPromoted() throws Exception {
+        Long evaluatorId2 = TestHelper.registerAndGetUserId(mockMvc, "evaluator3@test.com", "pass123");
         mockMvc.perform(post("/api/v1/evaluations")
                         .header("Authorization", "Bearer " + respondentToken)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .content(createBody(evaluateeId, evaluatorId2)))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("POST /evaluations — self-evaluation is skipped silently (BR-001)")
+    void create_selfEvaluation_skipped() throws Exception {
+        mockMvc.perform(post("/api/v1/evaluations")
+                        .header("Authorization", "Bearer " + facilitatorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(createBody(evaluateeId, evaluateeId)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.error.code").value("AUTH-003"));
+                .andExpect(status().isCreated());
     }
 
     @Test

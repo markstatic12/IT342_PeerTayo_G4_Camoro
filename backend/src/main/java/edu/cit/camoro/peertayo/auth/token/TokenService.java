@@ -5,6 +5,7 @@ import edu.cit.camoro.peertayo.auth.entity.Role;
 import edu.cit.camoro.peertayo.auth.entity.User;
 import edu.cit.camoro.peertayo.auth.repository.RoleRepository;
 import edu.cit.camoro.peertayo.auth.repository.UserRepository;
+import edu.cit.camoro.peertayo.auth.security.JwtService;
 import edu.cit.camoro.peertayo.auth.shared.AuthResponseBuilder;
 import edu.cit.camoro.peertayo.auth.shared.UserResponse;
 import edu.cit.camoro.peertayo.shared.exception.ResourceNotFoundException;
@@ -19,9 +20,21 @@ public class TokenService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final AuthResponseBuilder authResponseBuilder;
+    private final JwtService jwtService;
 
     @Transactional(readOnly = true)
     public AuthResponse refresh(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return authResponseBuilder.buildForUser(user);
+    }
+
+    @Transactional(readOnly = true)
+    public AuthResponse refreshWithToken(String refreshToken) {
+        if (jwtService.isTokenExpired(refreshToken)) {
+            throw new RuntimeException("Refresh token expired");
+        }
+        String email = jwtService.extractEmail(refreshToken);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return authResponseBuilder.buildForUser(user);

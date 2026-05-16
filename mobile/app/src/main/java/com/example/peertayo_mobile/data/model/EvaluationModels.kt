@@ -68,6 +68,7 @@ data class QuestionAverage(
 data class EvaluationResultSummary(
     @SerializedName("evaluationId") val evaluationId: Long,
     @SerializedName("title") val title: String,
+    @SerializedName("createdByName") val createdByName: String?,
     @SerializedName("overallAverage") val overallAverage: Double?,
     @SerializedName("totalResponses") val totalResponses: Int?,
     @SerializedName("submittedAt") val submittedAt: String?,
@@ -106,7 +107,9 @@ data class CreatedEvaluation(
     @SerializedName("evaluatorCount") val evaluatorCount: Int?,
     @SerializedName("evaluateeCount") val evaluateeCount: Int?,
     @SerializedName("submissionCount") val submissionCount: Int?,
-    @SerializedName("totalExpectedSubmissions") val totalExpectedSubmissions: Int?
+    @SerializedName("totalExpectedSubmissions") val totalExpectedSubmissions: Int?,
+    @SerializedName("roleUpgraded") val roleUpgraded: Boolean?,
+    @SerializedName("permanentlyClosed") val permanentlyClosed: Boolean?
 )
 
 data class CreateEvaluationRequest(

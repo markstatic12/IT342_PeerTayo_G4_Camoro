@@ -20,7 +20,12 @@ import java.util.Locale
  * - submissionProgress formatted as "N/M" from submissionCount + totalExpectedSubmissions (GAP-11)
  * - Deadline formatted from ISO string to human-readable "MMM d, yyyy"
  */
-class FormsAdapter : ListAdapter<CreatedEvaluation, FormsAdapter.ViewHolder>(DIFF) {
+class FormsAdapter(
+    private val onEdit: (CreatedEvaluation) -> Unit,
+    private val onArchive: (CreatedEvaluation) -> Unit,
+    private val onDelete: (CreatedEvaluation) -> Unit,
+    private val onViewResults: (CreatedEvaluation) -> Unit
+) : ListAdapter<CreatedEvaluation, FormsAdapter.ViewHolder>(DIFF) {
 
     companion object {
         private val DIFF = object : DiffUtil.ItemCallback<CreatedEvaluation>() {
@@ -75,6 +80,7 @@ class FormsAdapter : ListAdapter<CreatedEvaluation, FormsAdapter.ViewHolder>(DIF
             binding.tvDeadline.text = formatDeadline(item.deadline)
 
             // Context Menu (GAP-04)
+            binding.root.setOnClickListener { onViewResults(item) }
             binding.btnMenu.setOnClickListener { view ->
                 val popup = android.widget.PopupMenu(view.context, view)
                 popup.menu.add("View Results")
@@ -84,10 +90,10 @@ class FormsAdapter : ListAdapter<CreatedEvaluation, FormsAdapter.ViewHolder>(DIF
                 
                 popup.setOnMenuItemClickListener { menuItem ->
                     when (menuItem.title) {
-                        "View Results" -> { /* TODO: Nav to ResultsDetail */ true }
-                        "Edit" -> { /* TODO: Nav to EditEvaluation */ true }
-                        "Archive" -> { /* TODO: API Archive */ true }
-                        "Delete" -> { /* TODO: API Delete */ true }
+                        "View Results" -> { onViewResults(item); true }
+                        "Edit" -> { onEdit(item); true }
+                        "Archive" -> { onArchive(item); true }
+                        "Delete" -> { onDelete(item); true }
                         else -> false
                     }
                 }

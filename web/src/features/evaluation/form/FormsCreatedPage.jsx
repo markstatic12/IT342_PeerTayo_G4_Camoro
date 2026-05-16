@@ -229,7 +229,7 @@ function DeleteModal({ evaluation, onClose, onDeleted }) {
         </div>
         <div className="fc-delete-title">Delete this evaluation form?</div>
         <div className="fc-delete-body">
-          This form will be permanently deleted. Submitted responses will be retained in evaluatees' results and will not be lost.
+          This evaluation will be deleted. Submitted responses will be retained in evaluatees' results.
         </div>
         {error && <div className="fc-modal__error">{error}</div>}
         <div className="fc-modal__foot fc-modal__foot--center">

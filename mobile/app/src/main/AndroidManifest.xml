@@ -60,6 +60,11 @@
         <activity
             android:name=".settings.SettingsActivity"
             android:theme="@style/Theme.Peertayomobile.NoActionBar" />
+        <activity
+            android:name=".evaluation.EvaluationResultsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.PeerTayo" />
     </application>
 
 </manifest>

@@ -10,6 +10,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => authSession.getUser());
   const [token, setToken] = useState(() => authSession.getToken());
+  const [refreshToken, setRefreshToken] = useState(() => authSession.getRefreshToken());
   const [loading, setLoading] = useState(false);
 
   // On mount, if a token exists refresh it so roles are always current from DB
@@ -20,14 +21,13 @@ export function AuthProvider({ children }) {
     api.post('/auth/refresh', null, {
       headers: { Authorization: `Bearer ${storedToken}` },
     }).then((res) => {
-      const { user: userData, token: newToken } = adaptAuthPayload(res.data.data);
+      const { user: userData, token: newToken, refreshToken: newRefresh } = adaptAuthPayload(res.data.data);
       if (userData) setUser(userData);
       if (newToken) setToken(newToken);
+      if (newRefresh) setRefreshToken(newRefresh);
     }).catch(() => {
-      // Token is expired or invalid — clear session and let the user log in again
-      authSession.clearSession();
-      setUser(null);
-      setToken(null);
+      // Access token invalid — try refresh token via interceptor (automatic)
+      // or just wait for the first real API call to fail and trigger it
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -37,15 +37,28 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   useEffect(() => {
+    authSession.setRefreshToken(refreshToken);
+  }, [refreshToken]);
+
+  useEffect(() => {
     authSession.setUser(user);
   }, [user]);
 
   useEffect(() => {
-    const unsubscribeUnauthorized = authEventBus.on(AUTH_EVENTS.UNAUTHORIZED, () => {
+    const unsubscribeUnauthorized = authEventBus.on(AUTH_EVENTS.UNAUTHORIZED, (data) => {
       setUser(null);
       setToken(null);
+      setRefreshToken(null);
+      authSession.clearSession();
+      
       if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+        if (data?.reason === 'session-expired') {
+          // Trigger a modal or toast via app state if possible
+          // For now, redirect with a query param
+          window.location.href = '/login?expired=true';
+        } else {
+          window.location.href = '/login';
+        }
       }
     });
 
@@ -58,9 +71,10 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const res = await api.post('/auth/register', { firstName, lastName, email, password });
-      const { user: userData, token: jwt } = adaptAuthPayload(res.data.data);
+      const { user: userData, token: jwt, refreshToken: rt } = adaptAuthPayload(res.data.data);
       setUser(userData);
       setToken(jwt);
+      setRefreshToken(rt);
       return { success: true };
     } catch (err) {
       const msg = err.response?.data?.error?.message || 'Registration failed';
@@ -74,9 +88,10 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const res = await api.post('/auth/login', { email, password });
-      const { user: userData, token: jwt } = adaptAuthPayload(res.data.data);
+      const { user: userData, token: jwt, refreshToken: rt } = adaptAuthPayload(res.data.data);
       setUser(userData);
       setToken(jwt);
+      setRefreshToken(rt);
       return { success: true };
     } catch (err) {
       const msg = err.response?.data?.error?.message || 'Invalid email or password';
@@ -118,9 +133,10 @@ export function AuthProvider({ children }) {
   const promoteToFacilitator = async () => {
     try {
       const res = await api.post('/auth/promote-to-facilitator');
-      const { user: userData, token: newToken } = adaptAuthPayload(res.data.data);
+      const { user: userData, token: newToken, refreshToken: newRefresh } = adaptAuthPayload(res.data.data);
       if (userData) setUser(userData);
       if (newToken) setToken(newToken);
+      if (newRefresh) setRefreshToken(newRefresh);
       return { success: true, user: userData };
     } catch (err) {
       const msg = err.response?.data?.error?.message || 'Promotion failed';

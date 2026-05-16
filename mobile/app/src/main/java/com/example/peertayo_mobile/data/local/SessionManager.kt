@@ -11,6 +11,7 @@ class SessionManager(context: Context) {
     companion object {
         private const val PREF_NAME = "peertayo_session"
         private const val KEY_TOKEN = "jwt_token"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_USER_ID = "user_id"
         private const val KEY_FIRST_NAME = "first_name"
         private const val KEY_LAST_NAME = "last_name"
@@ -18,9 +19,10 @@ class SessionManager(context: Context) {
         private const val KEY_ROLE = "role"
     }
 
-    fun saveSession(token: String, userId: Long, firstName: String, lastName: String, email: String, role: String) {
+    fun saveSession(token: String, refreshToken: String?, userId: Long, firstName: String, lastName: String, email: String, role: String) {
         prefs.edit()
             .putString(KEY_TOKEN, token)
+            .putString(KEY_REFRESH_TOKEN, refreshToken)
             .putLong(KEY_USER_ID, userId)
             .putString(KEY_FIRST_NAME, firstName)
             .putString(KEY_LAST_NAME, lastName)
@@ -30,6 +32,8 @@ class SessionManager(context: Context) {
     }
 
     fun getToken(): String? = prefs.getString(KEY_TOKEN, null)
+
+    fun getRefreshToken(): String? = prefs.getString(KEY_REFRESH_TOKEN, null)
 
     fun getUserId(): Long = prefs.getLong(KEY_USER_ID, -1L)
 
